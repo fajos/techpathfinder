@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+// screens/QuestionnaireScreen.js
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,8 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { useTranslation } from "react-i18next";
-import { ThemeContext } from "../utils/ThemeContext";
+import { useThemeStyles } from "../hooks/useThemeStyles";
 import useNetworkStatus from "../hooks/useNetworkStatus";
 import NetworkBanner from "../components/NetworkBanner";
 import ThreeDButton from "../components/ThreeDButton";
@@ -15,32 +15,151 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const QuestionnaireScreen = ({ navigation }) => {
   const [answers, setAnswers] = useState({});
-  const { t } = useTranslation();
-  const { isDark } = useContext(ThemeContext);
+  const { colors, isDark } = useThemeStyles();
   const isConnected = useNetworkStatus();
 
-  const questions = t("questionnaire.questions", { returnObjects: true });
+  // Your original questions - hardcoded in English (since removing i18n)
+  const questions = [
+    {
+      q: "What kind of problems do you enjoy solving?",
+      options: [
+        "Building apps or tools",
+        "Designing things that look great",
+        "Helping people fix their tech",
+        "Understanding how systems work",
+        "Finding security flaws or risks",
+        "Organizing data to get insights"
+      ]
+    },
+    {
+      q: "Which of these sounds most exciting to you?",
+      options: [
+        "Creating a mobile app",
+        "Training an AI model",
+        "Designing user interfaces",
+        "Working with hardware or devices",
+        "Automating repetitive tasks",
+        "Managing cloud infrastructure"
+      ]
+    },
+    {
+      q: "What would you like to learn more about?",
+      options: [
+        "Cloud services (AWS, Azure, GCP)",
+        "Cybersecurity and ethical hacking",
+        "No-code tools and automation",
+        "Programming languages",
+        "Designing digital products",
+        "Analyzing or visualizing data"
+      ]
+    },
+    {
+      q: "Which of these tools or platforms have you heard of or used?",
+      options: [
+        "Figma or Canva",
+        "Python or JavaScript",
+        "SQL or Excel or Google Sheets",
+        "Unity or Unreal Engine",
+        "ChatGPT or AI tools",
+        "Bubble, Glide, or Zapier",
+        "Agile or Scrum"
+      ]
+    },
+    {
+      q: "How do you prefer to work?",
+      options: [
+        "Alone solving deep problems",
+        "In teams building big products",
+        "Helping users and customers",
+        "Designing beautiful interfaces",
+        "Exploring and analyzing data",
+        "Automating systems and workflows"
+      ]
+    },
+    {
+      q: "Which of these do you find most interesting?",
+      options: [
+        "Machine learning and AI",
+        "Website or app development",
+        "System administration",
+        "Data analysis and charts",
+        "Blockchain or crypto tech",
+        "Voice assistants and smart devices"
+      ]
+    },
+    {
+      q: "Which statement best describes you?",
+      options: [
+        "I like solving puzzles or coding challenges",
+        "I enjoy storytelling and making things simple",
+        "I'm very organized and like to plan and manage",
+        "I like drawing, designing, and prototyping",
+        "I enjoy working with devices, gadgets, or circuits",
+        "I love exploring new tech like AI, AR, or VR"
+      ]
+    },
+    {
+      q: "If given a week to explore, what would you do?",
+      options: [
+        "Build a website or blog",
+        "Design an app interface",
+        "Create an AI chatbot",
+        "Analyze data from a spreadsheet",
+        "Fix a broken laptop or troubleshoot Wi-Fi",
+        "Create a game or animation"
+      ]
+    },
+    {
+      q: "What industries or domains are you most curious about?",
+      options: [
+        "Health, finance, or education",
+        "Gaming and interactive media",
+        "Cybersecurity and privacy",
+        "Startups and digital products",
+        "IoT, robotics, and automation",
+        "Marketing and digital content"
+      ]
+    },
+    {
+      q: "How comfortable are you with technical concepts right now?",
+      options: [
+        "Very new to tech",
+        "Some familiarity, still learning",
+        "Intermediate — I’ve built a few things",
+        "Comfortable with coding",
+        "I’m more visual or creative",
+        "I prefer managing people or systems"
+      ]
+    }
+  ];
 
-  const handleSelect = (questionId, optionKey) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionKey }));
-  };
+  const handleSelect = (questionId, optionText) => {
+  setAnswers((prev) => ({ ...prev, [questionId]: optionText }));
+};
 
   const handleSubmit = () => {
     navigation.navigate("Result", { answers });
   };
 
+  const isComplete = Object.keys(answers).length === questions.length;
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={[
           styles.container,
-          { backgroundColor: isDark ? "#111827" : "#F8F8FF" },
+          { backgroundColor: colors.background },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         <NetworkBanner isConnected={isConnected} />
 
-        <Text style={[styles.heading, { color: isDark ? "#f9fafb" : "#111827" }]}>
-          {t("title")}
+        <Text style={[styles.heading, { color: colors.text }]}>
+          🚀 Discover Your Tech Career Path
+        </Text>
+
+        <Text style={[styles.subheading, { color: colors.textSecondary }]}>
+          Answer these 10 questions to find your ideal career match
         </Text>
 
         {questions.map((q, index) => {
@@ -52,56 +171,48 @@ const QuestionnaireScreen = ({ navigation }) => {
               style={[
                 styles.questionBox,
                 {
-                  backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                  borderColor: isDark ? "#374151" : "#e5e7eb",
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
                 },
               ]}
             >
               <Text
                 style={[
                   styles.questionText,
-                  { color: isDark ? "#f9fafb" : "#111827" },
+                  { color: colors.text },
                 ]}
               >
-                {`${questionId}. ${t(q.q)}`}
+                {`${questionId}. ${q.q}`}
               </Text>
 
               <View style={styles.optionsContainer}>
-                {q.options.map((optionKey, i) => {
-                  const selected = answers[questionId] === optionKey;
+                {q.options.map((option, optIndex) => {
+                  const selected = answers[questionId] === option; // Compare text, not index
 
                   return (
                     <TouchableOpacity
-                      key={`${questionId}_${i}`}
-                      onPress={() => handleSelect(questionId, optionKey)}
+                      key={`${questionId}_${optIndex}`}
+                      onPress={() => handleSelect(questionId, option)} // Pass the actual option text
                       style={[
                         styles.option,
                         {
                           backgroundColor: selected
-                            ? isDark
-                              ? "#6366f1"
-                              : "#3b82f6"
+                            ? colors.primary
                             : isDark
-                            ? "#374151"
-                            : "#f3f4f6",
-                          borderColor: selected
-                            ? isDark
-                              ? "#4f46e5"
-                              : "#2563eb"
-                            : isDark
-                            ? "#4b5563"
-                            : "#e5e7eb",
+                              ? "#374151"
+                              : "#f3f4f6",
+                          borderColor: selected ? colors.primary : colors.border,
                         },
                       ]}
                     >
                       <Text
                         style={{
-                          color: selected ? "#fff" : isDark ? "#f3f4f6" : "#111827",
+                          color: selected ? "#fff" : colors.text,
                           fontSize: 14,
                           fontWeight: selected ? "700" : "500",
                         }}
                       >
-                        {t(optionKey)}
+                        {option}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -114,12 +225,14 @@ const QuestionnaireScreen = ({ navigation }) => {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {Object.keys(answers).length === questions.length && (
-        <ThreeDButton
-          title={t("submit")}
-          onPress={handleSubmit}
-          gradient
-        />
+      {isComplete && (
+        <View style={[styles.submitContainer, { backgroundColor: colors.background }]}>
+          <ThreeDButton
+            title="🎯 Show My Career Path"
+            onPress={handleSubmit}
+            gradient
+          />
+        </View>
       )}
     </SafeAreaView>
   );
@@ -128,57 +241,59 @@ const QuestionnaireScreen = ({ navigation }) => {
 export default QuestionnaireScreen;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     padding: 16,
     paddingBottom: 40,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 8,
     textAlign: "center",
   },
+  subheading: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 20,
+  },
   questionBox: {
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 18,
     marginBottom: 20,
     shadowColor: "#000",
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
+    shadowRadius: 8,
+    elevation: 3,
   },
   questionText: {
     fontSize: 17,
     fontWeight: "600",
     marginBottom: 14,
+    lineHeight: 24,
   },
   optionsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
   },
   option: {
     borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 25,
     marginBottom: 8,
     marginRight: 8,
   },
-  submitBtn: {
-    backgroundColor: "#10b981",
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    borderTopWidth: 1,
-    borderColor: "#d1d5db",
-  },
-  submitText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+  submitContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderTopWidth: 0,
   },
 });

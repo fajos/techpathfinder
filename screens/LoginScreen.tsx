@@ -56,7 +56,7 @@ export default function LoginScreen() {
       <View style={styles.header}>
         <Ionicons name="person-circle" size={64} color="#4f46e5" />
         <Text style={[styles.title, { color: colors.text }]}>
-          {isLogin ? 'Welcome Back' : 'Create Account'}
+          {isLogin ? 'Welcome' : 'Create Account'}
         </Text>
       </View>
 

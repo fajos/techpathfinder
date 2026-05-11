@@ -33,6 +33,8 @@ import ResumeBuilderScreen from "./screens/ResumeBuilderScreen";
 import SavedResumesScreen from "./screens/SavedResumesScreen";
 import ProjectIdeasScreen from "./screens/ProjectIdeasScreen";
 import MockInterviewScreen from "./screens/MockInterviewScreen";
+import { useThemeStyles } from './hooks/useThemeStyles';
+import { ThemeContext } from './utils/ThemeContext';
 
 
 const Tab = createBottomTabNavigator();
@@ -90,6 +92,26 @@ export default AppWrapper;
 
 const RootNavigator = () => {
   const { user, initialized } = useAuth();
+  const { colors, isDark } = useThemeStyles();
+
+  const screenOptions = {
+  headerShown: true,
+  headerStyle: {
+    backgroundColor: colors.card,
+    shadowColor: isDark ? '#000' : '#e5e7eb',
+    elevation: 0,
+  },
+  headerTitleStyle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  headerTintColor: colors.primary, // This controls the back button color
+  headerBackTitleStyle: {
+    color: colors.textSecondary,
+  },
+  headerShadowVisible: false,
+};
   
   if (!initialized) {
     return (
@@ -99,33 +121,32 @@ const RootNavigator = () => {
     );
   }
   
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!user ? (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      ) : (
-        <>
-          <Stack.Screen name="Splash" component={SplashScreen} />
-          <Stack.Screen name="Main" component={MainTabs} />
-          <Stack.Screen name="Result" component={ResultScreen} options={{headerShown: true, title: 'Result', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="DashboardLock" component={DashboardLockScreen} options={{headerShown: true, title: 'Dashboard Lock', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="DashboardReal" component={DashboardScreen} options={{headerShown: true, title: 'Dashboard', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="About" component={AboutScreen} />
-          <Stack.Screen name="ChangePasscode" component={ChangePasscodeScreen} />
-          <Stack.Screen name="CareerExplorer" component={CareerExplorerScreen} options={{headerShown: true, title: 'Career Explorer', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="ProjectIdeas" component={ProjectIdeasScreen} />
-          <Stack.Screen name="MockInterview" component={MockInterviewScreen} />
-          <Stack.Screen name="SavedResumes" component={SavedResumesScreen} options={{headerShown: true, title: 'Saved Resumes', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="Premium" component={PremiumScreen} options={{headerShown: true, title: 'Premium', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="ResumeBuilder" component={ResumeBuilderScreen} options={{headerShown: true, title: 'Resume Builder', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: true, title: 'Profile', headerBackTitle: 'Back'}} />
-          <Stack.Screen name="SkillGap" component={SkillGapScreen} options={{headerShown: true, title: 'Skill Gap', headerBackTitle: 'Back'}}  />
-          <Stack.Screen name="LearningPlan" component={LearningPlanScreen} options={{headerShown: true, title: 'Learning Plan', headerBackTitle: 'Back'}} 
-/>
-        </>
-      )}
-    </Stack.Navigator>
-  );
+return (
+  <Stack.Navigator screenOptions={screenOptions}>
+    {!user ? (
+      <Stack.Screen name="Login" component={LoginScreen} />
+    ) : (
+      <>
+        <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Screen name="Result" component={ResultScreen} options={{ title: 'Result' }} />
+        <Stack.Screen name="DashboardLock" component={DashboardLockScreen} options={{ title: 'Dashboard Lock' }} />
+        <Stack.Screen name="DashboardReal" component={DashboardScreen} options={{ title: 'Dashboard' }} />
+        <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="ChangePasscode" component={ChangePasscodeScreen} />
+        <Stack.Screen name="CareerExplorer" component={CareerExplorerScreen} options={{ title: 'Career Explorer' }} />
+        <Stack.Screen name="ProjectIdeas" component={ProjectIdeasScreen} options={{ title: 'Projects' }} />
+        <Stack.Screen name="MockInterview" component={MockInterviewScreen} options={{ title: 'Mock Interview' }} />
+        <Stack.Screen name="SavedResumes" component={SavedResumesScreen} options={{ title: 'Saved Resumes' }} />
+        <Stack.Screen name="Premium" component={PremiumScreen} options={{ title: 'Premium' }} />
+        <Stack.Screen name="ResumeBuilder" component={ResumeBuilderScreen} options={{ title: 'Resume Builder' }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
+        <Stack.Screen name="SkillGap" component={SkillGapScreen} options={{ title: 'Skill Gap' }} />
+        <Stack.Screen name="LearningPlan" component={LearningPlanScreen} options={{ title: 'Learning Plan' }} />
+      </>
+    )}
+  </Stack.Navigator>
+);
 };
 
 const DashboardPlaceholder = () => {
@@ -136,10 +157,33 @@ const DashboardPlaceholder = () => {
 };
 
 function MainTabs() {
+  const { colors, isDark } = useThemeStyles();
+  
+  // Define tab bar styles based on theme
+  const tabBarStyle = {
+    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+    borderTopColor: isDark ? '#374151' : '#e5e7eb',
+    borderTopWidth: 1,
+    elevation: 8,
+    shadowColor: isDark ? '#000000' : '#000000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: isDark ? 0.3 : 0.1,
+    shadowRadius: 4,
+    height: 60,
+    paddingBottom: 8,
+    paddingTop: 8,
+    marginBottom: 8,
+  };
+
+  const activeTintColor = colors.primary; // #4f46e5
+  const inactiveTintColor = isDark ? '#9ca3af' : '#6b7280';
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarActiveTintColor: "#4f46e5",
+        tabBarActiveTintColor: activeTintColor,
+        tabBarInactiveTintColor: inactiveTintColor,
+        tabBarStyle: tabBarStyle,
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName;

@@ -1,15 +1,16 @@
+// utils/mapAnswersToCareers.js
 import careerKeywords from "../data/careerKeywords";
-import i18n from "../i18n"; // Adjust path to your i18n setup
 
 export default function mapAnswersToCareers(answers) {
   const matchedCareers = {};
 
-  Object.values(answers).forEach((answerKey) => {
-    const translatedAnswer = i18n.t(answerKey).toLowerCase();
+  // Process each answer (answers now are the actual text strings from Questionnaire)
+  Object.values(answers).forEach((answerText) => {
+    const lowerAnswer = answerText.toLowerCase();
 
     for (const [career, keywords] of Object.entries(careerKeywords)) {
       keywords.forEach((kw) => {
-        if (translatedAnswer.includes(kw.toLowerCase())) {
+        if (lowerAnswer.includes(kw.toLowerCase())) {
           matchedCareers[career] = (matchedCareers[career] || 0) + 1;
         }
       });

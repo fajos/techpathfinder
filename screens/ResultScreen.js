@@ -1,3 +1,4 @@
+// screens/ResultScreen.js
 import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   View,
@@ -25,7 +26,6 @@ import useNetworkStatus from "../hooks/useNetworkStatus";
 import OfflineBanner from "../components/OfflineBanner";
 import NetworkBanner from "../components/NetworkBanner";
 import CareerModal from "../components/CareerModal";
-import { useTranslation } from "react-i18next";
 import ThreeDButton from "../components/ThreeDButton";
 import { usePremium } from '../context/PremiumContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,7 +39,7 @@ const ResultScreen = () => {
   const { isDark } = useContext(ThemeContext);
   const isConnected = useNetworkStatus();
   const { colors } = useThemeStyles();
-  const { t } = useTranslation();
+  const [_, forceUpdate] = useState({}); // For forcing re-render on theme change
 
   const careerTitles = mapAnswersToCareers(answers);
   const fullResults = careerTitles
@@ -70,24 +70,26 @@ const ResultScreen = () => {
     setModalVisible(false);
   };
 
+  // Force re-render when theme changes
   useEffect(() => {
-  // Only save once when results are loaded and user exists
-  if (user && fullResults.length > 0 && !hasSavedRef.current) {
-    hasSavedRef.current = true;
-    
-    // Save quiz results to history
-    addQuizResult(user.uid, {
-      answers,
-      results: fullResults.map(c => c.title),
-      date: new Date().toISOString()
-    });
-    
-    // Auto-save top career
-    if (fullResults[0]) {
-      saveCareer(user.uid, fullResults[0].title);
+    forceUpdate({});
+  }, [isDark]);
+
+  useEffect(() => {
+    if (user && fullResults.length > 0 && !hasSavedRef.current) {
+      hasSavedRef.current = true;
+      
+      addQuizResult(user.uid, {
+        answers,
+        results: fullResults.map(c => c.title),
+        date: new Date().toISOString()
+      });
+      
+      if (fullResults[0]) {
+        saveCareer(user.uid, fullResults[0].title);
+      }
     }
-  }
-}, [user, fullResults, answers, addQuizResult, saveCareer]);
+  }, [user, fullResults, answers, addQuizResult, saveCareer]);
 
   useEffect(() => {
     const fetchSaved = async () => {
@@ -130,10 +132,10 @@ const ResultScreen = () => {
   const handleShare = async () => {
     try {
       const top = fullResults[0];
-      const title = top?.title || t("result.defaultCareer");
+      const title = top?.title || "Tech Career";
       const emoji = careerEmojis[title] || "💻";
       await Share.share({
-        message: t("result.shareMessage", { emoji, title }),
+        message: `Check out my career match: ${emoji} ${title}`,
       });
     } catch (error) {
       console.error("Error sharing:", error);
@@ -142,13 +144,13 @@ const ResultScreen = () => {
 
   if (!answers) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>{t("result.noAnswers")}</Text>
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <Text style={[styles.title, { color: colors.text }]}>No answers found</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("Questionnaire")}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>{t("result.takeQuiz")}</Text>
+          <Text style={styles.buttonText}>Take Quiz</Text>
         </TouchableOpacity>
       </View>
     );
@@ -176,16 +178,16 @@ const ResultScreen = () => {
         {!isConnected && <OfflineBanner />}
 
         <Text style={[styles.title, { color: colors.text }]}>
-          🎯 {t("result.title")}
+          🎯 Your Top Career Matches
         </Text>
 
         {showConfetti && (
-          <Text style={{ fontSize: 26, textAlign: "center", marginBottom: 12 }}>
-            {t("result.congrats")}
+          <Text style={{ fontSize: 26, textAlign: "center", marginBottom: 12, color: colors.text }}>
+            🎉 Congratulations!
           </Text>
         )}
 
-        {fullResults.map((career) => {
+        {fullResults.map((career, idx) => {
           const isSaved = savedTitles.includes(career.title);
           return (
             <TouchableOpacity
@@ -200,7 +202,7 @@ const ResultScreen = () => {
                     position: "absolute",
                     width: 70,
                     height: 70,
-                    opacity: 0.25,
+                    opacity: 0.3,
                     borderRadius: 35,
                     top: 0,
                     right: 10,
@@ -210,24 +212,24 @@ const ResultScreen = () => {
 
                 <Animated.View style={{ opacity: fadeAnim }}>
                   <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-                    <View style={{
-                      backgroundColor: "#e0e7ff",
-                      paddingVertical: 6,
-                      paddingHorizontal: 12,
-                      borderRadius: 20,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}>
-                      <Text style={{ fontSize: 18 }}>{careerEmojis[career.title] || "💼"}</Text>
-                      <Text style={{ fontSize: 16, fontWeight: "bold", marginLeft: 8, color: "#1e3a8a" }}>
+                    <View style={[
+                      styles.titleBadge,
+                      { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff" }
+                    ]}>
+                      <Text style={styles.emoji}>{careerEmojis[career.title] || "💼"}</Text>
+                      <Text style={[
+                        styles.badgeText,
+                        { color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                      ]}>
                         {career.title}
                       </Text>
                     </View>
                   </View>
                 </Animated.View>
+
                 {/* Career Intro */}
                 {career.intro && (
-                  <Text style={{ marginBottom: 8, fontStyle: "italic", color: colors.text }}>
+                  <Text style={[styles.intro, { color: colors.textSecondary }]}>
                     {career.intro}
                   </Text>
                 )}
@@ -238,27 +240,36 @@ const ResultScreen = () => {
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>Roles:</Text>
                     <View style={styles.skillContainer}>
                       {career.roles.slice(0, 3).map((role, i) => (
-                        <Text key={i} style={styles.skillTag}>{role}</Text>
+                        <Text key={i} style={[
+                          styles.skillTag,
+                          { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                        ]}>{role}</Text>
                       ))}
                     </View>
                   </>
                 )}
 
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("dashboard.skills")}:</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Top Skills:</Text>
                 <View style={styles.skillContainer}>
-                  {career.skills?.map((skill, i) => (
-                    <Text key={i} style={styles.skillTag}>{skill}</Text>
+                  {career.skills?.slice(0, 8).map((skill, i) => (
+                    <Text key={i} style={[
+                      styles.skillTag,
+                      { backgroundColor: isDark ? "#374151" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                    ]}>{skill}</Text>
                   ))}
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("dashboard.roadmap")}:</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Roadmap Preview:</Text>
                 {career.roadmap?.slice(0, 5).map((step, i) => (
                   <View key={i} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                     <Text style={[styles.smallText, { color: colors.text }]}>
                       • {typeof step === 'object' ? step.text : step}
                     </Text>
                     {typeof step === 'object' && step.difficulty && (
-                      <Text style={[styles.difficultyBadge, { backgroundColor: colors.primary + '20', color: colors.primary }]}>
+                      <Text style={[
+                        styles.difficultyBadge,
+                        { backgroundColor: colors.primary + '20', color: colors.primary }
+                      ]}>
                         {step.difficulty}
                       </Text>
                     )}
@@ -268,42 +279,38 @@ const ResultScreen = () => {
                 {career.resources?.length > 0 && (
                   <>
                     <View style={styles.sectionHeader}>
-                      <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                        {t("dashboard.resources")}:
-                      </Text>
+                      <Text style={[styles.sectionTitle, { color: colors.text }]}>Resources:</Text>
                       {!isPremium && (
                         <TouchableOpacity
                           onPress={() => navigation.navigate('Premium')}
-                          style={styles.premiumBadge}
+                          style={[styles.premiumBadge, { backgroundColor: colors.primary }]}
                         >
-                          <Ionicons name="diamond" size={16} color="#FFD700" />
+                          <Ionicons name="diamond" size={14} color="#FFD700" />
                           <Text style={styles.premiumText}>PREMIUM</Text>
                         </TouchableOpacity>
                       )}
                     </View>
 
                     {isPremium ? (
-                      // Show all resources for premium users
                       career.resources.slice(0, 3).map((link) => (
                         <Text
                           key={career.title + "_link_" + link}
-                          style={styles.link}
+                          style={[styles.link, { color: colors.primary }]}
                           onPress={() => Linking.openURL(link)}
                         >
                           🔗 {link}
                         </Text>
                       ))
                     ) : (
-                      // Show limited preview for free users
                       <>
-                        <Text style={[styles.previewText, { color: colors.text }]}>
+                        <Text style={[styles.previewText, { color: colors.textSecondary }]}>
                           {career.resources.slice(0, 1).map((link) => (
-                            <Text key={link} style={styles.link}>🔗 {link.substring(0, 30)}...\n</Text>
+                            <Text key={link} style={[styles.link, { color: colors.primary }]}>🔗 {link.substring(0, 40)}...\n</Text>
                           ))}
                         </Text>
                         <TouchableOpacity
                           onPress={() => navigation.navigate('Premium')}
-                          style={styles.unlockButton}
+                          style={[styles.unlockButton, { backgroundColor: colors.primary }]}
                         >
                           <Ionicons name="lock-open" size={20} color="white" />
                           <Text style={styles.unlockButtonText}> Unlock All Resources</Text>
@@ -313,64 +320,59 @@ const ResultScreen = () => {
                   </>
                 )}
 
-                {/* Premium Feature Buttons - Full Width */}
-<View style={styles.premiumButtonsContainer}>
-  {/* Learning Plan Button */}
-  <TouchableOpacity
-    style={[styles.premiumButton, { backgroundColor: '#05787c' }]}
-    onPress={() => navigation.navigate('LearningPlan', { career: career.title })}
-  >
-    <Ionicons name="calendar-outline" size={18} color="white" />
-    <Text style={styles.premiumButtonText}>View Learning Plan</Text>
-  </TouchableOpacity>
+                {/* Premium Feature Buttons */}
+                <View style={styles.premiumButtonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.premiumButton, { backgroundColor: '#0d9488' }]}
+                    onPress={() => navigation.navigate('LearningPlan', { career: career.title })}
+                  >
+                    <Ionicons name="calendar-outline" size={18} color="white" />
+                    <Text style={styles.premiumButtonText}>Learning Plan</Text>
+                  </TouchableOpacity>
 
-  {/* Skill Gap Button */}
-  <TouchableOpacity
-    style={[styles.premiumButton, { backgroundColor: '#10B981' }]}
-    onPress={() => navigation.navigate('SkillGap', { career: career.title })}
-  >
-    <Ionicons name="analytics" size={18} color="white" />
-    <Text style={styles.premiumButtonText}>Analyze Skill Gap</Text>
-  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.premiumButton, { backgroundColor: '#10B981' }]}
+                    onPress={() => navigation.navigate('SkillGap', { career: career.title })}
+                  >
+                    <Ionicons name="analytics" size={18} color="white" />
+                    <Text style={styles.premiumButtonText}>Skill Gap</Text>
+                  </TouchableOpacity>
 
-  {/* Project Ideas Button */}
-  <TouchableOpacity
-    style={[styles.premiumButton, { backgroundColor: '#8B5CF6' }]}
-    onPress={() => navigation.navigate('ProjectIdeas', { career: career.title })}
-  >
-    <Ionicons name="bulb-outline" size={18} color="white" />
-    <Text style={styles.premiumButtonText}>Projects Ideas</Text>
-  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.premiumButton, { backgroundColor: '#8B5CF6' }]}
+                    onPress={() => navigation.navigate('ProjectIdeas', { career: career.title })}
+                  >
+                    <Ionicons name="bulb-outline" size={18} color="white" />
+                    <Text style={styles.premiumButtonText}>Projects</Text>
+                  </TouchableOpacity>
 
-  {/* Mock Interview Button */}
-  <TouchableOpacity
-    style={[styles.premiumButton, { backgroundColor: '#EC489A' }]}
-    onPress={() => navigation.navigate('MockInterview', { career: career.title })}
-  >
-    <Ionicons name="chatbubbles-outline" size={18} color="white" />
-    <Text style={styles.premiumButtonText}>Mock Interview</Text>
-  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.premiumButton, { backgroundColor: '#EC489A' }]}
+                    onPress={() => navigation.navigate('MockInterview', { career: career.title })}
+                  >
+                    <Ionicons name="chatbubbles-outline" size={18} color="white" />
+                    <Text style={styles.premiumButtonText}>Interview</Text>
+                  </TouchableOpacity>
 
-  {/* Resume Builder Button */}
-  <TouchableOpacity
-    style={[styles.resumeButton, { backgroundColor: '#F59E0B' }]}
-    onPress={() => navigation.navigate('ResumeBuilder', { career: career.title })}
-  >
-    <Ionicons name="document-text" size={18} color="white" />
-    <Text style={styles.resumeButtonText}>Build Resume</Text>
-  </TouchableOpacity>
-</View>
+                  <TouchableOpacity
+                    style={[styles.resumeButton, { backgroundColor: '#F59E0B' }]}
+                    onPress={() => navigation.navigate('ResumeBuilder', { career: career.title })}
+                  >
+                    <Ionicons name="document-text" size={18} color="white" />
+                    <Text style={styles.resumeButtonText}>Build Resume</Text>
+                  </TouchableOpacity>
+                </View>
 
                 <TouchableOpacity
                   onPress={() => handleSaveSingle(career.title)}
                   disabled={isSaved}
                   style={[
-                    styles.button,
-                    { backgroundColor: isSaved ? "#9ca3af" : "#4f46e5" },
+                    styles.saveButton,
+                    { backgroundColor: isSaved ? (isDark ? "#4b5563" : "#9ca3af") : colors.primary },
                   ]}
                 >
-                  <Text style={styles.buttonText}>
-                    {isSaved ? `✔ ${t("dashboard.saved")}` : t("dashboard.saveToDashboard")}
+                  <Text style={styles.saveButtonText}>
+                    {isSaved ? `✔ Saved` : `Save to Dashboard`}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -379,29 +381,10 @@ const ResultScreen = () => {
         })}
 
         <View style={styles.buttonGroup}>
-          <ThreeDButton
-            title={t("result.share")}
-            onPress={handleShare}
-            gradient
-          />
-
-          <ThreeDButton
-            title={t("result.retake")}
-            onPress={() => navigation.navigate("Main", { screen: "Questionnaire" })}
-            gradient
-          />
-
-          <ThreeDButton
-            title={t("result.gotoDashboard")}
-            onPress={() => navigation.navigate("DashboardLock")}
-            gradient
-          />
-
-          <ThreeDButton
-            title={t("backHome")}
-            onPress={() => navigation.navigate("Main", { screen: "Home" })}
-            gradient
-          />
+          <ThreeDButton title="Share Results" onPress={handleShare} gradient />
+          <ThreeDButton title="Retake Quiz" onPress={() => navigation.navigate("Main", { screen: "Questionnaire" })} gradient />
+          <ThreeDButton title="Go to Dashboard" onPress={() => navigation.navigate("DashboardLock")} gradient />
+          <ThreeDButton title="Home" onPress={() => navigation.navigate("Main", { screen: "Home" })} gradient />
         </View>
       </ScrollView>
 
@@ -414,7 +397,7 @@ export default ResultScreen;
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
     marginTop: 25,
     marginBottom: 16,
@@ -422,51 +405,80 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
   },
-  skillContainer: {
+  titleBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 6,
-    marginBottom: 10,
+    alignItems: "center",
   },
-  skillTag: {
-    backgroundColor: "#e0e7ff",
-    color: "#1e3a8a",
-    fontSize: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    marginRight: 6,
-    marginBottom: 6,
+  emoji: {
+    fontSize: 18,
+  },
+  badgeText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
+  intro: {
+    marginBottom: 8,
+    fontStyle: "italic",
+    lineHeight: 20,
   },
   sectionTitle: {
     fontWeight: "600",
     marginTop: 8,
+    marginBottom: 6,
+  },
+  skillContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 10,
+  },
+  skillTag: {
+    fontSize: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
   },
   smallText: {
     fontSize: 14,
     marginTop: 4,
+    lineHeight: 18,
+  },
+  difficultyBadge: {
+    fontSize: 10,
+    fontWeight: "500",
+    marginLeft: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    overflow: "hidden",
   },
   link: {
-    fontSize: 14,
+    fontSize: 13,
     marginTop: 4,
-    color: "#2563eb",
     textDecorationLine: "underline",
   },
-  button: {
+  saveButton: {
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: 8,
+    borderRadius: 10,
+    marginTop: 12,
+    alignItems: "center",
   },
-  buttonText: {
+  saveButtonText: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center",
   },
   buttonGroup: {
     marginTop: 24,
@@ -480,7 +492,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
   },
-    sectionHeader: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -489,7 +501,6 @@ const styles = StyleSheet.create({
   premiumBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4f46e5',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -506,7 +517,6 @@ const styles = StyleSheet.create({
   },
   unlockButton: {
     flexDirection: 'row',
-    backgroundColor: '#4f46e5',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -518,46 +528,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 8,
   },
-  difficultyBadge: {
-  fontSize: 10,
-  fontWeight: '500',
-  marginLeft: 8,
-  paddingHorizontal: 6,
-  paddingVertical: 2,
-  borderRadius: 10,
-  overflow: 'hidden',
-},
-premiumButtonsContainer: {
-  marginTop: 12,
-  marginBottom: 8,
-},
-premiumButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  paddingVertical: 12,
-  paddingHorizontal: 16,
-  borderRadius: 8,
-  marginBottom: 10,
-  gap: 8,
-},
-premiumButtonText: {
-  color: 'white',
-  fontSize: 14,
-  fontWeight: '600',
-},
-resumeButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  paddingVertical: 12,
-  borderRadius: 8,
-  marginTop: 2,
-  gap: 8,
-},
-resumeButtonText: {
-  color: 'white',
-  fontSize: 14,
-  fontWeight: '600',
-},
+  premiumButtonsContainer: {
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  premiumButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    gap: 8,
+  },
+  premiumButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  resumeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 2,
+    gap: 8,
+  },
+  resumeButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
 });

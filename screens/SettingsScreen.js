@@ -36,7 +36,7 @@ export default function SettingsScreen({ navigation }) {
           style: 'destructive',
           onPress: async () => {
             await logout();
-            navigation.replace('Login');
+            
           }
         }
       ]
@@ -233,7 +233,7 @@ export default function SettingsScreen({ navigation }) {
 
       {/* Copyright */}
       <Text style={[styles.copyright, { color: colors.textSecondary }]}>
-        © 2025 TechPathFinder. All rights reserved.
+        © 2026 TechPathFinder. All rights reserved.
       </Text>
     </ScrollView>
   );
