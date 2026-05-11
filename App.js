@@ -141,6 +141,7 @@ return (
         <Stack.Screen name="Premium" component={PremiumScreen} options={{ title: 'Premium' }} />
         <Stack.Screen name="ResumeBuilder" component={ResumeBuilderScreen} options={{ title: 'Resume Builder' }} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
+        <Stack.Screen name="ResultTab" component={ResultTabScreen} options={{ title: 'Result Tab Screen' }} />
         <Stack.Screen name="SkillGap" component={SkillGapScreen} options={{ title: 'Skill Gap' }} />
         <Stack.Screen name="LearningPlan" component={LearningPlanScreen} options={{ title: 'Learning Plan' }} />
       </>
