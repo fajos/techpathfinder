@@ -1,5 +1,5 @@
-// screens/ProfileScreen.js
-import React, { useState, useEffect } from 'react';
+// screens/ProfileScreen.js - With Gradients
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,41 +7,94 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
-  Alert
+  Alert,
+  RefreshControl,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useUserProfileStore } from '../store/userProfileStore';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useAuth();
-  const { getCurrentProfile, updateProfile } = useUserProfileStore();
-  const { colors } = useThemeStyles();
+  const { getCurrentProfile, updateProfile, profiles, initProfile, ensureCurrentUser } = useUserProfileStore();
+  const { colors, isDark } = useThemeStyles();
   
   const [profile, setProfile] = useState(null);
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    displayName: '',
+    experience: 'beginner',
+    weeklyHours: 5,
+    targetCareer: ''
+  });
   
+  // Initialize profile for this user if not already set
   useEffect(() => {
     if (user) {
-      const userProfile = getCurrentProfile();
-      setProfile(userProfile);
-      setFormData({
-        displayName: userProfile?.displayName || '',
-        experience: userProfile?.experience || 'beginner',
-        weeklyHours: userProfile?.weeklyHours || 5,
-        targetCareer: userProfile?.targetCareer || ''
-      });
+      initProfile(user.uid, user.email);
+      ensureCurrentUser(user.uid);
     }
   }, [user]);
+  
+  // Load profile data
+  const loadProfile = useCallback(() => {
+    if (user) {
+      setLoading(true);
+      const userProfile = getCurrentProfile();
+      
+      if (userProfile) {
+        setProfile(userProfile);
+        setFormData({
+          displayName: userProfile.displayName || '',
+          experience: userProfile.experience || 'beginner',
+          weeklyHours: userProfile.weeklyHours || 5,
+          targetCareer: userProfile.targetCareer || ''
+        });
+      } else {
+        setProfile({
+          displayName: '',
+          experience: 'beginner',
+          weeklyHours: 5,
+          targetCareer: '',
+          savedCareers: [],
+          quizHistory: [],
+          completedRoadmaps: [],
+          streak: 0,
+          studySessions: []
+        });
+      }
+      setLoading(false);
+    }
+  }, [user, getCurrentProfile]);
+  
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+  
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadProfile();
+    setRefreshing(false);
+  };
+  
+  const handleSave = () => {
+    updateProfile(user.uid, formData);
+    setProfile(prev => ({ ...prev, ...formData }));
+    setEditing(false);
+    Alert.alert('Success', 'Profile updated successfully');
+  };
   
   if (!user) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={{ color: colors.text }}>Please log in to view profile</Text>
         <TouchableOpacity
-          style={styles.loginButton}
+          style={[styles.loginButton, { backgroundColor: colors.primary }]}
           onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.loginButtonText}>Go to Login</Text>
@@ -50,72 +103,97 @@ export default function ProfileScreen({ navigation }) {
     );
   }
   
-  const handleSave = () => {
-    updateProfile(user.uid, formData);
-    setEditing(false);
-    Alert.alert('Success', 'Profile updated successfully');
-  };
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+  
+  const safeProfile = profile || {};
   
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-          <Text style={styles.avatarText}>
-            {profile?.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+    <ScrollView 
+      style={[styles.container, { backgroundColor: colors.background }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />
+      }
+    >
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={[colors.primary, colors.primary + 'DD']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.headerContent}>
+          {editing ? (
+            <TextInput
+              style={[styles.nameInput, { color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }]}
+              value={formData.displayName}
+              onChangeText={(text) => setFormData({...formData, displayName: text})}
+              placeholder="Enter your name"
+              placeholderTextColor="rgba(255,255,255,0.7)"
+            />
+          ) : (
+            <Text style={styles.name}>
+              {safeProfile.displayName || 'Learner'}
+            </Text>
+          )}
+          
+          <Text style={styles.email}>
+            {user.email}
           </Text>
         </View>
-        
-        {editing ? (
-          <TextInput
-            style={[styles.nameInput, { color: colors.text, borderColor: colors.border }]}
-            value={formData.displayName}
-            onChangeText={(text) => setFormData({...formData, displayName: text})}
-            placeholder="Your name"
-            placeholderTextColor={colors.textSecondary}
-          />
-        ) : (
-          <Text style={[styles.name, { color: colors.text }]}>
-            {profile?.displayName || 'Learner'}
-          </Text>
-        )}
-        
-        <Text style={[styles.email, { color: colors.textSecondary }]}>
-          {user.email}
-        </Text>
-      </View>
+      </LinearGradient>
       
-      {/* Stats Cards */}
+      {/* Stats Cards with Gradients */}
       <View style={styles.statsGrid}>
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Ionicons name="flame" size={24} color="#FF6B6B" />
+        <LinearGradient
+          colors={isDark ? ['#1f2937', '#111827'] : ['#ffffff', '#f9fafb']}
+          style={styles.statCard}
+        >
+          <View style={[styles.statIconBg, { backgroundColor: '#FF6B6B20' }]}>
+            <Ionicons name="flame" size={28} color="#FF6B6B" />
+          </View>
           <Text style={[styles.statNumber, { color: colors.text }]}>
-            {profile?.streak || 0}
+            {safeProfile.streak || 0}
           </Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
             Day Streak
           </Text>
-        </View>
+        </LinearGradient>
         
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Ionicons name="book" size={24} color="#4f46e5" />
+        <LinearGradient
+          colors={isDark ? ['#1f2937', '#111827'] : ['#ffffff', '#f9fafb']}
+          style={styles.statCard}
+        >
+          <View style={[styles.statIconBg, { backgroundColor: '#4f46e520' }]}>
+            <Ionicons name="book" size={28} color="#4f46e5" />
+          </View>
           <Text style={[styles.statNumber, { color: colors.text }]}>
-            {profile?.completedRoadmaps?.length || 0}
+            {safeProfile.completedRoadmaps?.length || 0}
           </Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
             Roadmaps
           </Text>
-        </View>
+        </LinearGradient>
         
-        <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Ionicons name="time" size={24} color="#10B981" />
+        <LinearGradient
+          colors={isDark ? ['#1f2937', '#111827'] : ['#ffffff', '#f9fafb']}
+          style={styles.statCard}
+        >
+          <View style={[styles.statIconBg, { backgroundColor: '#10B98120' }]}>
+            <Ionicons name="time" size={28} color="#10B981" />
+          </View>
           <Text style={[styles.statNumber, { color: colors.text }]}>
-            {profile?.studySessions?.length || 0}
+            {safeProfile.studySessions?.length || 0}
           </Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
             Study Sessions
           </Text>
-        </View>
+        </LinearGradient>
       </View>
       
       {/* Saved Careers */}
@@ -123,8 +201,8 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Saved Careers
         </Text>
-        {profile?.savedCareers?.length > 0 ? (
-          profile.savedCareers.map((career, index) => (
+        {safeProfile.savedCareers?.length > 0 ? (
+          safeProfile.savedCareers.map((career, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.careerItem, { backgroundColor: colors.card }]}
@@ -146,19 +224,25 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Recent Quiz Results
         </Text>
-        {profile?.quizHistory?.slice(-3).reverse().map((quiz, index) => (
-          <View key={index} style={[styles.historyItem, { backgroundColor: colors.card }]}>
-            <Text style={{ color: colors.text, fontWeight: 'bold' }}>
-              {new Date(quiz.date).toLocaleDateString()}
-            </Text>
-            <Text style={{ color: colors.textSecondary }} numberOfLines={1}>
-              {quiz.results.slice(0, 3).join(' • ')}
-            </Text>
-          </View>
-        ))}
+        {safeProfile.quizHistory?.length > 0 ? (
+          safeProfile.quizHistory.slice(-3).reverse().map((quiz, index) => (
+            <View key={index} style={[styles.historyItem, { backgroundColor: colors.card }]}>
+              <Text style={{ color: colors.text, fontWeight: 'bold' }}>
+                {new Date(quiz.date).toLocaleDateString()}
+              </Text>
+              <Text style={{ color: colors.textSecondary }} numberOfLines={1}>
+                {quiz.results?.slice(0, 3).join(' • ') || 'No results'}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={{ color: colors.textSecondary }}>
+            No quiz history yet. Take the career quiz to see results!
+          </Text>
+        )}
       </View>
       
-      {/* Settings Button */}
+      {/* Edit Profile Button */}
       <TouchableOpacity
         style={[styles.settingsButton, { backgroundColor: colors.card }]}
         onPress={() => setEditing(!editing)}
@@ -170,12 +254,16 @@ export default function ProfileScreen({ navigation }) {
       </TouchableOpacity>
       
       {editing && (
-        <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: colors.primary }]}
-          onPress={handleSave}
+        <LinearGradient
+          colors={[colors.primary, colors.primary + 'CC']}
+          style={styles.saveButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.saveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleSave} style={styles.saveButtonInner}>
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       )}
       
       <TouchableOpacity
@@ -193,61 +281,76 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    alignItems: 'center',
-    padding: 20,
+  headerGradient: {
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    paddingTop: 50,
+    paddingBottom: 30,
   },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
+  headerContent: {
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  avatarText: {
-    fontSize: 32,
-    color: 'white',
-    fontWeight: 'bold',
+    paddingHorizontal: 20,
   },
   name: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
   },
   nameInput: {
-    fontSize: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 8,
+    borderRadius: 12,
+    padding: 12,
     width: '80%',
     textAlign: 'center',
+    color: '#fff',
+    marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    marginTop: 4,
+    color: 'rgba(255,255,255,0.8)',
   },
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: 16,
+    paddingHorizontal: 16,
+    marginTop: -20,
+    marginBottom: 16,
   },
   statCard: {
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderRadius: 16,
     width: '30%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginTop: 4,
   },
   statLabel: {
-    fontSize: 12,
-    marginTop: 2,
+    fontSize: 11,
+    marginTop: 4,
   },
   section: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
@@ -258,43 +361,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 8,
   },
   historyItem: {
-    padding: 16,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 8,
   },
   settingsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    margin: 16,
-    borderRadius: 8,
+    padding: 14,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
   },
   saveButton: {
-    padding: 16,
-    margin: 16,
-    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  saveButtonInner: {
+    padding: 14,
     alignItems: 'center',
   },
   saveButtonText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
+    padding: 14,
     margin: 16,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   loginButton: {
-    backgroundColor: '#4f46e5',
     padding: 16,
     borderRadius: 8,
     margin: 16,
@@ -304,4 +412,4 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-}); 
+});

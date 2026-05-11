@@ -366,7 +366,7 @@ useEffect(() => {
 
       {/* Career Info */}
       <View style={[styles.careerCard, { backgroundColor: colors.card }]}>
-        <Ionicons name="chatbubbles-outline" size={24} color={colors.primary} />
+        <Ionicons name="chatbubbles-outline" size={24} color={colors.text} />
         <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
       </View>
 
@@ -378,7 +378,7 @@ useEffect(() => {
             style={[
               styles.tab,
               selectedCategory === cat && styles.activeTab,
-              { borderBottomColor: selectedCategory === cat ? colors.primary : 'transparent' }
+              { borderBottomColor: selectedCategory === cat ? colors.text : 'transparent' }
             ]}
             onPress={() => {
               setSelectedCategory(cat);
@@ -391,7 +391,7 @@ useEffect(() => {
           >
             <Text style={[
               styles.tabText,
-              { color: selectedCategory === cat ? colors.primary : colors.textSecondary }
+              { color: selectedCategory === cat ? colors.text : colors.text }
             ]}>
               {cat.charAt(0).toUpperCase() + cat.slice(1)}
             </Text>
@@ -400,21 +400,21 @@ useEffect(() => {
       </View>
 
       {/* Question Counter */}
-      <Text style={[styles.counter, { color: colors.textSecondary }]}>
+      <Text style={[styles.counter, { color: colors.text }]}>
         Question {currentIndex + 1} of {currentList.length}
       </Text>
 
       {/* Question Card */}
       <View style={[styles.questionCard, { backgroundColor: colors.card }]}>
         <View style={styles.questionHeader}>
-          <Text style={[styles.categoryBadge, { color: colors.primary, borderColor: colors.primary }]}>
+          <Text style={[styles.categoryBadge, { color: colors.text, borderColor: colors.text }]}>
             {currentQuestion?.category}
           </Text>
           <TouchableOpacity onPress={() => toggleFavorite(currentQuestion?.id)}>
             <Ionicons
               name={isFavorite ? 'star' : 'star-outline'}
               size={22}
-              color={isFavorite ? '#FFD700' : colors.textSecondary}
+              color={isFavorite ? '#FFD700' : colors.text}
             />
           </TouchableOpacity>
         </View>
@@ -427,24 +427,24 @@ useEffect(() => {
           style={styles.showAnswerButton}
           onPress={() => setShowAnswer(!showAnswer)}
         >
-          <Text style={{ color: colors.primary }}>
+          <Text style={{ color: colors.text }}>
             {showAnswer ? 'Hide Answer' : 'Show Sample Answer'}
           </Text>
           <Ionicons
             name={showAnswer ? 'chevron-up' : 'chevron-down'}
             size={16}
-            color={colors.primary}
+            color={colors.text}
           />
         </TouchableOpacity>
 
         {showAnswer && (
           <View style={styles.answerContainer}>
             <Text style={[styles.answerTitle, { color: colors.text }]}>Sample Answer:</Text>
-            <Text style={[styles.answerText, { color: colors.textSecondary }]}>
+            <Text style={[styles.answerText, { color: colors.text }]}>
               {currentQuestion?.sampleAnswer}
             </Text>
             <Text style={[styles.tipsTitle, { color: colors.text }]}>💡 Tips:</Text>
-            <Text style={[styles.tipsText, { color: colors.textSecondary }]}>
+            <Text style={[styles.tipsText, { color: colors.text }]}>
               {currentQuestion?.tips}
             </Text>
           </View>
@@ -458,8 +458,8 @@ useEffect(() => {
           onPress={previousQuestion}
           disabled={currentIndex === 0}
         >
-          <Ionicons name="chevron-back" size={20} color={currentIndex === 0 ? colors.textSecondary : colors.primary} />
-          <Text style={{ color: currentIndex === 0 ? colors.textSecondary : colors.primary }}>Previous</Text>
+          <Ionicons name="chevron-back" size={20} color={currentIndex === 0 ? colors.text : colors.text} />
+          <Text style={{ color: currentIndex === 0 ? colors.text : colors.text }}>Previous</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -467,8 +467,8 @@ useEffect(() => {
           onPress={nextQuestion}
           disabled={currentIndex === currentList.length - 1}
         >
-          <Text style={{ color: currentIndex === currentList.length - 1 ? colors.textSecondary : colors.primary }}>Next</Text>
-          <Ionicons name="chevron-forward" size={20} color={currentIndex === currentList.length - 1 ? colors.textSecondary : colors.primary} />
+          <Text style={{ color: currentIndex === currentList.length - 1 ? colors.textSecondary : colors.text }}>Next</Text>
+          <Ionicons name="chevron-forward" size={20} color={currentIndex === currentList.length - 1 ? colors.text : colors.text} />
         </TouchableOpacity>
       </View>
 

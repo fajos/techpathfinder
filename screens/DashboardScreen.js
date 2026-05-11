@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import careerRoadmapsFull from "../data/careerRoadmapsFull";
 import careerEmojis from "../data/careerEmojis";
 import * as Print from "expo-print";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeStyles } from "../hooks/useThemeStyles";

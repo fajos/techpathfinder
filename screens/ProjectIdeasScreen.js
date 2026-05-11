@@ -1,5 +1,5 @@
 // screens/ProjectIdeasScreen.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { getProjectsForCareer, getDifficultyLevels } from '../data/projects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Animated, Easing } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -59,6 +60,28 @@ export default function ProjectIdeasScreen({ route, navigation }) {
   const [completedProjects, setCompletedProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const bounceAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+  // Subtle bounce animation for the hint
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(bounceAnim, {
+        toValue: 1.05,
+        duration: 800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(bounceAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ])
+  ).start();
+}, []);
   
   useEffect(() => {
     loadProjects();
@@ -279,6 +302,22 @@ export default function ProjectIdeasScreen({ route, navigation }) {
                       )}
                     </View>
                   </View>
+
+                  {/* Click for details indicator - Enhanced */}
+                  <Animated.View style={{ transform: [{ scale: bounceAnim }] }}>
+                  <View style={styles.clickIndicator}>
+                    <LinearGradient
+                      colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.05)']}
+                      style={styles.clickIndicatorGradient}
+                    >
+                      <View style={styles.clickIndicatorContent}>
+                        <Ionicons name="information-circle-outline" size={16} color="#9CA3AF" />
+                        <Text style={[styles.clickIndicatorText, {color: colors.text}]}>Tap for step-by-step guide</Text>
+                        <Ionicons name="chevron-forward" size={14} color="#9CA3AF" />
+                      </View>
+                    </LinearGradient>
+                  </View>
+                  </Animated.View>  
                 </LinearGradient>
               </TouchableOpacity>
             );
@@ -310,20 +349,20 @@ export default function ProjectIdeasScreen({ route, navigation }) {
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               <View style={styles.modalMetaContainer}>
                 <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="time-outline" size={18} color={colors.primary} />
+                  <Ionicons name="time-outline" size={18} color={colors.text} />
                   <Text style={{ color: colors.text, marginLeft: 6 }}>
                     {selectedProject?.estimatedHours} hours
                   </Text>
                 </View>
                 <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="code-outline" size={18} color={colors.primary} />
+                  <Ionicons name="code-outline" size={18} color={colors.text} />
                   <Text style={{ color: colors.text, marginLeft: 6 }}>
                     {selectedProject?.technologies.length} technologies
                   </Text>
                 </View>
               </View>
               
-              <Text style={[styles.modalDescription, { color: colors.textSecondary }]}>
+              <Text style={[styles.modalDescription, { color: colors.text }]}>
                 {selectedProject?.description}
               </Text>
               
@@ -338,7 +377,7 @@ export default function ProjectIdeasScreen({ route, navigation }) {
                   >
                     <Text style={styles.stepNumberText}>{index + 1}</Text>
                   </LinearGradient>
-                  <Text style={[styles.stepText, { color: colors.textSecondary }]}>{step}</Text>
+                  <Text style={[styles.stepText, { color: colors.text }]}>{step}</Text>
                 </View>
               ))}
               
@@ -353,11 +392,11 @@ export default function ProjectIdeasScreen({ route, navigation }) {
                       style={[styles.resourceLink, { backgroundColor: colors.primary + '10' }]}
                       onPress={() => Linking.openURL(resource)}
                     >
-                      <Ionicons name="link-outline" size={18} color={colors.primary} />
-                      <Text style={{ color: colors.primary, marginLeft: 10, flex: 1 }} numberOfLines={1}>
+                      <Ionicons name="link-outline" size={18} color={colors.text} />
+                      <Text style={{ color: colors.text, marginLeft: 10, flex: 1 }} numberOfLines={1}>
                         {resource.replace('https://', '').substring(0, 50)}
                       </Text>
-                      <Ionicons name="open-outline" size={16} color={colors.primary} />
+                      <Ionicons name="open-outline" size={16} color={colors.text} />
                     </TouchableOpacity>
                   ))}
                 </>
@@ -664,4 +703,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  clickIndicator: {
+  marginTop: 12,
+  paddingTop: 10,
+  borderTopWidth: 1,
+  borderTopColor: 'rgba(255,255,255,0.08)',
+},
+clickIndicatorContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 6,
+},
+clickIndicatorText: {
+  fontSize: 11,
+  fontWeight: '500',
+  textAlign: 'center',
+},
 });

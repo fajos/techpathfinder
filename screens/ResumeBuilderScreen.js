@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useAuth } from '../context/AuthContext';
 import { usePremium } from '../context/PremiumContext';
 import { useUserProfileStore } from '../store/userProfileStore';
@@ -392,7 +392,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                     <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
                         <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Personal Information</Text>
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>Full Name</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.name}
@@ -401,7 +401,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             placeholderTextColor="#9CA3AF"
                         />
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>Email</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Email</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.email}
@@ -412,7 +412,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             autoCapitalize="none"
                         />
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>Phone</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Phone</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.phone}
@@ -422,7 +422,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             keyboardType="phone-pad"
                         />
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>Location</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Location</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.location}
@@ -431,7 +431,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             placeholderTextColor="#9CA3AF"
                         />
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>LinkedIn</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>LinkedIn</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.linkedin}
@@ -441,7 +441,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             autoCapitalize="none"
                         />
 
-                        <Text style={[styles.label, { color: colors.textSecondary }]}>Portfolio/GitHub</Text>
+                        <Text style={[styles.label, { color: colors.text }]}>Portfolio/GitHub</Text>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             value={resume.data.personal.portfolio}
@@ -482,7 +482,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 {/* Header with job title and delete */}
                                 <View style={styles.experienceHeader}>
                                     <View style={styles.titleContainer}>
-                                        <Ionicons name="briefcase-outline" size={20} color={colors.primary} />
+                                        <Ionicons name="briefcase-outline" size={20} color={colors.text} />
                                         <TextInput
                                             style={[styles.jobTitleInput, { color: colors.text }]}
                                             value={exp.title}
@@ -502,7 +502,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
                                 {/* Company */}
                                 <View style={styles.companyContainer}>
-                                    <Ionicons name="business-outline" size={16} color={colors.textSecondary} />
+                                    <Ionicons name="business-outline" size={16} color={colors.text} />
                                     <TextInput
                                         style={[styles.companyInput, { color: colors.text }]}
                                         value={exp.company}
@@ -519,7 +519,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 {/* Date Range */}
                                 <View style={styles.dateRangeContainer}>
                                     <View style={styles.dateField}>
-                                        <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+                                        <Ionicons name="calendar-outline" size={14} color={colors.text} />
                                         <TextInput
                                             style={[styles.dateInput, { color: colors.text }]}
                                             value={exp.startDate}
@@ -532,9 +532,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                             placeholderTextColor="#9CA3AF"
                                         />
                                     </View>
-                                    <Text style={{ color: colors.textSecondary }}>→</Text>
+                                    <Text style={{ color: colors.text }}>→</Text>
                                     <View style={styles.dateField}>
-                                        <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+                                        <Ionicons name="calendar-outline" size={14} color={colors.text} />
                                         <TextInput
                                             style={[styles.dateInput, { color: colors.text }]}
                                             value={exp.endDate}
@@ -551,7 +551,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
                                 {/* Description */}
                                 <View style={styles.descriptionContainer}>
-                                    <Ionicons name="document-text-outline" size={16} color={colors.textSecondary} />
+                                    <Ionicons name="document-text-outline" size={16} color={colors.text} />
                                     <TextInput
                                         style={[styles.experienceDescription, { color: colors.text }]}
                                         value={exp.description}
@@ -571,7 +571,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.primary }]}
+                            style={[styles.addButton, { borderColor: colors.text }]}
                             onPress={() => {
                                 const updated = [...(resume.data.experience || []), {
                                     title: '',
@@ -583,8 +583,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 updateField('experience', null, updated);
                             }}
                         >
-                            <Ionicons name="add-circle-outline" size={20} color={colors.primary} />
-                            <Text style={{ color: colors.primary, fontWeight: '500' }}>Add Experience</Text>
+                            <Ionicons name="add-circle-outline" size={20} color={colors.text} />
+                            <Text style={{ color: colors.text, fontWeight: '500' }}>Add Experience</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -642,7 +642,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.primary }]}
+                            style={[styles.addButton, { borderColor: colors.text }]}
                             onPress={() => {
                                 const updated = [...(resume.data.projects || []), {
                                     name: '',
@@ -652,8 +652,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 updateField('projects', null, updated);
                             }}
                         >
-                            <Ionicons name="add" size={20} color={colors.primary} />
-                            <Text style={{ color: colors.primary }}>Add Project</Text>
+                            <Ionicons name="add" size={20} color={colors.text} />
+                            <Text style={{ color: colors.text }}>Add Project</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -711,7 +711,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.primary }]}
+                            style={[styles.addButton, { borderColor: colors.text }]}
                             onPress={() => {
                                 const updated = [...(resume.data.education || []), {
                                     degree: 'Bachelor of Science',
@@ -721,8 +721,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 updateField('education', null, updated);
                             }}
                         >
-                            <Ionicons name="add" size={20} color={colors.primary} />
-                            <Text style={{ color: colors.primary }}>Add Education</Text>
+                            <Ionicons name="add" size={20} color={colors.text} />
+                            <Text style={{ color: colors.text }}>Add Education</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -784,11 +784,11 @@ const saveToDownloads = async (sourceFile, fileName) => {
             <View style={[styles.careerInfo, { backgroundColor: colors.card }]}>
                 <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
                 <TouchableOpacity
-                    style={[styles.templateButton, { borderColor: colors.primary }]}
+                    style={[styles.templateButton, { borderColor: colors.text }]}
                     onPress={() => setShowTemplateModal(true)}
                 >
-                    <Ionicons name="color-palette-outline" size={16} color={colors.primary} />
-                    <Text style={{ color: colors.primary }}>Change Template</Text>
+                    <Ionicons name="color-palette-outline" size={16} color={colors.text} />
+                    <Text style={{ color: colors.text }}>Change Template</Text>
                 </TouchableOpacity>
             </View>
 
@@ -800,13 +800,13 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         style={[
                             styles.tab,
                             activeSection === section && styles.activeTab,
-                            { borderColor: activeSection === section ? colors.primary : 'transparent' }
+                            { borderColor: activeSection === section ? colors.text : 'transparent' }
                         ]}
                         onPress={() => setActiveSection(section)}
                     >
                         <Text style={[
                             styles.tabText,
-                            { color: activeSection === section ? colors.primary : colors.textSecondary }
+                            { color: activeSection === section ? colors.text : colors.text }
                         ]}>
                             {section.charAt(0).toUpperCase() + section.slice(1)}
                         </Text>

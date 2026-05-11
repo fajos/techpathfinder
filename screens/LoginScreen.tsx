@@ -13,7 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -125,7 +125,7 @@ export default function LoginScreen({ navigation }) {
           onPress={() => setIsLogin(!isLogin)}
           disabled={isSubmitting}
         >
-          <Text style={{ color: colors.textSecondary || '#666' }}>
+          <Text style={{ color: colors.text || '#666' }}>
             {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
           </Text>
         </TouchableOpacity>

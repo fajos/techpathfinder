@@ -108,7 +108,7 @@ const showPremiumFeatures = isPremium;
           {career.roadmap?.slice(0, 17).map((step, i) => (
             <View key={i} style={styles.stepContainer}>
               <Text style={[styles.step, { color: colors.text }]}>• {step.text}</Text>
-              <Text style={[styles.stepDifficulty, { color: colors.primary }]}>
+              <Text style={[styles.stepDifficulty, { color: colors.text }]}>
                 {step.difficulty}
               </Text>
             </View>
@@ -435,7 +435,7 @@ stepDifficulty: {
   fontSize: 11,
   fontWeight: '500',
   marginLeft: 8,
-  backgroundColor: 'rgba(79, 70, 229, 0.1)',
+  backgroundColor: 'rgba(220, 219, 241, 0.1)',
   paddingHorizontal: 6,
   paddingVertical: 2,
   borderRadius: 4,

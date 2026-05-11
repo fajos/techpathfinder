@@ -16,7 +16,6 @@ import { usePremium } from '../context/PremiumContext';
 import { useUserProfileStore } from '../store/userProfileStore';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import careerRoadmapsFull from '../data/careerRoadmapsFull';
-import { skillVariations } from '../data/skillVariations';
 import { Animated } from 'react-native';
 
 export default function SkillGapScreen({ route, navigation }) {

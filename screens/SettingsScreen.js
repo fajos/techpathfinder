@@ -1,181 +1,349 @@
-import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Switch, StyleSheet, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ThemeContext } from "../utils/ThemeContext";
-import { useNavigation } from "@react-navigation/native";
-import { useThemeStyles } from "../hooks/useThemeStyles";
-import { useTranslation } from "react-i18next";
-import { usePremium } from '../context/PremiumContext';
+// screens/SettingsScreen.js
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Switch,
+  Alert,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import RevenueCatService from '../services/RevenueCatService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../context/AuthContext';
+import { usePremium } from '../context/PremiumContext';
+import { useThemeStyles } from '../hooks/useThemeStyles';
+import { ThemeContext } from '../utils/ThemeContext';
 
-const SettingsScreen = () => {
-  const { isDark, toggleTheme } = useContext(ThemeContext);
-  const navigation = useNavigation();
+export default function SettingsScreen({ navigation }) {
+  const { user, logout } = useAuth();
+  const { isPremium } = usePremium();
   const { colors } = useThemeStyles();
-  const { t, i18n } = useTranslation();
+  const { isDark, toggleTheme } = useContext(ThemeContext);
+  
+  const [notifications, setNotifications] = useState(true);
+  const [weeklyGoal, setWeeklyGoal] = useState(5);
 
-  const [language, setLanguage] = useState(i18n.language);
-
-  const { isPremium, expirationDate, refreshPremiumStatus } = usePremium();
-
-  const availableLanguages = [
-    { code: "en", label: "English" },
-    { code: "yo", label: "Yorùbá" },
-    { code: "fr", label: "Français" },
-    { code: "es", label: "Español" },
-  ];
-
-
-  const changeLang = async (lang) => {
-    await i18n.changeLanguage(lang);
-    await AsyncStorage.setItem("appLanguage", lang);
-    setLanguage(lang);
+  const handleLogout = () => {
+    Alert.alert(
+      'Log Out',
+      'Are you sure you want to log out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Log Out', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            navigation.replace('Login');
+          }
+        }
+      ]
+    );
   };
 
-  useEffect(() => {
-    const loadLang = async () => {
-      const lang = await AsyncStorage.getItem("appLanguage");
-      if (lang) setLanguage(lang);
-    };
-    loadLang();
-  }, []);
-
-  const resetDashboard = async () => {
-    await AsyncStorage.removeItem("savedCareers");
-    alert(t("resetSuccess", "All saved careers have been cleared."));
+  const clearAllData = () => {
+    Alert.alert(
+      'Clear All Data',
+      'This will erase all your saved careers, progress, and preferences. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Clear Data', 
+          style: 'destructive',
+          onPress: async () => {
+            await AsyncStorage.clear();
+            Alert.alert('Success', 'All data has been cleared');
+            navigation.replace('Login');
+          }
+        }
+      ]
+    );
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.header, { color: colors.text }]}>⚙️ {t("settings", "Settings")}</Text>
-
-      {/* 🌙 Dark Mode */}
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Text style={[styles.label, { color: colors.text }]}>🌙 {t("darkMode", "Dark Mode")}</Text>
-        <Switch value={isDark} onValueChange={toggleTheme} />
+  const SettingItem = ({ icon, title, subtitle, onPress, rightElement, destructive }) => (
+    <TouchableOpacity
+      style={[styles.settingItem, { borderBottomColor: colors.border }]}
+      onPress={onPress}
+      disabled={!onPress}
+    >
+      <View style={styles.settingLeft}>
+        <View style={[styles.settingIcon, { backgroundColor: destructive ? '#EF444420' : colors.primary + '20' }]}>
+          <Ionicons name={icon} size={22} color={destructive ? '#EF4444' : colors.primary} />
+        </View>
+        <View style={styles.settingText}>
+          <Text style={[styles.settingTitle, { color: destructive ? '#EF4444' : colors.text }]}>
+            {title}
+          </Text>
+          {subtitle && (
+            <Text style={[styles.settingSubtitle, { color: colors.textSecondary }]}>
+              {subtitle}
+            </Text>
+          )}
+        </View>
       </View>
+      {rightElement || (onPress && <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />)}
+    </TouchableOpacity>
+  );
 
-      {/* 🗑 Reset Button */}
-      <TouchableOpacity style={[styles.card, { backgroundColor: colors.card }]} onPress={resetDashboard}>
-        <Text style={[styles.label, { color: "#dc2626" }]}>🗑 {t("reset", "Reset Saved Careers")}</Text>
-      </TouchableOpacity>
-
-      {/* 🔐 Passcode */}
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.card }]}
-        onPress={() => navigation.navigate("ChangePasscode")}
-      >
-        <Text style={[styles.label, { color: colors.text }]}>🔐 {t("changePasscode", "Change Dashboard Passcode")}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.card }]}
-        onPress={() => navigation.navigate('Premium')}
-      >
-        <Ionicons
-          name={isPremium ? "diamond" : "diamond-outline"}
-          size={24}
-          color={isPremium ? "#FFD700" : colors.text}
-        />
-        <Text style={[styles.label, { color: colors.text }]}>
-          {isPremium ? 'Premium Active' : 'Upgrade to Premium'}
-        </Text>
-        <Ionicons name="chevron-forward" size={20} color={colors.text} />
-      </TouchableOpacity>
-
-      {/* ℹ️ About */}
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.card }]}
-        onPress={() => navigation.navigate("About")}
-      >
-        <Text style={[styles.label, { color: colors.text }]}>ℹ️ {t("about", "About This App")}</Text>
-      </TouchableOpacity>
-
-      {/* 🌐 Language Selection */}
-      <View style={{ marginTop: 24 }}>
-        <Text style={[styles.label, { marginBottom: 10, color: colors.text }]}>
-          🌍 {t("chooseLanguage", "Choose Language")}:
-        </Text>
-
-        {availableLanguages.map(({ code, label }) => {
-          const isActive = language === code;
-
-          return (
-            <TouchableOpacity
-              key={code}
-              style={[
-                styles.langRow,
-                {
-                  backgroundColor: isActive ? "#e0e7ff" : "transparent",
-                  borderColor: isActive ? "#4f46e5" : "#e5e7eb",
-                },
-              ]}
-              onPress={() => changeLang(code)}
-            >
-              <Text
-                style={[
-                  styles.languageText,
-                  {
-                    fontWeight: isActive ? "bold" : "500",
-                    color: isActive ? "#1e3a8a" : colors.text,
-                  },
-                ]}
-              >
-                {label} {isActive && "✅"}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+  const SwitchItem = ({ icon, title, subtitle, value, onValueChange }) => (
+    <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+      <View style={styles.settingLeft}>
+        <View style={[styles.settingIcon, { backgroundColor: colors.primary + '20' }]}>
+          <Ionicons name={icon} size={22} color={colors.primary} />
+        </View>
+        <View style={styles.settingText}>
+          <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
+          {subtitle && <Text style={[styles.settingSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
+        </View>
       </View>
-
-      {/* 🔙 Back to Home */}
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{ false: colors.border, true: colors.primary }}
+        thumbColor={value ? '#fff' : '#f4f3f4'}
+      />
     </View>
   );
-};
 
-export default SettingsScreen;
+  const StatsItem = ({ icon, title, value, color }) => (
+    <View style={[styles.statsItem, { backgroundColor: colors.card }]}>
+      <View style={[styles.statsIcon, { backgroundColor: color + '20' }]}>
+        <Ionicons name={icon} size={24} color={color} />
+      </View>
+      <Text style={[styles.statsValue, { color: colors.text }]}>{value}</Text>
+      <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>{title}</Text>
+    </View>
+  );
+
+  return (
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+          Customize your experience
+        </Text>
+      </View>
+
+      {/* Stats Section (Only for logged in users) */}
+      {user && (
+        <View style={styles.statsSection}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Your Activity</Text>
+          <View style={styles.statsGrid}>
+            <StatsItem icon="flame" title="Day Streak" value="0" color="#FF6B6B" />
+            <StatsItem icon="book" title="Roadmaps" value="0" color="#4f46e5" />
+            <StatsItem icon="time" title="Hours" value="0" color="#10B981" />
+          </View>
+        </View>
+      )}
+
+      {/* Preferences Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
+        <SwitchItem
+          icon="moon-outline"
+          title="Dark Mode"
+          subtitle="Switch between light and dark theme"
+          value={isDark}
+          onValueChange={toggleTheme}
+        />
+        <SwitchItem
+          icon="notifications-outline"
+          title="Notifications"
+          subtitle="Get weekly progress reminders"
+          value={notifications}
+          onValueChange={setNotifications}
+        />
+      </View>
+
+      {/* Premium Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Premium</Text>
+        <SettingItem
+          icon="diamond-outline"
+          title={isPremium ? "Premium Active" : "Upgrade to Premium"}
+          subtitle={isPremium ? "You have full access to all features" : "Unlock learning plans, projects, interviews & more"}
+          onPress={() => navigation.navigate('Premium')}
+          rightElement={
+            isPremium ? (
+              <View style={styles.premiumBadge}>
+                <Text style={styles.premiumBadgeText}>ACTIVE</Text>
+              </View>
+            ) : null
+          }
+        />
+      </View>
+
+      {/* Account Section */}
+      {user && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+          <SettingItem
+            icon="person-outline"
+            title="Edit Profile"
+            subtitle={user.email}
+            onPress={() => navigation.navigate('Profile')}
+          />
+          <SettingItem
+            icon="log-out-outline"
+            title="Log Out"
+            subtitle="Sign out of your account"
+            onPress={handleLogout}
+            destructive
+          />
+        </View>
+      )}
+
+      {/* Data Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Data</Text>
+        <SettingItem
+          icon="trash-outline"
+          title="Clear All Data"
+          subtitle="Erase all saved careers and progress"
+          onPress={clearAllData}
+          destructive
+        />
+      </View>
+
+      {/* About Section */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
+        <SettingItem
+          icon="information-circle-outline"
+          title="About TechPathFinder"
+          subtitle="Version 1.0.0"
+          onPress={() => navigation.navigate('About')}
+        />
+        <SettingItem
+          icon="star-outline"
+          title="Rate Us"
+          subtitle="Love the app? Leave a review"
+          onPress={() => Alert.alert('Rate Us', 'Feature coming soon!')}
+        />
+        <SettingItem
+          icon="share-social-outline"
+          title="Share App"
+          subtitle="Share with friends and colleagues"
+          onPress={() => Alert.alert('Share', 'Feature coming soon!')}
+        />
+      </View>
+
+      {/* Copyright */}
+      <Text style={[styles.copyright, { color: colors.textSecondary }]}>
+        © 2025 TechPathFinder. All rights reserved.
+      </Text>
+    </ScrollView>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   header: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  statsSection: {
+    paddingHorizontal: 20,
     marginBottom: 24,
   },
-  card: {
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    elevation: 2,
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 12,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
+  statsItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderRadius: 16,
   },
-  button: {
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  langRow: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
+  statsIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  languageText: {
-    fontSize: 14,
+  statsValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  statsLabel: {
+    fontSize: 11,
+    marginTop: 4,
+  },
+  section: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    letterSpacing: 0.5,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+  },
+  settingLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  settingText: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  settingSubtitle: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  premiumBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  premiumBadgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  copyright: {
+    textAlign: 'center',
+    fontSize: 12,
+    marginVertical: 24,
+    marginBottom: 40,
   },
 });

@@ -118,6 +118,7 @@ const RootNavigator = () => {
           <Stack.Screen name="SavedResumes" component={SavedResumesScreen} options={{headerShown: true, title: 'Saved Resumes', headerBackTitle: 'Back'}} />
           <Stack.Screen name="Premium" component={PremiumScreen} options={{headerShown: true, title: 'Premium', headerBackTitle: 'Back'}} />
           <Stack.Screen name="ResumeBuilder" component={ResumeBuilderScreen} options={{headerShown: true, title: 'Resume Builder', headerBackTitle: 'Back'}} />
+          <Stack.Screen name="Profile" component={ProfileScreen} options={{headerShown: true, title: 'Profile', headerBackTitle: 'Back'}} />
           <Stack.Screen name="SkillGap" component={SkillGapScreen} options={{headerShown: true, title: 'Skill Gap', headerBackTitle: 'Back'}}  />
           <Stack.Screen name="LearningPlan" component={LearningPlanScreen} options={{headerShown: true, title: 'Learning Plan', headerBackTitle: 'Back'}} 
 />
@@ -181,15 +182,6 @@ function MainTabs() {
 
       <Tab.Screen name="Last Results" component={ResultTabScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      />
     </Tab.Navigator>
   );
 }

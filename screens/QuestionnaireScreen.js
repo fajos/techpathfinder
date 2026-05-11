@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import { ThemeContext } from "../utils/ThemeContext";
 import useNetworkStatus from "../hooks/useNetworkStatus";
 import NetworkBanner from "../components/NetworkBanner";
-import { styles3D } from "../styles/globalStyles";
 import ThreeDButton from "../components/ThreeDButton";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
