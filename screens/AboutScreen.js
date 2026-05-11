@@ -12,21 +12,14 @@ const AboutScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* 🔙 Back button */}
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}
-      >
-        <Text style={styles.backText}>← {t("back", "Back")}</Text>
-      </TouchableOpacity>
-
+      
       <Text style={[styles.title, { color: colors.text }]}>{APP_NAME}</Text>
       <Text style={[styles.subtitle, { color: colors.text }]}>
         {t("version", "Version")} {VERSION}
       </Text>
 
       <Text style={[styles.text, { color: colors.text }]}>
-        {t("builtWith", "Built with ❤️ by")} {BUILT_BY}
+        {t("builtWith", "Built by")} {BUILT_BY}
       </Text>
       <Text style={[styles.text, { color: colors.text }]}>
         {t("poweredBy", "Powered by")} {POWERED_BY}
@@ -38,7 +31,7 @@ const AboutScreen = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => Linking.openURL("mailto:orjidom@yahoo.com?subject=Feedback on Tech Career App")}>
+      <TouchableOpacity onPress={() => Linking.openURL("mailto:fajostech@gmail.com?subject=Feedback on Tech Career App")}>
         <Text style={[styles.link, { color: "#3b82f6" }]}>
           📧 {t("contactDeveloper", "Contact the Developer")}
         </Text>
