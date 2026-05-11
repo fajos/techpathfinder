@@ -115,7 +115,7 @@ export default function LearningPlanScreen({ route, navigation }) {
         <Text style={[styles.careerTitle, { color: colors.text }]}>
           {plan.careerTitle}
         </Text>
-        <Text style={[styles.planSubtitle, { color: colors.textSecondary }]}>
+        <Text style={[styles.planSubtitle, { color: colors.text }]}>
           Your personalized {plan.weeksNeeded}-week learning journey
         </Text>
       </View>
@@ -123,24 +123,24 @@ export default function LearningPlanScreen({ route, navigation }) {
       {/* Stats Cards */}
       <View style={styles.statsContainer}>
         <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statValue, { color: colors.primary }]}>
+          <Text style={[styles.statValue, { color: colors.text }]}>
             {plan.weeksNeeded}
           </Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Weeks</Text>
+          <Text style={[styles.statLabel, { color: colors.text }]}>Weeks</Text>
         </View>
 
 
         <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.statValue, { color: colors.primary }]}>
+          <Text style={[styles.statValue, { color: colors.text }]}>
             {plan.pace}
           </Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Pace</Text>
+          <Text style={[styles.statLabel, { color: colors.text }]}>Pace</Text>
         </View>
       </View>
 
       {/* Completion Date */}
       <View style={[styles.completionCard, { backgroundColor: colors.card }]}>
-        <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+        <Ionicons name="calendar-outline" size={20} color={colors.text} />
         <Text style={{ color: colors.text, marginLeft: 8, flex: 1 }}>
           Est. completion: {new Date(plan.estimatedEndDate).toLocaleDateString('en-US', {
             month: 'long',
@@ -159,7 +159,7 @@ export default function LearningPlanScreen({ route, navigation }) {
       {plan.weeklyPlan.map((week) => (
         <View key={week.week} style={[styles.weekCard, { backgroundColor: colors.card }]}>
           <View style={styles.weekHeader}>
-            <Text style={[styles.weekTitle, { color: colors.primary }]}>
+            <Text style={[styles.weekTitle, { color: colors.text }]}>
               Week {week.week}
             </Text>
           </View>
@@ -198,17 +198,17 @@ export default function LearningPlanScreen({ route, navigation }) {
                   onPress={() => course.url && Linking.openURL(course.url)}
                 >
                   <View style={styles.resourceIcon}>
-                    <Ionicons name="school" size={20} color={colors.primary} />
+                    <Ionicons name="school" size={20} color={colors.text} />
                   </View>
                   <View style={styles.resourceContent}>
                     <Text style={[styles.resourceTitle, { color: colors.text }]}>
                       {course.displayTitle || course.title}
                     </Text>
                     <View style={styles.resourceMeta}>
-                      <Text style={[styles.resourcePlatform, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourcePlatform, { color: colors.text }]}>
                         {course.platform}
                       </Text>
-                      <Text style={[styles.resourceDuration, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourceDuration, { color: colors.text }]}>
                         • {course.duration}
                       </Text>
                       {course.pricing === 'free' ? (
@@ -234,17 +234,17 @@ export default function LearningPlanScreen({ route, navigation }) {
                   onPress={() => article.url && Linking.openURL(article.url)}
                 >
                   <View style={styles.resourceIcon}>
-                    <Ionicons name="document-text" size={20} color={colors.primary} />
+                    <Ionicons name="document-text" size={20} color={colors.text} />
                   </View>
                   <View style={styles.resourceContent}>
                     <Text style={[styles.resourceTitle, { color: colors.text }]}>
                       {article.title}
                     </Text>
                     <View style={styles.resourceMeta}>
-                      <Text style={[styles.resourcePlatform, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourcePlatform, { color: colors.text }]}>
                         {article.platform}
                       </Text>
-                      <Text style={[styles.resourceDuration, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourceDuration, { color: colors.text }]}>
                         • {article.readTime || article.duration}
                       </Text>
                       {article.pricing === 'free' && (
@@ -266,17 +266,17 @@ export default function LearningPlanScreen({ route, navigation }) {
                   onPress={() => video.url && Linking.openURL(video.url)}
                 >
                   <View style={styles.resourceIcon}>
-                    <Ionicons name="play-circle" size={20} color={colors.primary} />
+                    <Ionicons name="play-circle" size={20} color={colors.text} />
                   </View>
                   <View style={styles.resourceContent}>
                     <Text style={[styles.resourceTitle, { color: colors.text }]}>
                       {video.title}
                     </Text>
                     <View style={styles.resourceMeta}>
-                      <Text style={[styles.resourcePlatform, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourcePlatform, { color: colors.text }]}>
                         {video.platform}
                       </Text>
-                      <Text style={[styles.resourceDuration, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourceDuration, { color: colors.text }]}>
                         • {video.duration}
                       </Text>
                       {video.pricing === 'free' && (
@@ -294,17 +294,17 @@ export default function LearningPlanScreen({ route, navigation }) {
               {week.projects?.map((project, idx) => (
                 <View key={`project-${idx}`} style={[styles.resourceItem, { backgroundColor: colors.background }]}>
                   <View style={styles.resourceIcon}>
-                    <Ionicons name="code-slash" size={20} color={colors.primary} />
+                    <Ionicons name="code-slash" size={20} color={colors.text} />
                   </View>
                   <View style={styles.resourceContent}>
                     <Text style={[styles.resourceTitle, { color: colors.text }]}>
                       {project.title}
                     </Text>
-                    <Text style={[styles.resourceDescription, { color: colors.textSecondary }]}>
+                    <Text style={[styles.resourceDescription, { color: colors.text }]}>
                       {project.description}
                     </Text>
                     <View style={styles.resourceMeta}>
-                      <Text style={[styles.resourcePlatform, { color: colors.textSecondary }]}>
+                      <Text style={[styles.resourcePlatform, { color: colors.text }]}>
                         {project.difficulty} • {project.timeEstimate}
                       </Text>
                     </View>
@@ -338,7 +338,7 @@ export default function LearningPlanScreen({ route, navigation }) {
           <Text style={[styles.milestoneTitle, { color: colors.text }]}>
             {milestone.title}
           </Text>
-          <Text style={[styles.milestoneDescription, { color: colors.textSecondary }]}>
+          <Text style={[styles.milestoneDescription, { color: colors.text }]}>
             {milestone.description}
           </Text>
         </View>

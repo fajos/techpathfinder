@@ -142,23 +142,23 @@ export default function SkillGapScreen({ route, navigation }) {
                 <Text style={[styles.careerTitle, { color: colors.text }]}>
                     {analysis.careerTitle}
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                <Text style={[styles.subtitle, { color: colors.text }]}>
                     Skill Gap Analysis
                 </Text>
             </View>
 
             {/* Match Percentage Card */}
             <View style={[styles.percentageCard, { backgroundColor: colors.card }]}>
-                <Text style={[styles.percentageLabel, { color: colors.textSecondary }]}>
+                <Text style={[styles.percentageLabel, { color: colors.text }]}>
                     Match Percentage
                 </Text>
-                <Text style={[styles.percentageValue, { color: colors.primary }]}>
+                <Text style={[styles.percentageValue, { color: colors.text }]}>
                     {analysis.percentage}%
                 </Text>
                 <View style={styles.progressBar}>
                     <View style={[styles.progressFill, { width: `${analysis.percentage}%`, backgroundColor: colors.primary }]} />
                 </View>
-                <Text style={[styles.matchText, { color: colors.textSecondary }]}>
+                <Text style={[styles.matchText, { color: colors.text }]}>
                     {analysis.matched.length} of {analysis.total} skills matched
                 </Text>
             </View>
@@ -258,7 +258,7 @@ export default function SkillGapScreen({ route, navigation }) {
           
           {!isAdded ? (
             <TouchableOpacity
-              style={[styles.addSkillButton, { borderColor: colors.primary }]}
+              style={[styles.addSkillButton, { borderColor: colors.text }]}
               onPress={async () => {
                 const updatedSkills = [...userSkills, skill];
                 setUserSkills(updatedSkills);
@@ -266,7 +266,7 @@ export default function SkillGapScreen({ route, navigation }) {
                 analyzeSkillGap(updatedSkills);
               }}
             >
-              <Text style={{ color: colors.primary, fontSize: 12 }}>Add</Text>
+              <Text style={{ color: colors.text, fontSize: 12 }}>Add</Text>
             </TouchableOpacity>
           ) : (
             <View style={[styles.addedSkillBadge, { backgroundColor: '#10B98120' }]}>
@@ -298,7 +298,7 @@ export default function SkillGapScreen({ route, navigation }) {
                                     analyzeSkillGap(updated);
                                 }}
                             >
-                                <Text style={{ color: colors.primary }}>+ {skill}</Text>
+                                <Text style={{ color: colors.text }}>+ {skill}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -311,12 +311,12 @@ export default function SkillGapScreen({ route, navigation }) {
                     <Text style={[styles.recommendationsTitle, { color: colors.text }]}>
                         🎯 Next Steps
                     </Text>
-                    <Text style={[styles.recommendationText, { color: colors.textSecondary }]}>
+                    <Text style={[styles.recommendationText, { color: colors.text }]}>
                         Focus on learning these {analysis.missing.length} skills to become a competitive {analysis.careerTitle}:
                     </Text>
                     {analysis.missing.slice(0, 10).map((skill, index) => (
                         <View key={index} style={styles.recommendationItem}>
-                            <Ionicons name="arrow-forward" size={16} color={colors.primary} />
+                            <Ionicons name="arrow-forward" size={16} color={colors.text} />
                             <Text style={[styles.recommendationItemText, { color: colors.text }]}>
                                 {skill}
                             </Text>

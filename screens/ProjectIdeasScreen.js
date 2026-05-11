@@ -1,4 +1,4 @@
-// screens/ProjectIdeasScreen.js (Updated - Fixed Spacing)
+// screens/ProjectIdeasScreen.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -9,14 +9,43 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
-  Linking
+  Linking,
+  Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { getProjectsForCareer, getDifficultyLevels } from '../data/projects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width } = Dimensions.get('window');
+
+// Difficulty colors and gradients
+const difficultyConfig = {
+  beginner: {
+    name: 'Beginner',
+    gradient: ['#10B981', '#059669'],
+    badgeColor: '#10B981',
+    bgLight: '#D1FAE5',
+    icon: '🌱'
+  },
+  intermediate: {
+    name: 'Intermediate',
+    gradient: ['#F59E0B', '#D97706'],
+    badgeColor: '#F59E0B',
+    bgLight: '#FEF3C7',
+    icon: '⚡'
+  },
+  advanced: {
+    name: 'Advanced',
+    gradient: ['#EF4444', '#DC2626'],
+    badgeColor: '#EF4444',
+    bgLight: '#FEE2E2',
+    icon: '🚀'
+  }
+};
 
 export default function ProjectIdeasScreen({ route, navigation }) {
   const { career } = route.params;
@@ -69,7 +98,12 @@ export default function ProjectIdeasScreen({ route, navigation }) {
   if (!isPremium) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-        <Ionicons name="lock-closed" size={60} color={colors.primary} />
+        <LinearGradient
+          colors={['#4f46e5', '#7c3aed']}
+          style={styles.lockIconContainer}
+        >
+          <Ionicons name="lock-closed" size={40} color="white" />
+        </LinearGradient>
         <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: 20 }]}>
           Project Ideas
         </Text>
@@ -77,10 +111,16 @@ export default function ProjectIdeasScreen({ route, navigation }) {
           Get curated portfolio projects to build your skills and stand out to employers.
         </Text>
         <TouchableOpacity
-          style={[styles.upgradeButton, { backgroundColor: '#4d31f1' }]}
+          style={styles.upgradeButton}
           onPress={() => navigation.navigate('Premium')}
         >
-          <Text style={styles.upgradeButtonText}>View Premium</Text>
+          <LinearGradient
+            colors={['#4f46e5', '#7c3aed']}
+            style={styles.upgradeGradient}
+          >
+            <Ionicons name="diamond" size={20} color="white" />
+            <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     );
@@ -89,63 +129,74 @@ export default function ProjectIdeasScreen({ route, navigation }) {
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator size="large" color="#4f46e5" />
       </View>
     );
   }
   
   const currentProjects = projects[selectedDifficulty] || [];
-  const difficultyNames = {
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-    advanced: 'Advanced'
-  };
+  const currentConfig = difficultyConfig[selectedDifficulty];
   
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Project Ideas</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 40 }} />
       </View>
       
-      {/* Career Info */}
-      <View style={[styles.careerCard, { backgroundColor: colors.card }]}>
-        <Ionicons name="briefcase-outline" size={24} color={colors.primary} />
-        <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
-      </View>
+      {/* Hero Section */}
+      <LinearGradient
+        colors={['#4f46e5', '#7c3aed']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.heroSection}
+      >
+        <Ionicons name="bulb-outline" size={40} color="white" />
+        <Text style={styles.heroTitle}>Build Your Portfolio</Text>
+        <Text style={styles.heroSubtitle}>
+          Complete projects to showcase your {career} skills
+        </Text>
+      </LinearGradient>
       
-      {/* Difficulty Tabs - Removed bottom margin, let ScrollView handle */}
+      {/* Difficulty Tabs */}
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false} 
         style={styles.tabs}
         contentContainerStyle={styles.tabsContent}
       >
-        {getDifficultyLevels().map(level => (
-          <TouchableOpacity
-            key={level}
-            style={[
-              styles.tab,
-              selectedDifficulty === level && styles.activeTab,
-              { borderBottomColor: selectedDifficulty === level ? colors.primary : 'transparent' }
-            ]}
-            onPress={() => setSelectedDifficulty(level)}
-          >
-            <Text style={[
-              styles.tabText,
-              { color: selectedDifficulty === level ? colors.primary : colors.textSecondary }
-            ]}>
-              {difficultyNames[level]}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {getDifficultyLevels().map(level => {
+          const config = difficultyConfig[level];
+          const isActive = selectedDifficulty === level;
+          return (
+            <TouchableOpacity
+              key={level}
+              style={[
+                styles.tab,
+                isActive && { backgroundColor: config.gradient[0] + '15' }
+              ]}
+              onPress={() => setSelectedDifficulty(level)}
+            >
+              <Text style={[
+                styles.tabEmoji,
+                isActive && { color: config.gradient[0] }
+              ]}>{config.icon}</Text>
+              <Text style={[
+                styles.tabText,
+                { color: isActive ? config.gradient[0] : colors.textSecondary }
+              ]}>
+                {config.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
       
-      {/* Projects List - Directly after tabs, no extra padding */}
+      {/* Projects List */}
       <ScrollView 
         style={styles.projectsList} 
         showsVerticalScrollIndicator={false}
@@ -153,79 +204,85 @@ export default function ProjectIdeasScreen({ route, navigation }) {
       >
         {currentProjects.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Ionicons name="bulb-outline" size={48} color={colors.textSecondary} />
+            <Ionicons name="bulb-outline" size={64} color={colors.textSecondary} />
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               No projects available for this level yet.
             </Text>
           </View>
         ) : (
-
-currentProjects.map(project => {
-  const isCompleted = completedProjects.includes(project.id);
-  
-  return (
-    <TouchableOpacity
-      key={project.id}
-      style={[styles.projectCard, { backgroundColor: colors.card }]}
-      onPress={() => {
-        setSelectedProject(project);
-        setModalVisible(true);
-      }}
-      activeOpacity={0.7}
-    >
-      <View style={styles.projectHeader}>
-        <View style={styles.projectTitleContainer}>
-          <Text style={[styles.projectTitle, { color: colors.text }]}>
-            {project.title}
-          </Text>
-          <View style={[styles.difficultyBadge, { backgroundColor: colors.primary + '20' }]}>
-            <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '600' }}>
-              {project.difficulty}
-            </Text>
-          </View>
-        </View>
-        <TouchableOpacity onPress={() => toggleComplete(project.id)}>
-          <Ionicons
-            name={isCompleted ? 'checkmark-circle' : 'checkmark-circle-outline'}
-            size={24}
-            color={isCompleted ? '#10B981' : colors.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
-      
-      <Text style={[styles.projectDescription, { color: colors.textSecondary }]}>
-        {project.description}
-      </Text>
-      
-      <View style={styles.projectMeta}>
-        <View style={styles.metaItem}>
-          <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
-          <Text style={[styles.metaText, { color: colors.textSecondary }]}>
-            {project.estimatedHours} hrs
-          </Text>
-        </View>
-        <View style={styles.metaItem}>
-          <Ionicons name="code-outline" size={14} color={colors.textSecondary} />
-          <Text style={[styles.metaText, { color: colors.textSecondary }]}>
-            {project.technologies.slice(0, 3).join(', ')}
-            {project.technologies.length > 3 ? '...' : ''}
-          </Text>
-        </View>
-      </View>
-      
-      {/* ADD THIS: Click for details indicator */}
-      <View style={styles.clickIndicator}>
-        <View style={styles.clickIndicatorContent}>
-          <Ionicons name="information-circle-outline" size={14} color={colors.textSecondary} />
-          <Text style={[styles.clickIndicatorText, { color: colors.textSecondary }]}>
-            Tap for details & step-by-step guide
-          </Text>
-          <Ionicons name="chevron-forward" size={14} color={colors.textSecondary} />
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-})
+          currentProjects.map((project, index) => {
+            const isCompleted = completedProjects.includes(project.id);
+            const config = difficultyConfig[selectedDifficulty];
+            
+            return (
+              <TouchableOpacity
+                key={project.id}
+                activeOpacity={0.9}
+                onPress={() => {
+                  setSelectedProject(project);
+                  setModalVisible(true);
+                }}
+              >
+                <LinearGradient
+                  colors={isCompleted ? ['#10B981', '#059669'] : ['#183663', '#04225e']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.projectCard}
+                >
+                  {/* Completion ribbon */}
+                  {isCompleted && (
+                    <View style={styles.completedRibbon}>
+                      <Ionicons name="checkmark" size={16} color="white" />
+                      <Text style={styles.completedRibbonText}>Completed</Text>
+                    </View>
+                  )}
+                  
+                  <View style={styles.projectHeader}>
+                    <View style={styles.projectNumber}>
+                      <Text style={styles.projectNumberText}>{String(index + 1).padStart(2, '0')}</Text>
+                    </View>
+                    <TouchableOpacity 
+                      onPress={() => toggleComplete(project.id)}
+                      style={styles.checkButton}
+                    >
+                      <Ionicons
+                        name={isCompleted ? 'checkmark-circle' : 'checkmark-circle-outline'}
+                        size={28}
+                        color={isCompleted ? '#10B981' : '#9CA3AF'}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={[styles.projectTitle, { color: isCompleted ? '#D1D5DB' : 'white' }]}>
+                    {project.title}
+                  </Text>
+                  
+                  <Text style={[styles.projectDescription, { color: '#9CA3AF' }]}>
+                    {project.description}
+                  </Text>
+                  
+                  <View style={styles.projectMeta}>
+                    <View style={[styles.metaItem, { backgroundColor: config.gradient[0] + '20' }]}>
+                      <Ionicons name="time-outline" size={14} color={config.gradient[0]} />
+                      <Text style={{ color: config.gradient[0], fontSize: 12 }}>
+                        {project.estimatedHours} hrs
+                      </Text>
+                    </View>
+                    <View style={styles.techStack}>
+                      {project.technologies.slice(0, 3).map((tech, idx) => (
+                        <View key={idx} style={[styles.techTag, { backgroundColor: '#374151' }]}>
+                          <Text style={styles.techTagText}>{tech}</Text>
+                        </View>
+                      ))}
+                      {project.technologies.length > 3 && (
+                        <Text style={{ color: '#6B7280', fontSize: 11 }}>+{project.technologies.length - 3}</Text>
+                      )}
+                    </View>
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            );
+          })
         )}
       </ScrollView>
       
@@ -238,52 +295,69 @@ currentProjects.map(project => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>
-                {selectedProject?.title}
-              </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color={colors.textSecondary} />
+            <LinearGradient
+              colors={difficultyConfig[selectedDifficulty]?.gradient || ['#4f46e5', '#7c3aed']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.modalHeaderGradient}
+            >
+              <Text style={styles.modalHeaderTitle}>{selectedProject?.title}</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
+                <Ionicons name="close" size={24} color="white" />
               </TouchableOpacity>
-            </View>
+            </LinearGradient>
             
-            <ScrollView style={styles.modalBody}>
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+              <View style={styles.modalMetaContainer}>
+                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
+                  <Ionicons name="time-outline" size={18} color={colors.primary} />
+                  <Text style={{ color: colors.text, marginLeft: 6 }}>
+                    {selectedProject?.estimatedHours} hours
+                  </Text>
+                </View>
+                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
+                  <Ionicons name="code-outline" size={18} color={colors.primary} />
+                  <Text style={{ color: colors.text, marginLeft: 6 }}>
+                    {selectedProject?.technologies.length} technologies
+                  </Text>
+                </View>
+              </View>
+              
               <Text style={[styles.modalDescription, { color: colors.textSecondary }]}>
                 {selectedProject?.description}
               </Text>
               
-              <View style={styles.modalMeta}>
-                <View style={styles.modalMetaItem}>
-                  <Ionicons name="time-outline" size={16} color={colors.primary} />
-                  <Text style={{ color: colors.text }}>{selectedProject?.estimatedHours} hours</Text>
-                </View>
-                <View style={styles.modalMetaItem}>
-                  <Ionicons name="code-outline" size={16} color={colors.primary} />
-                  <Text style={{ color: colors.text }}>{selectedProject?.technologies.join(' · ')}</Text>
-                </View>
-              </View>
-              
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Steps</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                📋 Steps to Complete
+              </Text>
               {selectedProject?.steps.map((step, index) => (
                 <View key={index} style={styles.stepRow}>
-                  <Text style={[styles.stepNumber, { color: colors.primary }]}>{index + 1}</Text>
+                  <LinearGradient
+                    colors={['#4f46e5', '#7c3aed']}
+                    style={styles.stepNumberCircle}
+                  >
+                    <Text style={styles.stepNumberText}>{index + 1}</Text>
+                  </LinearGradient>
                   <Text style={[styles.stepText, { color: colors.textSecondary }]}>{step}</Text>
                 </View>
               ))}
               
               {selectedProject?.resources && selectedProject.resources.length > 0 && (
                 <>
-                  <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 16 }]}>Resources</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 16 }]}>
+                    📚 Helpful Resources
+                  </Text>
                   {selectedProject.resources.map((resource, index) => (
                     <TouchableOpacity
                       key={index}
-                      style={styles.resourceLink}
+                      style={[styles.resourceLink, { backgroundColor: colors.primary + '10' }]}
                       onPress={() => Linking.openURL(resource)}
                     >
-                      <Ionicons name="link-outline" size={16} color={colors.primary} />
-                      <Text style={{ color: colors.primary, marginLeft: 8 }}>
-                        {resource.replace('https://', '').substring(0, 40)}
+                      <Ionicons name="link-outline" size={18} color={colors.primary} />
+                      <Text style={{ color: colors.primary, marginLeft: 10, flex: 1 }} numberOfLines={1}>
+                        {resource.replace('https://', '').substring(0, 50)}
                       </Text>
+                      <Ionicons name="open-outline" size={16} color={colors.primary} />
                     </TouchableOpacity>
                   ))}
                 </>
@@ -291,13 +365,19 @@ currentProjects.map(project => {
             </ScrollView>
             
             <TouchableOpacity
-              style={[styles.startButton, { backgroundColor: colors.primary }]}
+              style={styles.startButton}
               onPress={() => {
                 setModalVisible(false);
-                Alert.alert('Great choice!', `Start working on "${selectedProject?.title}". Mark it complete when you're done!`);
+                Alert.alert('🎯 Get Started!', `Time to build "${selectedProject?.title}". Good luck with your project!`);
               }}
             >
-              <Text style={styles.startButtonText}>Start Project</Text>
+              <LinearGradient
+                colors={['#4f46e5', '#7c3aed']}
+                style={styles.startButtonGradient}
+              >
+                <Ionicons name="rocket-outline" size={20} color="white" />
+                <Text style={styles.startButtonText}>Start Building</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -317,122 +397,271 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginTop: 20,
   },
-  headerTitle: { fontSize: 18, fontWeight: '600' },
-  careerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 16,
-    marginBottom: 12,
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
   },
-  careerName: { fontSize: 18, fontWeight: '600', flex: 1 },
+  headerTitle: { fontSize: 18, fontWeight: '600' },
+  
+  heroSection: {
+    margin: 16,
+    padding: 24,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  heroTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'white',
+    marginTop: 12,
+  },
+  heroSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  
   tabs: {
-    maxHeight: 44,
+    maxHeight: 50,
   },
   tabsContent: {
     paddingHorizontal: 16,
-    gap: 8,
+    gap: 12,
   },
   tab: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderBottomWidth: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    backgroundColor: '#1f2937',
   },
-  activeTab: { borderBottomWidth: 2 },
+  tabEmoji: { fontSize: 16 },
   tabText: { fontSize: 14, fontWeight: '500' },
-  projectsList: {
-    flex: 1,
-  },
+  
+  projectsList: { flex: 1 },
   projectsListContent: {
     padding: 16,
-    paddingTop: 0,
-    paddingBottom: 24,
+    paddingTop: 8,
+    paddingBottom: 30,
   },
+  
   projectCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  completedRibbon: {
+    position: 'absolute',
+    top: 12,
+    right: -30,
+    backgroundColor: '#10B981',
+    paddingHorizontal: 30,
+    paddingVertical: 4,
+    transform: [{ rotate: '45deg' }],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  completedRibbonText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   projectHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  projectNumber: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  projectNumberText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  checkButton: {
+    padding: 4,
+  },
+  projectTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 8,
   },
-  projectTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flex: 1,
-    flexWrap: 'wrap',
+  projectDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
   },
-  projectTitle: { fontSize: 16, fontWeight: '600', flexShrink: 1 },
-  difficultyBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
-  projectDescription: { fontSize: 14, marginBottom: 12, lineHeight: 20 },
-  projectMeta: { flexDirection: 'row', gap: 16 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { fontSize: 12 },
-  emptyContainer: { alignItems: 'center', padding: 40, gap: 12 },
-  emptyText: { fontSize: 16, textAlign: 'center' },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: '85%',
-  },
-  modalHeader: {
+  projectMeta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', flex: 1, marginRight: 12 },
-  modalBody: { maxHeight: '80%' },
-  modalDescription: { fontSize: 14, lineHeight: 20, marginBottom: 16 },
-  modalMeta: { flexDirection: 'row', gap: 20, marginBottom: 16 },
-  modalMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
-  stepRow: { flexDirection: 'row', gap: 12, marginBottom: 10 },
-  stepNumber: { fontSize: 14, fontWeight: '600', width: 24 },
-  stepText: { fontSize: 14, lineHeight: 20, flex: 1 },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 15,
+    gap: 4,
+  },
+  techStack: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  techTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  techTagText: {
+    color: '#9CA3AF',
+    fontSize: 10,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 60,
+    gap: 16,
+  },
+  emptyText: { fontSize: 16, textAlign: 'center' },
+  
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    overflow: 'hidden',
+  },
+  modalHeaderGradient: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  modalHeaderTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    flex: 1,
+  },
+  modalCloseButton: {
+    padding: 8,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalMetaContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 20,
+  },
+  modalMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  modalDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 12,
+  },
+  stepNumberCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepNumberText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  stepText: {
+    fontSize: 14,
+    lineHeight: 20,
+    flex: 1,
+  },
   resourceLink: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
     marginBottom: 8,
-    padding: 8,
-    backgroundColor: 'rgba(79,70,229,0.1)',
-    borderRadius: 8,
   },
   startButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 16,
+    margin: 20,
+    marginTop: 0,
   },
-  clickIndicator: {
-  marginTop: 12,
-  paddingTop: 8,
-  borderTopWidth: 1,
-  borderTopColor: 'rgba(0,0,0,0.05)',
-},
-clickIndicatorContent: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 6,
-},
-clickIndicatorText: {
-  fontSize: 11,
-  textAlign: 'center',
-},
-  startButtonText: { color: 'white', fontSize: 16, fontWeight: '600' },
-  upgradeButton: { padding: 16, borderRadius: 8, width: '80%', alignItems: 'center' },
-  upgradeButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  startButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 16,
+    gap: 8,
+  },
+  startButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  lockIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  upgradeButton: {
+    width: '100%',
+    maxWidth: 280,
+  },
+  upgradeGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 12,
+    gap: 8,
+  },
+  upgradeButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
