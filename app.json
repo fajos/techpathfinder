@@ -1,28 +1,41 @@
 {
   "expo": {
-    "name": "tech-career-mobile",
-    "slug": "tech-career-mobile",
+    "name": "TechPathFinder",
+    "slug": "techpathfinder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
+      "package": "com.fajostech.techpathfinder",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"]
+    },
+    "ios": {
+      "bundleIdentifier": "com.fajos.techpathfinder",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app needs microphone access to record your practice answers."
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": [
+      "expo-localization",
+      "expo-notifications",
+      "expo-asset",
+      "expo-audio"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6fc82007-8329-447c-ae0c-3ab96c6ef4bd"
+      }
     }
   }
 }

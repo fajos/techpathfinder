@@ -1,0 +1,256 @@
+{
+  "appTitle": "Tech Career PathFinder",
+  "appSubtitle": "Uncover your future in tech based on your interest",
+  "startQuiz": "🎯 Take the Questionnaire",
+  "viewSaved": "🔐 View Saved Careers",
+  "version": "Version",
+  "builtWith": "Built by",
+  "poweredBy": "Powered by",
+  "visitDeveloper": "Visit Developer Page",
+  "back": "Back",
+  "settings": "Settings",
+  "contactDeveloper": "Contact the Developer",
+  "darkMode": "Dark Mode",
+  "careerExplore": "Career Explorer",
+  "exploreCareers": "Explore Careers",
+  "reset": "Reset Saved Careers",
+  "changePasscode": "Change Dashboard Passcode",
+  "about": "About This App",
+  "chooseLanguage": "Choose Language",
+  "backHome": "Home",
+  "resetSuccess": "All saved careers have been cleared.",
+  "dashboard": {
+    "savedTitle": "My Saved Careers",
+    "empty": "You haven’t saved any career paths yet.",
+    "skills": "Top Skills",
+    "roadmap": "Roadmap Preview",
+    "resources": "Resources",
+    "delete": "Delete Career",
+    "exportPdf": "Save as PDF",
+    "exportJson": "Export JSON",
+    "clear": "Clear Dashboard",
+    "exportTitle": "My Career Paths",
+    "saved": "Saved",
+    "saveToDashboard": "Save to Dashboard"
+  },
+  "careerExplorer": {
+  "title": "🔍 Explore Tech Careers",
+  "searchPlaceholder": "Search for a career...",
+  "skills": "Top Skills",
+  "roadmap": "Career Roadmap",
+  "resources": "Helpful Resources",
+  "saveToDashboard": "Save to Dashboard",
+  "saved": "Saved"
+},
+    "result": {
+      "title": "Your Top 5 Career Matches",
+      "congrats": "🎉 Congratulations on discovering your career path!",
+      "share": "📤 Share Result",
+      "retake": "🔁 Retake Questionnaire",
+      "gotoDashboard": "Go to Dashboard"
+    },
+    "resultTab": {
+  "title": "My Last Career Suggestions",
+  "empty": "No result saved yet. Take the quiz to get started!"
+},
+"title": "🚀 Discover Your Tech Career Path",
+"submit": "🎯 Show My Career Path",
+  "questions": {
+    "q1": "What kind of problems do you enjoy solving?",
+    "q1.opt1": "Building apps or tools",
+    "q1.opt2": "Designing things that look great",
+    "q1.opt3": "Helping people fix their tech",
+    "q1.opt4": "Understanding how systems work",
+    "q1.opt5": "Finding security flaws or risks",
+    "q1.opt6": "Organizing data to get insights",
+
+    "q2": "Which of these sounds most exciting to you?",
+    "q2.opt1": "Creating a mobile app",
+    "q2.opt2": "Training an AI model",
+    "q2.opt3": "Designing user interfaces",
+    "q2.opt4": "Working with hardware or devices",
+    "q2.opt5": "Automating repetitive tasks",
+    "q2.opt6": "Managing cloud infrastructure",
+
+    "q3": "What would you like to learn more about?",
+    "q3.opt1": "Cloud services (AWS, Azure, GCP)",
+    "q3.opt2": "Cybersecurity and ethical hacking",
+    "q3.opt3": "No-code tools and automation",
+    "q3.opt4": "Programming languages",
+    "q3.opt5": "Designing digital products",
+    "q3.opt6": "Analyzing or visualizing data",
+
+    "q4": "Which of these tools or platforms have you heard of or used?",
+    "q4.opt1": "Figma or Canva",
+    "q4.opt2": "Python or JavaScript",
+    "q4.opt3": "SQL or Excel or Google Sheets",
+    "q4.opt4": "Unity or Unreal Engine",
+    "q4.opt5": "ChatGPT or AI tools",
+    "q4.opt6": "Bubble, Glide, or Zapier",
+    "q4.opt7": "Agile or Scrum",
+
+    "q5": "How do you prefer to work?",
+    "q5.opt1": "Alone solving deep problems",
+    "q5.opt2": "In teams building big products",
+    "q5.opt3": "Helping users and customers",
+    "q5.opt4": "Designing beautiful interfaces",
+    "q5.opt5": "Exploring and analyzing data",
+    "q5.opt6": "Automating systems and workflows",
+
+    "q6": "Which of these do you find most interesting?",
+    "q6.opt1": "Machine learning and AI",
+    "q6.opt2": "Website or app development",
+    "q6.opt3": "System administration",
+    "q6.opt4": "Data analysis and charts",
+    "q6.opt5": "Blockchain or crypto tech",
+    "q6.opt6": "Voice assistants and smart devices",
+
+    "q7": "Which statement best describes you?",
+    "q7.opt1": "I like solving puzzles or coding challenges",
+    "q7.opt2": "I enjoy storytelling and making things simple",
+    "q7.opt3": "I'm very organized and like to plan and manage",
+    "q7.opt4": "I like drawing, designing, and prototyping",
+    "q7.opt5": "I enjoy working with devices, gadgets, or circuits",
+    "q7.opt6": "I love exploring new tech like AI, AR, or VR",
+
+    "q8": "If given a week to explore, what would you do?",
+    "q8.opt1": "Build a website or blog",
+    "q8.opt2": "Design an app interface",
+    "q8.opt3": "Create an AI chatbot",
+    "q8.opt4": "Analyze data from a spreadsheet",
+    "q8.opt5": "Fix a broken laptop or troubleshoot Wi-Fi",
+    "q8.opt6": "Create a game or animation",
+
+    "q9": "What industries or domains are you most curious about?",
+    "q9.opt1": "Health, finance, or education",
+    "q9.opt2": "Gaming and interactive media",
+    "q9.opt3": "Cybersecurity and privacy",
+    "q9.opt4": "Startups and digital products",
+    "q9.opt5": "IoT, robotics, and automation",
+    "q9.opt6": "Marketing and digital content",
+
+    "q10": "How comfortable are you with technical concepts right now?",
+    "q10.opt1": "Very new to tech",
+    "q10.opt2": "Some familiarity, still learning",
+    "q10.opt3": "Intermediate — I’ve built a few things",
+    "q10.opt4": "Comfortable with coding",
+    "q10.opt5": "I’m more visual or creative",
+    "q10.opt6": "I prefer managing people or systems"
+  },
+  "questionnaire": {
+  "questions": [
+    {
+      "q": "questions.q1",
+      "options": [
+        "questions.q1.opt1",
+        "questions.q1.opt2",
+        "questions.q1.opt3",
+        "questions.q1.opt4",
+        "questions.q1.opt5",
+        "questions.q1.opt6"
+      ]
+    },
+    {
+      "q": "questions.q2",
+      "options": [
+        "questions.q2.opt1",
+        "questions.q2.opt2",
+        "questions.q2.opt3",
+        "questions.q2.opt4",
+        "questions.q2.opt5",
+        "questions.q2.opt6"
+      ]
+    },
+    {
+      "q": "questions.q3",
+      "options": [
+        "questions.q3.opt1",
+        "questions.q3.opt2",
+        "questions.q3.opt3",
+        "questions.q3.opt4",
+        "questions.q3.opt5",
+        "questions.q3.opt6"
+      ]
+    },
+    {
+      "q": "questions.q4",
+      "options": [
+        "questions.q4.opt1",
+        "questions.q4.opt2",
+        "questions.q4.opt3",
+        "questions.q4.opt4",
+        "questions.q4.opt5",
+        "questions.q4.opt6",
+        "questions.q4.opt7"
+      ]
+    },
+    {
+      "q": "questions.q5",
+      "options": [
+        "questions.q5.opt1",
+        "questions.q5.opt2",
+        "questions.q5.opt3",
+        "questions.q5.opt4",
+        "questions.q5.opt5",
+        "questions.q5.opt6"
+      ]
+    },
+    {
+      "q": "questions.q6",
+      "options": [
+        "questions.q6.opt1",
+        "questions.q6.opt2",
+        "questions.q6.opt3",
+        "questions.q6.opt4",
+        "questions.q6.opt5",
+        "questions.q6.opt6"
+      ]
+    },
+    {
+      "q": "questions.q7",
+      "options": [
+        "questions.q7.opt1",
+        "questions.q7.opt2",
+        "questions.q7.opt3",
+        "questions.q7.opt4",
+        "questions.q7.opt5",
+        "questions.q7.opt6"
+      ]
+    },
+    {
+      "q": "questions.q8",
+      "options": [
+        "questions.q8.opt1",
+        "questions.q8.opt2",
+        "questions.q8.opt3",
+        "questions.q8.opt4",
+        "questions.q8.opt5",
+        "questions.q8.opt6"
+      ]
+    },
+    {
+      "q": "questions.q9",
+      "options": [
+        "questions.q9.opt1",
+        "questions.q9.opt2",
+        "questions.q9.opt3",
+        "questions.q9.opt4",
+        "questions.q9.opt5",
+        "questions.q9.opt6"
+      ]
+    },
+    {
+      "q": "questions.q10",
+      "options": [
+        "questions.q10.opt1",
+        "questions.q10.opt2",
+        "questions.q10.opt3",
+        "questions.q10.opt4",
+        "questions.q10.opt5",
+        "questions.q10.opt6"
+      ]
+    }
+  ]
+}
+
+}
