@@ -61,6 +61,8 @@ const ResultScreen = () => {
 
   const { isPremium } = usePremium();
 
+  const { updateLastActive } = useUserProfileStore();
+
   const openModal = (career) => {
     setSelectedCareer(career);
     setModalVisible(true);

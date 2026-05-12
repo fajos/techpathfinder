@@ -165,23 +165,30 @@ useEffect(() => {
     );
   };
 
-  const nextQuestion = () => {
-    const currentList = selectedCategory === 'behavioral'
-      ? questions.behavioral
-      : questions.technical;
+const nextQuestion = () => {
+  const currentList = selectedCategory === 'behavioral'
+    ? questions.behavioral
+    : questions.technical;
 
-    const currentIndex = currentList.findIndex(q => q.id === currentQuestion?.id);
-    const nextIndex = currentIndex + 1;
+  const currentIndex = currentList.findIndex(q => q.id === currentQuestion?.id);
+  const nextIndex = currentIndex + 1;
 
-    if (nextIndex < currentList.length) {
-      setCurrentQuestion(currentList[nextIndex]);
-      setShowAnswer(false);
-      setUserAnswer('');
-      setRecordedUri(null);
-    } else {
-      Alert.alert('Great job!', 'You\'ve completed all questions. Keep practicing to improve!');
-    }
-  };
+  if (nextIndex < currentList.length) {
+    setCurrentQuestion(currentList[nextIndex]);
+    setShowAnswer(false);
+    setUserAnswer('');
+    setRecordedUri(null);
+  } else {
+    // ✅ TRACK HERE - User completed all questions
+    trackEvent('interview_completed', {
+      career: career,
+      category: selectedCategory,
+      total_questions: currentList.length
+    });
+    
+    Alert.alert('Great job!', 'You\'ve completed all questions. Keep practicing to improve!');
+  }
+};
 
   const previousQuestion = () => {
     const currentList = selectedCategory === 'behavioral'
