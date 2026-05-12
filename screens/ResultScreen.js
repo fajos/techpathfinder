@@ -31,6 +31,7 @@ import { usePremium } from '../context/PremiumContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useUserProfileStore } from '../store/userProfileStore';
+import { trackScreen } from "../services/analytics";
 
 const ResultScreen = () => {
   const route = useRoute();
@@ -76,6 +77,10 @@ const ResultScreen = () => {
   }, [isDark]);
 
   useEffect(() => {
+  trackScreen('ResultScreen');
+}, []);
+
+  useEffect(() => {
     if (user && fullResults.length > 0 && !hasSavedRef.current) {
       hasSavedRef.current = true;
       
@@ -88,6 +93,8 @@ const ResultScreen = () => {
       if (fullResults[0]) {
         saveCareer(user.uid, fullResults[0].title);
       }
+
+      updateLastActive(user.uid);
     }
   }, [user, fullResults, answers, addQuizResult, saveCareer]);
 

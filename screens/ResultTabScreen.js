@@ -20,6 +20,7 @@ import careerRoadmapsFull from "../data/careerRoadmapsFull";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { usePremium } from '../context/PremiumContext';
+import { trackScreen } from "../services/analytics";
 
 const ResultTabScreen = () => {
   const { colors, isDark } = useThemeStyles();
@@ -41,6 +42,10 @@ const ResultTabScreen = () => {
     setSelectedCareer(null);
     setModalVisible(false);
   };
+
+  useEffect(() => {
+  trackScreen('ResultTabScreen');
+}, []);
 
   useEffect(() => {
     const load = async () => {

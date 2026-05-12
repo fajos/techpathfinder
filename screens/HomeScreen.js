@@ -12,6 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeStyles } from "../hooks/useThemeStyles";
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { trackScreen } from '../services/analytics';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -28,6 +29,10 @@ const HomeScreen = () => {
       setLoading(false);
     }, 100);
   };
+
+  useEffect(() => {
+  trackScreen('HomeScreen');
+}, []);
 
   useEffect(() => {
     Animated.parallel([

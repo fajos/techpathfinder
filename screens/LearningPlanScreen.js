@@ -16,6 +16,7 @@ import { useThemeStyles } from '../hooks/useThemeStyles';
 import learningPlanService from '../services/learningPlanService';
 import careerRoadmapsFull from '../data/careerRoadmapsFull';
 import { Linking } from 'react-native';
+import { trackScreen, trackEvent } from '../services/analytics';
 
 export default function LearningPlanScreen({ route, navigation }) {
   const { career } = route.params;
@@ -32,6 +33,15 @@ export default function LearningPlanScreen({ route, navigation }) {
       generatePlan();
     }
   }, [user, career]);
+
+useEffect(() => {
+  trackScreen('LearningPlanScreen');
+  trackEvent('feature_used', { 
+    feature: 'learning_plan', 
+    career: career,
+    weeks: plan?.weeksNeeded
+  });
+}, [career, plan]);
 
   const generatePlan = async () => {
     setLoading(true);

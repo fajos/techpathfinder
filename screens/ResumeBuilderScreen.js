@@ -22,6 +22,7 @@ import { useResumeStore } from '../store/resumeStore';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import * as Sharing from 'expo-sharing';
 import { StorageAccessFramework } from 'expo-file-system';
+import { trackScreen, trackEvent } from '../services/analytics';
 
 
 
@@ -50,6 +51,15 @@ export default function ResumeBuilderScreen({ route, navigation }) {
     const { Paths, File, Directory } = FileSystem;
 
     console.log('FileSystem API:', Object.keys(FileSystem));
+
+
+useEffect(() => {
+  trackScreen('ResumeBuilderScreen');
+  trackEvent('feature_used', { 
+    feature: 'resume_builder', 
+    career: career
+  });
+}, [career]);
 
 
 // Export to Downloads using simple file copy
@@ -231,6 +241,11 @@ const saveToDownloads = async (sourceFile, fileName) => {
     };
 
     const generatePDF = async () => {
+
+        trackEvent('resume_generated', { 
+    career: career,
+    has_skills: resume.data.skills?.length > 0
+  });
         setGeneratingPDF(true);
 
         const html = `
@@ -767,9 +782,6 @@ const saveToDownloads = async (sourceFile, fileName) => {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color={colors.text} />
-                </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Resume Builder</Text>
                 <TouchableOpacity onPress={generatePDF} disabled={generatingPDF}>
                     {generatingPDF ? (

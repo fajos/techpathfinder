@@ -12,6 +12,7 @@ import {
 import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { Ionicons } from '@expo/vector-icons';
+import { trackEvent } from '../services/analytics';
 
 const PremiumScreen = ({ navigation }) => {
   // ✅ FIXED: Use correct function names from context
@@ -37,15 +38,28 @@ const PremiumScreen = ({ navigation }) => {
   }
 
   const handlePurchase = async (pkg) => {
-    console.log('🟡 Purchase button pressed for:', pkg?.identifier);
-    try {
-      console.log('Calling purchaseProduct...');
-      const result = await purchaseProduct(pkg);
-      console.log('Purchase result:', result);
-    } catch (error) {
-      console.error('Purchase error caught in screen:', error);
-    }
-  };
+  // Track purchase attempt
+  trackEvent('premium_purchase_started', { 
+    plan: pkg.identifier,
+    price: pkg.product.priceString
+  });
+  
+  const result = await purchaseProduct(pkg);
+  
+  if (result.success) {
+    // Track successful purchase
+    trackEvent('premium_purchase_success', { 
+      plan: pkg.identifier,
+      price: pkg.product.priceString
+    });
+  } else if (!result.userCancelled) {
+    // Track failed purchase
+    trackEvent('premium_purchase_failed', { 
+      plan: pkg.identifier,
+      error: result.error
+    });
+  }
+};
 
   const handleRestore = async () => {
     console.log('🔄 Restore button pressed');

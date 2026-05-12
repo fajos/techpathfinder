@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useUserProfileStore } from '../store/userProfileStore';
 import { useThemeStyles } from '../hooks/useThemeStyles';
+import { trackScreen } from '../services/analytics';
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useAuth();
@@ -40,6 +41,10 @@ export default function ProfileScreen({ navigation }) {
       ensureCurrentUser(user.uid);
     }
   }, [user]);
+
+  useEffect(() => {
+  trackScreen('ProfileScreen');
+}, []);
   
   // Load profile data
   const loadProfile = useCallback(() => {

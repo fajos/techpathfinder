@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a14">
+    <title>SuperCalc - AI Math Solver</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlN1cGVyQ2FsYyAtIE1hdGggU29sdmVyIiwKICAic2hvcnRfbmFtZSI6ICJTdXBlckNhbGMiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBhMGExNCIsCiAgInRoZW1lX2NvbG9yIjogIiMwMGQ0YWEiLAogICJpY29ucyI6IFtdCn0=">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a14;
+            --bg-secondary: #111122;
+            --bg-card: #161630;
+            --bg-input: #0d0d1f;
+            --border: #1e1e3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #9090a8;
+            --accent: #00d4aa;
+            --accent-glow: #00ffcc;
+            --accent-bg: rgba(0, 212, 170, 0.1);
+            --purple: #7c5ce7;
+            --purple-glow: #a78bfa;
+            --purple-bg: rgba(124, 92, 231, 0.12);
+            --danger: #ff4757;
+            --warning: #ffa502;
+            --info: #3498db;
+            --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --safe-bottom: env(safe-area-inset-bottom, 16px);
+            --safe-top: env(safe-area-inset-top, 0px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(0, 212, 170, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 90%, rgba(124, 92, 231, 0.03) 0%, transparent 60%);
+        }
+
+        /* === APP CONTAINER === */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 12px 16px 24px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 4px 16px;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .app-header.scrolled {
+            border-bottom-color: var(--border);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #00b894);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.2);
+        }
+        .logo-text h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+        .logo-text span {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .icon-btn:active {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(0.93);
+        }
+
+        /* === MODE CHIPS === */
+        .mode-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 16px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            flex-shrink: 0;
+        }
+        .mode-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
+            flex-shrink: 0;
+        }
+        .chip:active {
+            transform: scale(0.95);
+        }
+        .chip.active {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent-glow);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.12);
+        }
+        .chip .chip-emoji {
+            margin-right: 5px;
+        }
+
+        /* === INPUT CARD === */
+        .input-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px 18px;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .input-card:focus-within {
+            border-color: rgba(0, 212, 170, 0.4);
+            box-shadow: 0 0 30px rgba(0, 212, 170, 0.06);
+        }
+
+        .input-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .input-label strong {
+            color: var(--text-primary);
+        }
+
+        .coeff-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .coeff-row input {
+            flex: 1;
+            min-width: 55px;
+            padding: 14px 12px;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: var(--font-mono);
+            text-align: center;
+            outline: none;
+            transition: all 0.2s;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .coeff-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.06);
+        }
+        .coeff-separator {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .data-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: var(--font-mono);
+            outline: none;
+            -webkit-user-select: text;
+            user-select: text;
+            transition: all 0.2s;
+        }
+        .data-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.06);
+        }
+
+        .solve-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 14px;
+            background: linear-gradient(135deg, var(--accent), #00b894);
+            border: none;
+            border-radius: 16px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            font-family: var(--font-sans);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.2);
+        }
+        .solve-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0, 212, 170, 0.3);
+        }
+        .solve-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        .solve-btn:active::after {
+            transform: translateX(100%);
+        }
+
+        /* === SOLUTION AREA === */
+        .solution-area {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .solution-area.visible {
+            display: flex;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .step-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        .step-badge.primary {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+        .step-badge.secondary {
+            background: var(--purple-bg);
+            color: var(--purple-glow);
+        }
+        .step-badge.warning {
+            background: rgba(255, 165, 2, 0.1);
+            color: var(--warning);
+        }
+
+        .step-content {
+            color: #c8c8d8;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            font-family: var(--font-mono);
+        }
+        .step-content .hl {
+            color: var(--accent-glow);
+            font-weight: 600;
+        }
+        .step-content .formula {
+            color: var(--purple-glow);
+        }
+        .step-content .result-box {
+            display: inline-block;
+            background: var(--purple-bg);
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: #c4b5fd;
+            font-weight: 600;
+        }
+
+        .final-card {
+            background: linear-gradient(135deg, var(--accent-bg), var(--purple-bg));
+            border: 1.5px solid var(--accent);
+            border-radius: 20px;
+            padding: 22px 20px;
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 212, 170, 0.2);
+            }
+        }
+        .final-card .final-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .final-card .final-value {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            line-height: 1.6;
+        }
+
+        .disc-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .disc-badge.real-distinct {
+            background: rgba(0, 212, 170, 0.12);
+            color: #00d4aa;
+        }
+        .disc-badge.real-equal {
+            background: rgba(255, 165, 2, 0.12);
+            color: #ffa502;
+        }
+        .disc-badge.complex {
+            background: rgba(124, 92, 231, 0.12);
+            color: #c4b5fd;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+        }
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* === TOAST === */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #fff;
+            z-index: 200;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header" id="appHeader">
+            <div class="logo-section">
+                <div class="logo-icon">🧮</div>
+                <div class="logo-text">
+                    <h1>SuperCalc</h1>
+                    <span>Step-by-Step Solver</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="historyBtn" aria-label="History">📋</button>
+            </div>
+        </header>
+
+        <!-- MODE CHIPS -->
+        <nav class="mode-chips" id="modeChips">
+            <button class="chip active" data-mode="quadratic">
+                <span class="chip-emoji">📐</span>Quadratic
+            </button>
+            <button class="chip" data-mode="statistics">
+                <span class="chip-emoji">📊</span>Statistics
+            </button>
+            <button class="chip" data-mode="linear">
+                <span class="chip-emoji">📏</span>Linear Sys
+            </button>
+            <button class="chip" data-mode="polynomial">
+                <span class="chip-emoji">📈</span>Polynomial
+            </button>
+            <button class="chip" data-mode="trigonometry">
+                <span class="chip-emoji">📐</span>Trig
+            </button>
+        </nav>
+
+        <!-- INPUT CARDS -->
+        <!-- Quadratic Input -->
+        <div class="input-card" id="card-quadratic">
+            <div class="input-label">Enter Quadratic: <strong>ax² + bx + c = 0</strong></div>
+            <div class="coeff-row">
+                <input type="number" id="q-a" placeholder="a" value="1" step="any">
+                <span class="coeff-separator">x² +</span>
+                <input type="number" id="q-b" placeholder="b" value="-5" step="any">
+                <span class="coeff-separator">x +</span>
+                <input type="number" id="q-c" placeholder="c" value="6" step="any">
+                <span class="coeff-separator">= 0</span>
+            </div>
+            <button class="solve-btn" id="solveQuadratic">⚡ Solve Quadratic</button>
+        </div>
+
+        <!-- Statistics Input -->
+        <div class="input-card" id="card-statistics" style="display:none;">
+            <div class="input-label">Enter Data: <strong>comma-separated values</strong></div>
+            <input type="text" class="data-input" id="stats-data" placeholder="e.g., 12, 15, 18, 22, 25, 30" value="12,15,18,22,25,30">
+            <button class="solve-btn" id="solveStatistics">📊 Analyze Data</button>
+        </div>
+
+        <!-- Linear System Input -->
+        <div class="input-card" id="card-linear" style="display:none;">
+            <div class="input-label"><strong>2×2 Linear System</strong></div>
+            <div class="coeff-row" style="margin-bottom:8px;">
+                <input type="number" id="l-a1" placeholder="a₁" value="2" step="any">
+                <span class="coeff-separator">x +</span>
+                <input type="number" id="l-b1" placeholder="b₁" value="1" step="any">
+                <span class="coeff-separator">y =</span>
+                <input type="number" id="l-c1" placeholder="c₁" value="10" step="any">
+            </div>
+            <div class="coeff-row">
+                <input type="number" id="l-a2" placeholder="a₂" value="1" step="any">
+                <span class="coeff-separator">x +</span>
+                <input type="number" id="l-b2" placeholder="b₂" value="-1" step="any">
+                <span class="coeff-separator">y =</span>
+                <input type="number" id="l-c2" placeholder="c₂" value="2" step="any">
+            </div>
+            <button class="solve-btn" id="solveLinear">📏 Solve System</button>
+        </div>
+
+        <!-- Polynomial Input -->
+        <div class="input-card" id="card-polynomial" style="display:none;">
+            <div class="input-label">Cubic Equation: <strong>ax³ + bx² + cx + d = 0</strong></div>
+            <div class="coeff-row">
+                <input type="number" id="p-a" placeholder="a" value="1" step="any">
+                <span class="coeff-separator">x³ +</span>
+                <input type="number" id="p-b" placeholder="b" value="-6" step="any">
+                <span class="coeff-separator">x² +</span>
+                <input type="number" id="p-c" placeholder="c" value="11" step="any">
+                <span class="coeff-separator">x +</span>
+                <input type="number" id="p-d" placeholder="d" value="-6" step="any">
+                <span class="coeff-separator">= 0</span>
+            </div>
+            <button class="solve-btn" id="solvePolynomial">📈 Solve Cubic</button>
+        </div>
+
+        <!-- Trigonometry Input -->
+        <div class="input-card" id="card-trigonometry" style="display:none;">
+            <div class="input-label">Solve Trig Equation: <strong>sin(x) = value</strong></div>
+            <div class="coeff-row">
+                <select id="trig-func" style="padding:14px;border-radius:14px;background:var(--bg-input);color:#fff;border:1.5px solid var(--border);font-family:var(--font-mono);">
+                    <option value="sin">sin</option>
+                    <option value="cos">cos</option>
+                    <option value="tan">tan</option>
+                </select>
+                <span class="coeff-separator">(x) =</span>
+                <input type="number" id="trig-val" placeholder="value" value="0.5" step="any" style="flex:2;">
+            </div>
+            <button class="solve-btn" id="solveTrig">📐 Solve Trig</button>
+        </div>
+
+        <!-- SOLUTION AREA -->
+        <div class="solution-area" id="solutionArea">
+            <div class="empty-state">
+                <div class="empty-icon">🚀</div>
+                <p>Enter values and tap <strong>Solve</strong><br>to see step-by-step solutions!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============ APP STATE ============
+        const state = {
+            currentMode: 'quadratic',
+            history: [],
+        };
+
+        // ============ DOM REFS ============
+        const solutionArea = document.getElementById('solutionArea');
+        const toast = document.getElementById('toast');
+        const modeChips = document.getElementById('modeChips');
+        const appHeader = document.getElementById('appHeader');
+
+        // ============ TOAST ============
+        let toastTimer;
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // ============ HEADER SCROLL EFFECT ============
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                appHeader.classList.add('scrolled');
+            } else {
+                appHeader.classList.remove('scrolled');
+            }
+        });
+
+        // ============ MODE SWITCHING ============
+        const inputCards = {
+            quadratic: document.getElementById('card-quadratic'),
+            statistics: document.getElementById('card-statistics'),
+            linear: document.getElementById('card-linear'),
+            polynomial: document.getElementById('card-polynomial'),
+            trigonometry: document.getElementById('card-trigonometry'),
+        };
+
+        modeChips.addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+
+            const mode = chip.dataset.mode;
+            if (state.currentMode === mode) return;
+
+            // Update chips
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+
+            // Hide all cards
+            Object.values(inputCards).forEach(card => card.style.display = 'none');
+
+            // Show selected card
+            if (inputCards[mode]) {
+                inputCards[mode].style.display = 'block';
+                inputCards[mode].style.animation = 'slideUp 0.3s ease';
+            }
+
+            // Clear solution
+            solutionArea.classList.remove('visible');
+            solutionArea.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🚀</div>
+                    <p>Enter values and tap <strong>Solve</strong><br>to see step-by-step solutions!</p>
+                </div>
+            `;
+
+            state.currentMode = mode;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ============ QUADRATIC SOLVER ============
+        document.getElementById('solveQuadratic').addEventListener('click', solveQuadratic);
+
+        function solveQuadratic() {
+            const a = parseFloat(document.getElementById('q-a').value) || 0;
+            const b = parseFloat(document.getElementById('q-b').value) || 0;
+            const c = parseFloat(document.getElementById('q-c').value) || 0;
+
+            if (a === 0) {
+                showToast('⚠️ Coefficient "a" cannot be zero');
+                return;
+            }
+
+            let steps = [];
+
+            // Format equation
+            let eqStr = '';
+            if (a === 1) eqStr += 'x²';
+            else if (a === -1) eqStr += '-x²';
+            else eqStr += `${a}x²`;
+
+            if (b !== 0) {
+                const sign = b > 0 ? '+' : '-';
+                const absB = Math.abs(b);
+                eqStr += ` ${sign} `;
+                if (absB === 1) eqStr += 'x';
+                else eqStr += `${absB}x`;
+            }
+
+            if (c !== 0) {
+                const sign = c > 0 ? '+' : '-';
+                eqStr += ` ${sign} ${Math.abs(c)}`;
+            }
+            eqStr += ' = 0';
+
+            // Step 1: Identify coefficients
+            steps.push({
+                badge: 'primary',
+                title: 'STEP 1',
+                content: `
+                    <strong>Identify coefficients</strong> from <span class="hl">ax² + bx + c = 0</span>:<br>
+                    &nbsp;&nbsp;<span class="hl">a = ${a}</span><br>
+                    &nbsp;&nbsp;<span class="hl">b = ${b}</span><br>
+                    &nbsp;&nbsp;<span class="hl">c = ${c}</span><br>
+                    <span style="color:#888;">Equation: ${eqStr}</span>
+                `
+            });
+
+            // Step 2: Discriminant
+            const discriminant = b * b - 4 * a * c;
+            let discClass, discLabel;
+            if (discriminant > 0) { discClass = 'real-distinct';
+                discLabel = 'Two distinct real roots'; } else if (discriminant === 0) { discClass = 'real-equal';
+                discLabel = 'One real double root'; } else { discClass = 'complex';
+                discLabel = 'Two complex conjugate roots'; }
+
+            steps.push({
+                badge: 'secondary',
+                title: 'STEP 2',
+                content: `
+                    <strong>Calculate discriminant</strong> <span class="formula">Δ = b² − 4ac</span>:<br>
+                    &nbsp;&nbsp;Δ = (${b})² − 4(${a})(${c})<br>
+                    &nbsp;&nbsp;Δ = ${b*b} − ${4*a*c}<br>
+                    &nbsp;&nbsp;<span class="hl">Δ = ${discriminant}</span>
+                    &nbsp;<span class="disc-badge ${discClass}">${discLabel}</span>
+                `
+            });
+
+            // Step 3: Quadratic formula
+            const denom = 2 * a;
+            steps.push({
+                badge: 'primary',
+                title: 'STEP 3',
+                content: `
+                    <strong>Apply quadratic formula</strong>:<br>
+                    <span class="formula">x = (−b ± √Δ) / (2a)</span><br><br>
+                    &nbsp;&nbsp;x = (−(${b}) ± √${discriminant}) / (2×${a})<br>
+                    &nbsp;&nbsp;x = (${-b} ± √${discriminant}) / ${denom}
+                `
+            });
+
+            // Step 4: Compute roots
+            let root1, root2;
+            const sqrtAbsDisc = Math.sqrt(Math.abs(discriminant));
+
+            if (discriminant >= 0) {
+                root1 = (-b + Math.sqrt(discriminant)) / denom;
+                root2 = (-b - Math.sqrt(discriminant)) / denom;
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 4',
+                    content: `
+                        <strong>Compute real roots</strong>:<br>
+                        &nbsp;&nbsp;√${discriminant} = ${sqrtAbsDisc.toFixed(4)}<br><br>
+                        &nbsp;&nbsp;x₁ = (${-b} + ${sqrtAbsDisc.toFixed(4)}) / ${denom}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;= ${(-b+sqrtAbsDisc).toFixed(4)} / ${denom}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;= <span class="result-box">${root1.toFixed(4)}</span><br><br>
+                        &nbsp;&nbsp;x₂ = (${-b} − ${sqrtAbsDisc.toFixed(4)}) / ${denom}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;= ${(-b-sqrtAbsDisc).toFixed(4)} / ${denom}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;= <span class="result-box">${root2.toFixed(4)}</span>
+                    `
+                });
+            } else {
+                const realPart = -b / denom;
+                const imagPart = sqrtAbsDisc / denom;
+                root1 = `${realPart.toFixed(4)} + ${imagPart.toFixed(4)}i`;
+                root2 = `${realPart.toFixed(4)} − ${imagPart.toFixed(4)}i`;
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 4',
+                    content: `
+                        <strong>Compute complex roots</strong>:<br>
+                        &nbsp;&nbsp;√|${discriminant}| = ${sqrtAbsDisc.toFixed(4)}<br>
+                        &nbsp;&nbsp;√${discriminant} = ${sqrtAbsDisc.toFixed(4)}i<br><br>
+                        &nbsp;&nbsp;Real part = −b/(2a) = ${realPart.toFixed(4)}<br>
+                        &nbsp;&nbsp;Imag part = √|Δ|/(2a) = ${imagPart.toFixed(4)}<br><br>
+                        &nbsp;&nbsp;x₁ = <span class="result-box">${root1}</span><br>
+                        &nbsp;&nbsp;x₂ = <span class="result-box">${root2}</span>
+                    `
+                });
+            }
+
+            // Verification
+            steps.push({
+                badge: 'warning',
+                title: 'VERIFICATION',
+                content: `
+                    <strong>✅ Check:</strong> Sum of roots = −b/a = ${(-b/a).toFixed(4)}<br>
+                    Product of roots = c/a = ${(c/a).toFixed(4)}
+                `
+            });
+
+            // Final answer
+            const finalHTML = `
+                <div class="final-card">
+                    <div class="final-label">🎯 Solution</div>
+                    <div class="final-value">
+                        x₁ = ${typeof root1 === 'string' ? root1 : root1.toFixed(4)}<br>
+                        x₂ = ${typeof root2 === 'string' ? root2 : root2.toFixed(4)}
+                    </div>
+                </div>
+            `;
+
+            renderSolution(steps, finalHTML, { equation: eqStr, discriminant, a, b, c, roots: [root1, root2] });
+        }
+
+        // ============ STATISTICS SOLVER ============
+        document.getElementById('solveStatistics').addEventListener('click', solveStatistics);
+
+        function solveStatistics() {
+            const rawData = document.getElementById('stats-data').value;
+            const data = rawData.split(',')
+                .map(s => parseFloat(s.trim()))
+                .filter(n => !isNaN(n));
+
+            if (data.length < 2) {
+                showToast('⚠️ Please enter at least 2 numbers');
+                return;
+            }
+
+            const sorted = [...data].sort((a, b) => a - b);
+            const n = data.length;
+            const sum = data.reduce((a, v) => a + v, 0);
+            const mean = sum / n;
+            const median = n % 2 === 0 ?
+                (sorted[n / 2 - 1] + sorted[n / 2]) / 2 :
+                sorted[Math.floor(n / 2)];
+
+            const freq = {};
+            data.forEach(v => freq[v] = (freq[v] || 0) + 1);
+            const maxFreq = Math.max(...Object.values(freq));
+            const modes = Object.keys(freq).filter(k => freq[k] === maxFreq).map(Number);
+            const modeStr = maxFreq === 1 ? 'None (all unique)' : modes.join(', ');
+
+            const variance = data.reduce((a, v) => a + (v - mean) ** 2, 0) / n;
+            const stdDev = Math.sqrt(variance);
+            const sampleVar = data.reduce((a, v) => a + (v - mean) ** 2, 0) / (n - 1);
+            const sampleStd = Math.sqrt(sampleVar);
+            const min = sorted[0];
+            const max = sorted[n - 1];
+            const range = max - min;
+            const q1 = sorted[Math.floor(n / 4)];
+            const q3 = sorted[Math.floor(3 * n / 4)];
+            const iqr = q3 - q1;
+
+            const steps = [{
+                badge: 'primary',
+                title: 'STEP 1',
+                content: `
+                    <strong>Sort data (ascending):</strong><br>
+                    [${sorted.join(', ')}]<br>
+                    <span style="color:#888;">n = ${n} values</span>
+                `
+            }, {
+                badge: 'secondary',
+                title: 'STEP 2',
+                content: `
+                    <strong>Central Tendency:</strong><br>
+                    &nbsp;&nbsp;📌 <span class="hl">Mean</span> = Σx/n = ${sum}/${n} = <strong>${mean.toFixed(4)}</strong><br>
+                    &nbsp;&nbsp;📌 <span class="hl">Median</span> = <strong>${median.toFixed(4)}</strong><br>
+                    &nbsp;&nbsp;📌 <span class="hl">Mode</span> = <strong>${modeStr}</strong>
+                `
+            }, {
+                badge: 'primary',
+                title: 'STEP 3',
+                content: `
+                    <strong>Dispersion:</strong><br>
+                    &nbsp;&nbsp;📏 <span class="hl">Range</span> = ${max} − ${min} = <strong>${range}</strong><br>
+                    &nbsp;&nbsp;📏 <span class="hl">Variance (pop.)</span> = <strong>${variance.toFixed(4)}</strong><br>
+                    &nbsp;&nbsp;📏 <span class="hl">Std Dev (pop.)</span> = <strong>${stdDev.toFixed(4)}</strong><br>
+                    &nbsp;&nbsp;📏 <span class="hl">Sample Std Dev</span> = <strong>${sampleStd.toFixed(4)}</strong>
+                `
+            }, {
+                badge: 'secondary',
+                title: 'STEP 4',
+                content: `
+                    <strong>Five-Number Summary:</strong><br>
+                    &nbsp;&nbsp;Min=${min} | Q1=${q1} | Med=${median.toFixed(4)} | Q3=${q3} | Max=${max}<br>
+                    &nbsp;&nbsp;<span class="hl">IQR</span> = ${iqr.toFixed(4)}
+                `
+            }];
+
+            const finalHTML = `
+                <div class="final-card">
+                    <div class="final-label">📊 Statistical Summary</div>
+                    <div class="final-value" style="font-size:1.1rem;line-height:2.2;">
+                        Mean = ${mean.toFixed(4)}<br>
+                        Median = ${median.toFixed(4)}<br>
+                        Std Dev = ${stdDev.toFixed(4)}<br>
+                        Range = ${range.toFixed(4)}
+                    </div>
+                </div>
+            `;
+
+            renderSolution(steps, finalHTML, { data, mean, median, stdDev, range });
+        }
+
+        // ============ LINEAR SYSTEM SOLVER ============
+        document.getElementById('solveLinear').addEventListener('click', solveLinear);
+
+        function solveLinear() {
+            const a1 = parseFloat(document.getElementById('l-a1').value) || 0;
+            const b1 = parseFloat(document.getElementById('l-b1').value) || 0;
+            const c1 = parseFloat(document.getElementById('l-c1').value) || 0;
+            const a2 = parseFloat(document.getElementById('l-a2').value) || 0;
+            const b2 = parseFloat(document.getElementById('l-b2').value) || 0;
+            const c2 = parseFloat(document.getElementById('l-c2').value) || 0;
+
+            const det = a1 * b2 - a2 * b1;
+
+            if (det === 0) {
+                showToast('⚠️ System has no unique solution (det = 0)');
+                solutionArea.classList.remove('visible');
+                solutionArea.innerHTML = `
+                    <div class="step-card">
+                        <span class="step-badge warning">RESULT</span>
+                        <div class="step-content">
+                            Determinant = <span class="hl">0</span><br>
+                            The system is either <strong>dependent</strong> (infinite solutions) or <strong>inconsistent</strong> (no solution).
+                        </div>
+                    </div>
+                `;
+                solutionArea.classList.add('visible');
+                return;
+            }
+
+            const x = (c1 * b2 - c2 * b1) / det;
+            const y = (a1 * c2 - a2 * c1) / det;
+
+            const steps = [{
+                badge: 'primary',
+                title: 'STEP 1',
+                content: `
+                    <strong>Write the system:</strong><br>
+                    &nbsp;&nbsp;${a1}x + ${b1}y = ${c1}<br>
+                    &nbsp;&nbsp;${a2}x + ${b2}y = ${c2}
+                `
+            }, {
+                badge: 'secondary',
+                title: 'STEP 2',
+                content: `
+                    <strong>Calculate determinant</strong> <span class="formula">D = a₁b₂ − a₂b₁</span>:<br>
+                    &nbsp;&nbsp;D = (${a1})(${b2}) − (${a2})(${b1})<br>
+                    &nbsp;&nbsp;D = ${a1*b2} − ${a2*b1}<br>
+                    &nbsp;&nbsp;<span class="hl">D = ${det}</span> ✅ (non-zero, unique solution exists)
+                `
+            }, {
+                badge: 'primary',
+                title: 'STEP 3',
+                content: `
+                    <strong>Apply Cramer's Rule:</strong><br>
+                    &nbsp;&nbsp;<span class="hl">x</span> = (c₁b₂ − c₂b₁) / D<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= (${c1}×${b2} − ${c2}×${b1}) / ${det}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= ${c1*b2 - c2*b1} / ${det}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= <span class="result-box">${x.toFixed(4)}</span><br><br>
+                    &nbsp;&nbsp;<span class="hl">y</span> = (a₁c₂ − a₂c₁) / D<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= (${a1}×${c2} − ${a2}×${c1}) / ${det}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= ${a1*c2 - a2*c1} / ${det}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= <span class="result-box">${y.toFixed(4)}</span>
+                `
+            }];
+
+            const finalHTML = `
+                <div class="final-card">
+                    <div class="final-label">🎯 Solution</div>
+                    <div class="final-value">
+                        x = ${x.toFixed(4)}<br>
+                        y = ${y.toFixed(4)}
+                    </div>
+                </div>
+            `;
+
+            renderSolution(steps, finalHTML, { a1, b1, c1, a2, b2, c2, det, x, y });
+        }
+
+        // ============ CUBIC SOLVER (Numerical) ============
+        document.getElementById('solvePolynomial').addEventListener('click', solveCubic);
+
+        function solveCubic() {
+            const a = parseFloat(document.getElementById('p-a').value) || 0;
+            const b = parseFloat(document.getElementById('p-b').value) || 0;
+            const c = parseFloat(document.getElementById('p-c').value) || 0;
+            const d = parseFloat(document.getElementById('p-d').value) || 0;
+
+            if (a === 0) {
+                showToast('⚠️ Coefficient "a" cannot be zero for cubic');
+                return;
+            }
+
+            // Find one real root using Newton's method, then factor
+            function f(x) { return a * x ** 3 + b * x ** 2 + c * x + d; }
+
+            function fPrime(x) { return 3 * a * x ** 2 + 2 * b * x + c; }
+
+            // Newton's method
+            let x0 = 0;
+            for (let i = 0; i < 50; i++) {
+                const fx = f(x0);
+                const fpx = fPrime(x0);
+                if (Math.abs(fpx) < 1e-10) break;
+                const x1 = x0 - fx / fpx;
+                if (Math.abs(x1 - x0) < 1e-10) { x0 = x1; break; }
+                x0 = x1;
+            }
+            const root1 = Math.abs(f(x0)) < 1e-8 ? x0 : null;
+
+            const steps = [{
+                badge: 'primary',
+                title: 'STEP 1',
+                content: `
+                    <strong>Cubic equation:</strong> ${a}x³ + ${b}x² + ${c}x + ${d} = 0<br>
+                    Using <span class="hl">Newton's Method</span> to find first real root...
+                `
+            }];
+
+            if (root1 !== null && isFinite(root1)) {
+                // Synthetic division to get quadratic
+                const newA = a;
+                const newB = b + root1 * newA;
+                const newC = c + root1 * newB;
+
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 2',
+                    content: `
+                        <strong>Root found:</strong> x₁ = <span class="result-box">${root1.toFixed(6)}</span><br>
+                        <strong>Synthetic division</strong> yields quadratic:<br>
+                        &nbsp;&nbsp;${newA.toFixed(4)}x² + ${newB.toFixed(4)}x + ${newC.toFixed(4)} = 0
+                    `
+                });
+
+                const disc = newB * newB - 4 * newA * newC;
+                let root2, root3;
+                if (disc >= 0) {
+                    root2 = (-newB + Math.sqrt(disc)) / (2 * newA);
+                    root3 = (-newB - Math.sqrt(disc)) / (2 * newA);
+                    steps.push({
+                        badge: 'primary',
+                        title: 'STEP 3',
+                        content: `
+                            <strong>Solve quadratic</strong> (Δ = ${disc.toFixed(4)} ≥ 0):<br>
+                            &nbsp;&nbsp;x₂ = <span class="result-box">${root2.toFixed(6)}</span><br>
+                            &nbsp;&nbsp;x₃ = <span class="result-box">${root3.toFixed(6)}</span>
+                        `
+                    });
+                } else {
+                    const realP = -newB / (2 * newA);
+                    const imagP = Math.sqrt(-disc) / (2 * newA);
+                    root2 = `${realP.toFixed(4)} + ${imagP.toFixed(4)}i`;
+                    root3 = `${realP.toFixed(4)} − ${imagP.toFixed(4)}i`;
+                    steps.push({
+                        badge: 'primary',
+                        title: 'STEP 3',
+                        content: `
+                            <strong>Solve quadratic</strong> (Δ < 0, complex roots):<br>
+                            &nbsp;&nbsp;x₂ = <span class="result-box">${root2}</span><br>
+                            &nbsp;&nbsp;x₃ = <span class="result-box">${root3}</span>
+                        `
+                    });
+                }
+
+                const finalHTML = `
+                    <div class="final-card">
+                        <div class="final-label">🎯 Cubic Roots</div>
+                        <div class="final-value" style="font-size:1.1rem;">
+                            x₁ = ${root1.toFixed(6)}<br>
+                            x₂ = ${typeof root2 === 'string' ? root2 : root2.toFixed(6)}<br>
+                            x₃ = ${typeof root3 === 'string' ? root3 : root3.toFixed(6)}
+                        </div>
+                    </div>
+                `;
+                renderSolution(steps, finalHTML, { a, b, c, d, roots: [root1, root2, root3] });
+            } else {
+                steps.push({
+                    badge: 'warning',
+                    title: 'RESULT',
+                    content: 'Newton\'s method did not converge. Try different initial values or check coefficients.'
+                });
+                renderSolution(steps, '', null);
+            }
+        }
+
+        // ============ TRIGONOMETRY SOLVER ============
+        document.getElementById('solveTrig').addEventListener('click', solveTrig);
+
+        function solveTrig() {
+            const func = document.getElementById('trig-func').value;
+            const val = parseFloat(document.getElementById('trig-val').value);
+
+            if (isNaN(val)) {
+                showToast('⚠️ Please enter a valid value');
+                return;
+            }
+
+            let principal, general;
+            const steps = [{
+                badge: 'primary',
+                title: 'STEP 1',
+                content: `
+                    <strong>Equation:</strong> ${func}(x) = ${val}<br>
+                    Domain: x ∈ [0, 2π) for principal solution
+                `
+            }];
+
+            if (func === 'sin') {
+                if (Math.abs(val) > 1) {
+                    showToast('⚠️ sin(x) must be between -1 and 1');
+                    return;
+                }
+                principal = Math.asin(val);
+                const principalDeg = principal * 180 / Math.PI;
+                const secondSolution = Math.PI - principal;
+                const secondDeg = secondSolution * 180 / Math.PI;
+
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 2',
+                    content: `
+                        <strong>Principal value</strong> (arcsin):<br>
+                        &nbsp;&nbsp;x₁ = arcsin(${val})<br>
+                        &nbsp;&nbsp;x₁ = <span class="result-box">${principal.toFixed(6)} rad</span> = ${principalDeg.toFixed(2)}°<br><br>
+                        <strong>Second solution</strong> in [0, 2π):<br>
+                        &nbsp;&nbsp;x₂ = π − arcsin(${val})<br>
+                        &nbsp;&nbsp;x₂ = <span class="result-box">${secondSolution.toFixed(6)} rad</span> = ${secondDeg.toFixed(2)}°<br><br>
+                        <strong>General solution:</strong><br>
+                        &nbsp;&nbsp;x = ${principal.toFixed(4)} + 2πk &nbsp;or&nbsp; x = ${secondSolution.toFixed(4)} + 2πk, k ∈ ℤ
+                    `
+                });
+            } else if (func === 'cos') {
+                if (Math.abs(val) > 1) {
+                    showToast('⚠️ cos(x) must be between -1 and 1');
+                    return;
+                }
+                principal = Math.acos(val);
+                const principalDeg = principal * 180 / Math.PI;
+                const secondSolution = 2 * Math.PI - principal;
+                const secondDeg = secondSolution * 180 / Math.PI;
+
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 2',
+                    content: `
+                        <strong>Principal value</strong> (arccos):<br>
+                        &nbsp;&nbsp;x₁ = arccos(${val})<br>
+                        &nbsp;&nbsp;x₁ = <span class="result-box">${principal.toFixed(6)} rad</span> = ${principalDeg.toFixed(2)}°<br><br>
+                        <strong>Second solution</strong> in [0, 2π):<br>
+                        &nbsp;&nbsp;x₂ = 2π − arccos(${val})<br>
+                        &nbsp;&nbsp;x₂ = <span class="result-box">${secondSolution.toFixed(6)} rad</span> = ${secondDeg.toFixed(2)}°<br><br>
+                        <strong>General solution:</strong><br>
+                        &nbsp;&nbsp;x = ±${principal.toFixed(4)} + 2πk, k ∈ ℤ
+                    `
+                });
+            } else if (func === 'tan') {
+                principal = Math.atan(val);
+                const principalDeg = principal * 180 / Math.PI;
+
+                steps.push({
+                    badge: 'secondary',
+                    title: 'STEP 2',
+                    content: `
+                        <strong>Principal value</strong> (arctan):<br>
+                        &nbsp;&nbsp;x = arctan(${val})<br>
+                        &nbsp;&nbsp;x = <span class="result-box">${principal.toFixed(6)} rad</span> = ${principalDeg.toFixed(2)}°<br><br>
+                        <strong>General solution:</strong><br>
+                        &nbsp;&nbsp;x = ${principal.toFixed(4)} + πk, k ∈ ℤ
+                    `
+                });
+            }
+
+            const finalHTML = `
+                <div class="final-card">
+                    <div class="final-label">🎯 Solution for ${func}(x) = ${val}</div>
+                    <div class="final-value" style="font-size:1rem;">
+                        Principal: ${principal.toFixed(6)} rad<br>
+                        = ${(principal*180/Math.PI).toFixed(4)}°
+                    </div>
+                </div>
+            `;
+
+            renderSolution(steps, finalHTML, { func, val, principal });
+        }
+
+        // ============ RENDER SOLUTION ============
+        function renderSolution(steps, finalHTML, saveData) {
+            solutionArea.classList.remove('visible');
+            let html = '';
+
+            steps.forEach((step, i) => {
+                html += `
+                    <div class="step-card" style="animation-delay:${i * 0.05}s;">
+                        <span class="step-badge ${step.badge}">${step.title}</span>
+                        <div class="step-content">${step.content}</div>
+                    </div>
+                `;
+            });
+
+            if (finalHTML) {
+                html += finalHTML;
+            }
+
+            solutionArea.innerHTML = html;
+            solutionArea.classList.add('visible');
+
+            // Save to history
+            if (saveData) {
+                state.history.unshift({
+                    mode: state.currentMode,
+                    timestamp: new Date().toISOString(),
+                    data: saveData,
+                });
+                if (state.history.length > 20) state.history.pop();
+            }
+
+            // Scroll to solution
+            setTimeout(() => {
+                solutionArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // ============ HISTORY BUTTON ============
+        document.getElementById('historyBtn').addEventListener('click', () => {
+            if (state.history.length === 0) {
+                showToast('📋 No history yet. Solve something first!');
+                return;
+            }
+            showToast(`📋 ${state.history.length} solution(s) in history`);
+        });
+
+        // ============ INIT ============
+        // Auto-solve quadratic on load for demo
+        setTimeout(solveQuadratic, 400);
+
+        console.log('🚀 SuperCalc Mobile App Ready!');
+        console.log('📱 Install on home screen for native app experience.');
+        console.log('🧮 Modes: Quadratic | Statistics | Linear System | Cubic | Trigonometry');
+    </script>
+</body>
+</html>

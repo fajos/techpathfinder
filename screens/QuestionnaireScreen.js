@@ -12,11 +12,16 @@ import useNetworkStatus from "../hooks/useNetworkStatus";
 import NetworkBanner from "../components/NetworkBanner";
 import ThreeDButton from "../components/ThreeDButton";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { trackScreen } from "../services/analytics";
 
 const QuestionnaireScreen = ({ navigation }) => {
   const [answers, setAnswers] = useState({});
   const { colors, isDark } = useThemeStyles();
   const isConnected = useNetworkStatus();
+
+  useEffect(() => {
+  trackScreen('QuestionnaireScreen');
+}, []);
 
   // Your original questions - hardcoded in English (since removing i18n)
   const questions = [

@@ -24,6 +24,7 @@ import NetworkBanner from "../components/NetworkBanner";
 import ThreeDButton from "../components/ThreeDButton";
 import { usePremium } from '../context/PremiumContext';
 import { Ionicons } from "@expo/vector-icons";
+import { trackScreen } from "../services/analytics";
 
 const DashboardScreen = () => {
   const [savedCareers, setSavedCareers] = useState([]);
@@ -42,6 +43,10 @@ const DashboardScreen = () => {
     };
     loadCareers();
   }, []);
+
+  useEffect(() => {
+  trackScreen('DashboardScreen');
+}, []);
 
   const handleRemoveCareer = async (titleToRemove) => {
     const updated = savedCareers.filter((c) => c.title !== titleToRemove);

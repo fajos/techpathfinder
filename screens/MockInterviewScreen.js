@@ -24,7 +24,8 @@ import { useAuth } from '../context/AuthContext';
 import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { getQuestionsForCareer, getQuestionCategories } from '../data/interviewQuestions';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { trackScreen, trackEvent } from '../services/analytics';
 
 export default function MockInterviewScreen({ route, navigation }) {
   const { career } = route.params;
@@ -61,6 +62,14 @@ const [isPlaying, setIsPlaying] = useState(false);
     loadQuestions();
     loadFavorites();
   }, [career]);
+
+useEffect(() => {
+  trackScreen('MockInterviewScreen');
+  trackEvent('feature_used', { 
+    feature: 'mock_interview', 
+    career: career
+  });
+}, [career]);
 
   const loadQuestions = () => {
     const careerQuestions = getQuestionsForCareer(career);
@@ -228,6 +237,10 @@ const startRecording = async () => {
 
 // Stop Recording
 const stopRecording = async () => {
+    trackEvent('interview_answer_recorded', {
+    career: career,
+    question_category: currentQuestion?.category
+  });
   if (!recording) {
     console.warn('No active recording to stop');
     setIsRecording(false);
@@ -355,9 +368,7 @@ useEffect(() => {
     ]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
+        
         <Text style={[styles.headerTitle, { color: colors.text }]}>Mock Interview</Text>
         <TouchableOpacity onPress={() => setShowPracticeModal(true)}>
           <Ionicons name="mic-outline" size={24} color={colors.primary} />

@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { Ionicons } from '@expo/vector-icons';
+import { trackScreen } from '../services/analytics';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,6 +23,10 @@ export default function LoginScreen() {
   
   const { signIn, signUp, isLoading: authLoading, initialized } = useAuth();
   const { colors } = useThemeStyles();
+
+  useEffect(() => {
+  trackScreen('LoginScreen');
+}, []);
 
   // Show loading while auth is initializing
   if (!initialized || authLoading) {

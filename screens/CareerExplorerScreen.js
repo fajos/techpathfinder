@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import ThreeDButton from "../components/ThreeDButton";
 import { Ionicons } from '@expo/vector-icons';
 import { usePremium } from '../context/PremiumContext';
+import { trackScreen } from '../services/analytics';
 
 const CareerExplorerScreen = () => {
   const { colors, isDark } = useThemeStyles();
@@ -27,6 +28,8 @@ const CareerExplorerScreen = () => {
 
   const { isPremium } = usePremium();
 
+
+
   useEffect(() => {
     const load = async () => {
       const saved = await AsyncStorage.getItem("savedCareers");
@@ -34,6 +37,10 @@ const CareerExplorerScreen = () => {
     };
     load();
   }, []);
+
+  useEffect(() => {
+  trackScreen('CareerExplorerScreen');
+}, []);
 
   const filteredCareers = Object.keys(careerRoadmapsFull)
     .filter((title) => title.toLowerCase().includes(query.toLowerCase()))

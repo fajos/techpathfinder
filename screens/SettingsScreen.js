@@ -1,5 +1,5 @@
 // screens/SettingsScreen.js
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { ThemeContext } from '../utils/ThemeContext';
+import { trackScreen } from '../services/analytics';
 
 export default function SettingsScreen({ navigation }) {
   const { user, logout } = useAuth();
@@ -24,6 +25,10 @@ export default function SettingsScreen({ navigation }) {
   
   const [notifications, setNotifications] = useState(true);
   const [weeklyGoal, setWeeklyGoal] = useState(5);
+
+  useEffect(() => {
+  trackScreen('SettingsScreen');
+}, []);
 
   const handleLogout = () => {
     Alert.alert(
@@ -126,18 +131,6 @@ export default function SettingsScreen({ navigation }) {
           Customize your experience
         </Text>
       </View>
-
-      {/* Stats Section (Only for logged in users) */}
-      {user && (
-        <View style={styles.statsSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Your Activity</Text>
-          <View style={styles.statsGrid}>
-            <StatsItem icon="flame" title="Day Streak" value="0" color="#FF6B6B" />
-            <StatsItem icon="book" title="Roadmaps" value="0" color="#4f46e5" />
-            <StatsItem icon="time" title="Hours" value="0" color="#10B981" />
-          </View>
-        </View>
-      )}
 
       {/* Preferences Section */}
       <View style={styles.section}>

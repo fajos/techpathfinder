@@ -17,6 +17,7 @@ import { useUserProfileStore } from '../store/userProfileStore';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import careerRoadmapsFull from '../data/careerRoadmapsFull';
 import { Animated } from 'react-native';
+import { trackScreen, trackEvent } from '../services/analytics';
 
 export default function SkillGapScreen({ route, navigation }) {
     const { career } = route.params;
@@ -36,6 +37,15 @@ export default function SkillGapScreen({ route, navigation }) {
             loadData();
         }
     }, [user, career]);
+
+  useEffect(() => {
+  trackScreen('SkillGapScreen');
+  trackEvent('feature_used', { 
+    feature: 'skill_gap', 
+    career: career,
+    skills_count: career.skills?.length
+  });
+}, [career]);
 
     const loadData = () => {
         const profile = getCurrentProfile();

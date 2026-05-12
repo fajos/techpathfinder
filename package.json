@@ -36,6 +36,7 @@
     "firebase": "^12.10.0",
     "glob": "^13.0.6",
     "i18next": "^25.0.0",
+    "posthog-react-native": "^4.45.4",
     "react": "19.1.0",
     "react-i18next": "^15.4.1",
     "react-native": "0.81.5",

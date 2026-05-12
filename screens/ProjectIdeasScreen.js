@@ -20,6 +20,7 @@ import { useThemeStyles } from '../hooks/useThemeStyles';
 import { getProjectsForCareer, getDifficultyLevels } from '../data/projects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Animated, Easing } from 'react-native';
+import { trackScreen, trackEvent } from '../services/analytics';
 
 const { width } = Dimensions.get('window');
 
@@ -87,6 +88,15 @@ export default function ProjectIdeasScreen({ route, navigation }) {
     loadProjects();
     loadCompletedProjects();
   }, [career]);
+
+useEffect(() => {
+  trackScreen('ProjectIdeasScreen');
+  trackEvent('feature_used', { 
+    feature: 'project_ideas', 
+    career: career,
+    difficulty: selectedDifficulty
+  });
+}, [career]);
   
   const loadProjects = () => {
     const careerProjects = getProjectsForCareer(career);
@@ -164,9 +174,6 @@ export default function ProjectIdeasScreen({ route, navigation }) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Project Ideas</Text>
         <View style={{ width: 40 }} />
       </View>
