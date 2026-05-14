@@ -3,9 +3,16 @@ import Purchases from 'react-native-purchases';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// IMPORTANT: Replace these with your PRODUCTION keys when launching
 const API_KEYS = {
-  ios: 'your_ios_api_key_here',
-  android: 'test_dwFsfUBLqajVghxYiAeCIPCtRil',  // Your test key
+  ios: 'appl_xxxxxxxxxxxxx',  // Replace with your iOS production key
+  android: 'goog_xxxxxxxxxxxxx', // Replace with your Google Play production key
+};
+
+// Test keys for development (keep for testing)
+const TEST_API_KEYS = {
+  ios: 'your_ios_test_key_here',
+  android: 'test_dwFsfUBLqajVghxYiAeCIPCtRil',
 };
 
 let isConfigured = false;
@@ -13,6 +20,12 @@ let isConfigured = false;
 class RevenueCatService {
   constructor() {
     this.entitlements = null;
+    this.isProduction = false; // Set to true when launching
+  }
+
+  // Set to production mode before building final APK
+  setProductionMode(enabled) {
+    this.isProduction = enabled;
   }
 
   async configure(userId) {
@@ -21,11 +34,12 @@ class RevenueCatService {
     try {
       console.log('Configuring RevenueCat for user:', userId);
       
-      if (Platform.OS === 'ios') {
-        await Purchases.configure({ apiKey: API_KEYS.ios });
-      } else {
-        await Purchases.configure({ apiKey: API_KEYS.android });
-      }
+      // Use production or test keys based on mode
+      const apiKey = this.isProduction 
+        ? (Platform.OS === 'ios' ? API_KEYS.ios : API_KEYS.android)
+        : (Platform.OS === 'ios' ? TEST_API_KEYS.ios : TEST_API_KEYS.android);
+      
+      await Purchases.configure({ apiKey });
 
       if (userId) {
         const { customerInfo } = await Purchases.logIn(userId);
@@ -50,61 +64,92 @@ class RevenueCatService {
         return [];
       }
       
-      console.log('Current offering packages:', offerings.current.availablePackages.length);
-      return offerings.current.availablePackages || [];
+      // Organize packages by type for easier display
+      const packages = offerings.current.availablePackages || [];
+      const organized = {
+        monthly: packages.find(p => p.identifier === '$rc_monthly'),
+        yearly: packages.find(p => p.identifier === '$rc_annual'),
+        lifetime: packages.find(p => p.identifier === '$rc_lifetime'),
+        all: packages
+      };
+      
+      console.log('Packages found:', {
+        monthly: organized.monthly?.product.priceString,
+        yearly: organized.yearly?.product.priceString,
+        lifetime: organized.lifetime?.product.priceString
+      });
+      
+      return organized;
     } catch (error) {
       console.error('Error getting packages:', error);
-      return [];
+      return { monthly: null, yearly: null, lifetime: null, all: [] };
     }
   }
 
-  async purchasePackage(purchasedPackage) {
-  try {
-    console.log('💳 RevenueCatService: Starting purchase for:', purchasedPackage.identifier);
-    
-    // Make sure we have a valid package
-    if (!purchasedPackage || !purchasedPackage.product) {
-      throw new Error('Invalid package');
-    }
-    
-    console.log('Product details:', {
-      identifier: purchasedPackage.identifier,
-      title: purchasedPackage.product.title,
-      price: purchasedPackage.product.priceString
-    });
-    
-    // Attempt the purchase
-    const purchaseResult = await Purchases.purchasePackage(purchasedPackage);
-    console.log('Purchase result received:', purchaseResult);
-    
-    const { customerInfo } = purchaseResult;
-    this.entitlements = customerInfo.entitlements.active;
-    const isPremium = this.entitlements?.premium?.isActive === true;
-    
-    console.log('✅ Purchase successful. Premium status:', isPremium);
-    
-    return { 
-      success: true, 
-      customerInfo,
-      isPremium
-    };
-  } catch (error) {
-    console.error('❌ RevenueCatService purchase error:', error);
-    
-    // Check if user cancelled
-    if (error.code === '1' || error.userCancelled) {
-      console.log('User cancelled purchase');
-      return { success: false, userCancelled: true };
-    }
-    
-    // Return error details
-    return { 
-      success: false, 
-      error: error.message || 'Purchase failed',
-      code: error.code
+  // Get formatted pricing for display
+  getFormattedPricing(packages) {
+    return {
+      monthly: packages.monthly?.product.priceString || '$4.99',
+      yearly: packages.yearly?.product.priceString || '$29.99',
+      lifetime: packages.lifetime?.product.priceString || '$49.99',
+      yearlySavings: this.calculateYearlySavings(packages)
     };
   }
-}
+
+  calculateYearlySavings(packages) {
+    if (packages.monthly && packages.yearly) {
+      const monthlyPrice = packages.monthly.product.price;
+      const yearlyPrice = packages.yearly.product.price;
+      const monthlyTotal = monthlyPrice * 12;
+      const savings = ((monthlyTotal - yearlyPrice) / monthlyTotal) * 100;
+      return Math.round(savings);
+    }
+    return 50; // Default 50% savings
+  }
+
+  async purchasePackage(purchasedPackage) {
+    try {
+      console.log('💳 Starting purchase for:', purchasedPackage.identifier);
+      
+      if (!purchasedPackage || !purchasedPackage.product) {
+        throw new Error('Invalid package');
+      }
+      
+      console.log('Product details:', {
+        identifier: purchasedPackage.identifier,
+        title: purchasedPackage.product.title,
+        price: purchasedPackage.product.priceString
+      });
+      
+      const purchaseResult = await Purchases.purchasePackage(purchasedPackage);
+      console.log('Purchase result received');
+      
+      const { customerInfo } = purchaseResult;
+      this.entitlements = customerInfo.entitlements.active;
+      const isPremium = this.entitlements?.premium?.isActive === true;
+      
+      console.log('✅ Purchase successful. Premium status:', isPremium);
+      
+      return { 
+        success: true, 
+        customerInfo,
+        isPremium
+      };
+    } catch (error) {
+      console.error('❌ Purchase error:', error);
+      
+      if (error.code === '1' || error.userCancelled) {
+        console.log('User cancelled purchase');
+        return { success: false, userCancelled: true };
+      }
+      
+      return { 
+        success: false, 
+        error: error.message || 'Purchase failed',
+        code: error.code
+      };
+    }
+  }
 
   async restorePurchases() {
     try {

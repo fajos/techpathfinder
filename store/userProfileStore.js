@@ -2,6 +2,17 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import syncService from '../services/syncService';
+
+// We'll inject isPremium from outside since store doesn't have access to context
+let currentIsPremium = false;
+let currentUserId = null;
+
+// Function to set premium status from outside
+export const setPremiumSyncStatus = (isPremium, userId) => {
+  currentIsPremium = isPremium;
+  currentUserId = userId;
+};
 
 export const useUserProfileStore = create()(
   persist(
@@ -32,7 +43,9 @@ export const useUserProfileStore = create()(
             streak: 0,
             lastStudyDate: null,
             notifications: true,
-            weeklyGoal: 3
+            weeklyGoal: 3,
+            skills: [],
+            skillHistory: []
           };
         }
         return { 
@@ -69,21 +82,23 @@ export const useUserProfileStore = create()(
         const profile = state.profiles[userId];
         if (profile && !profile.savedCareers.includes(career)) {
           profile.savedCareers.push(career);
+          
+          // Auto-sync for premium users
+          if (currentIsPremium && currentUserId === userId) {
+            syncService.syncSavedCareers(userId, profile.savedCareers, true).catch(console.error);
+          }
         }
         return { profiles: { ...state.profiles } };
       }),
-
-      ensureCurrentUser: (userId) => set((state) => {
-        if (!state.currentUserId && userId && state.profiles[userId]) {
-          return { currentUserId: userId };
-        }
-        return state;
-      }),
-
+      
       unsaveCareer: (userId, career) => set((state) => {
         const profile = state.profiles[userId];
         if (profile) {
           profile.savedCareers = profile.savedCareers.filter(c => c !== career);
+          
+          if (currentIsPremium && currentUserId === userId) {
+            syncService.syncSavedCareers(userId, profile.savedCareers, true).catch(console.error);
+          }
         }
         return { profiles: { ...state.profiles } };
       }),
@@ -101,6 +116,10 @@ export const useUserProfileStore = create()(
         if (!profile.roadmapProgress[careerId].stepsCompleted.includes(stepIndex)) {
           profile.roadmapProgress[careerId].stepsCompleted.push(stepIndex);
           profile.roadmapProgress[careerId].lastActive = new Date().toISOString();
+          
+          if (currentIsPremium && currentUserId === userId) {
+            syncService.syncLearningProgress(userId, profile.roadmapProgress, true).catch(console.error);
+          }
         }
         
         return { profiles: { ...state.profiles } };
@@ -115,6 +134,11 @@ export const useUserProfileStore = create()(
         };
         
         get().updateLastActive(userId);
+        
+        if (currentIsPremium && currentUserId === userId) {
+          syncService.syncLearningProgress(userId, profile.roadmapProgress, true).catch(console.error);
+        }
+        
         return { profiles: { ...state.profiles } };
       }),
       
@@ -130,13 +154,40 @@ export const useUserProfileStore = create()(
           profile.quizHistory.shift();
         }
         
+        if (currentIsPremium && currentUserId === userId) {
+          syncService.syncQuizHistory(userId, profile.quizHistory, true).catch(console.error);
+        }
+        
+        return { profiles: { ...state.profiles } };
+      }),
+      
+      addSkill: (userId, skill) => set((state) => {
+        const profile = state.profiles[userId];
+        if (!profile.skills) profile.skills = [];
+        if (!profile.skills.includes(skill)) {
+          profile.skills.push(skill);
+          
+          if (currentIsPremium && currentUserId === userId) {
+            syncService.syncProfileToCloud(userId, profile, true).catch(console.error);
+          }
+        }
+        return { profiles: { ...state.profiles } };
+      }),
+      
+      removeSkill: (userId, skill) => set((state) => {
+        const profile = state.profiles[userId];
+        if (profile && profile.skills) {
+          profile.skills = profile.skills.filter(s => s !== skill);
+          
+          if (currentIsPremium && currentUserId === userId) {
+            syncService.syncProfileToCloud(userId, profile, true).catch(console.error);
+          }
+        }
         return { profiles: { ...state.profiles } };
       }),
       
       updateProfile: (userId, updates) => set((state) => {
-        // Create profile if it doesn't exist
         if (!state.profiles[userId]) {
-          console.log('Creating new profile for user:', userId);
           state.profiles[userId] = {
             userId,
             email: '',
@@ -157,14 +208,14 @@ export const useUserProfileStore = create()(
             streak: 0,
             lastStudyDate: null,
             notifications: true,
-            weeklyGoal: 3
+            weeklyGoal: 3,
+            skills: [],
+            skillHistory: []
           };
         }
 
-        // Get the current profile
         const currentProfile = state.profiles[userId];
         
-        // Handle learningPlans specially if present
         let learningPlansUpdate = {};
         if (updates.learningPlans) {
           learningPlansUpdate = {
@@ -176,14 +227,17 @@ export const useUserProfileStore = create()(
           delete updates.learningPlans;
         }
         
-        // Merge all updates safely
         state.profiles[userId] = {
           ...currentProfile,
           ...updates,
           ...learningPlansUpdate
         };
 
-        console.log('Profile updated:', state.profiles[userId]);
+        // Sync to cloud for premium users
+        if (currentIsPremium && currentUserId === userId) {
+          syncService.syncProfileToCloud(userId, state.profiles[userId], true).catch(console.error);
+        }
+
         return { profiles: { ...state.profiles } };
       }),
       
@@ -196,6 +250,11 @@ export const useUserProfileStore = create()(
         });
         
         get().updateLastActive(userId);
+        
+        if (currentIsPremium && currentUserId === userId) {
+          syncService.syncProfileToCloud(userId, profile, true).catch(console.error);
+        }
+        
         return { profiles: { ...state.profiles } };
       }),
       
@@ -209,7 +268,40 @@ export const useUserProfileStore = create()(
         return profile?.roadmapProgress[careerId] || { stepsCompleted: [] };
       },
       
-      clearUser: () => set({ currentUserId: null })
+      getCompletionPercentage: (careerId) => {
+        const profile = get().getCurrentProfile();
+        const careerData = require('../data/careerRoadmapsFull').default?.[careerId];
+        if (!profile || !careerData) return 0;
+        
+        const progress = profile.roadmapProgress[careerId];
+        if (!progress) return 0;
+        
+        return (progress.stepsCompleted.length / careerData.roadmap.length) * 100;
+      },
+      
+      clearUser: () => set({ currentUserId: null }),
+      
+      // Manual sync method for premium users
+      syncToCloud: async (userId) => {
+        if (currentIsPremium && currentUserId === userId) {
+          const profile = get().getCurrentProfile();
+          await syncService.fullSyncToCloud(userId, true);
+          return true;
+        }
+        return false;
+      },
+      
+      loadFromCloud: async (userId) => {
+        if (currentIsPremium && currentUserId === userId) {
+          const success = await syncService.loadFromCloudToLocal(userId, true);
+          if (success) {
+            // Refresh local state
+            const freshProfile = get().getCurrentProfile();
+            return freshProfile;
+          }
+        }
+        return null;
+      }
     }),
     {
       name: 'user-profiles-storage',

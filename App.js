@@ -13,6 +13,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { PremiumProvider } from './context/PremiumContext';
 import { useUserProfileStore } from './store/userProfileStore';
 import { initAnalytics, identifyUser, resetAnalytics } from './services/analytics';
+import syncService from './services/syncService';
+import { usePremium } from './context/PremiumContext';
+import { setPremiumSyncStatus } from './store/userProfileStore';
 
 // Screens
 import HomeScreen from "./screens/HomeScreen";
@@ -46,6 +49,7 @@ const RootNavigator = () => {
   const { user, initialized } = useAuth();
   const { colors, isDark } = useThemeStyles(); // Add this
   const { updateLastActive } = useUserProfileStore();
+  const { isPremium } = usePremium();
 
   // Theme-aware header options
   const headerOptions = {
@@ -85,6 +89,26 @@ const RootNavigator = () => {
       resetAnalytics();
     }
   }, [user]);
+
+      useEffect(() => {
+    if (user) {
+      setPremiumSyncStatus(isPremium, user.uid);
+      
+      // Load cloud data when user becomes premium
+      if (isPremium) {
+        const loadData = async () => {
+          const hasCloudData = await syncService.loadFromCloudToLocal(user.uid, true);
+          if (!hasCloudData) {
+            // First time premium user - upload local data
+            await syncService.fullSyncToCloud(user.uid, true);
+          }
+        };
+        loadData();
+      }
+    } else {
+      setPremiumSyncStatus(false, null);
+    }
+  }, [user, isPremium]);
 
   if (!initialized) {
     return (

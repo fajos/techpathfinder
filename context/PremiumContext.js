@@ -9,13 +9,14 @@ export const PremiumContext = createContext();
 
 export const PremiumProvider = ({ children }) => {
   const [isPremium, setIsPremium] = useState(false);
-  const [packages, setPackages] = useState([]);
+  const [packages, setPackages] = useState({ monthly: null, yearly: null, lifetime: null, all: [] });
   const [loading, setLoading] = useState(true);
   const [subscriptionEndDate, setSubscriptionEndDate] = useState(null);
+  const [yearlySavings, setYearlySavings] = useState(50);
   
   const { user } = useAuth();
 
-  // Listen for app foreground (like working app)
+  // Listen for app foreground
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (nextAppState === 'active' && user) {
@@ -34,7 +35,7 @@ export const PremiumProvider = ({ children }) => {
     } else {
       // Reset when logged out
       setIsPremium(false);
-      setPackages([]);
+      setPackages({ monthly: null, yearly: null, lifetime: null, all: [] });
       setSubscriptionEndDate(null);
       setLoading(false);
     }
@@ -64,7 +65,6 @@ export const PremiumProvider = ({ children }) => {
     if (!user) return false;
     
     try {
-      // Match working app pattern - simple check
       const status = await RevenueCatService.checkPremiumStatus(user.uid);
       setIsPremium(status);
       
@@ -73,7 +73,6 @@ export const PremiumProvider = ({ children }) => {
         const expDate = info?.entitlements.active?.premium?.expirationDate;
         setSubscriptionEndDate(expDate || null);
         
-        // Store in AsyncStorage like working app
         await AsyncStorage.setItem('@premium_status', 'true');
         if (expDate) {
           await AsyncStorage.setItem('@premium_expiry', expDate);
@@ -85,7 +84,6 @@ export const PremiumProvider = ({ children }) => {
       return status;
     } catch (error) {
       console.error('Status check error:', error);
-      // Fallback to stored value
       const stored = await AsyncStorage.getItem('@premium_status');
       setIsPremium(stored === 'true');
       return stored === 'true';
@@ -95,76 +93,89 @@ export const PremiumProvider = ({ children }) => {
   const loadProducts = async () => {
     try {
       console.log('Loading products...');
-      const availablePackages = await RevenueCatService.getPackages();
-      console.log('Packages loaded:', availablePackages?.length || 0);
+      const organizedPackages = await RevenueCatService.getPackages();
+      console.log('Packages loaded:', {
+        monthly: organizedPackages.monthly?.product.priceString,
+        yearly: organizedPackages.yearly?.product.priceString,
+        lifetime: organizedPackages.lifetime?.product.priceString
+      });
       
-      // Filter out any invalid packages
-      const validPackages = availablePackages.filter(pkg => 
-        pkg && pkg.product && pkg.product.priceString
-      );
+      setPackages(organizedPackages);
       
-      setPackages(validPackages);
+      // Calculate yearly savings
+      const savings = RevenueCatService.calculateYearlySavings(organizedPackages);
+      setYearlySavings(savings);
     } catch (error) {
       console.error('Error loading products:', error);
-      setPackages([]);
+      setPackages({ monthly: null, yearly: null, lifetime: null, all: [] });
     }
   };
 
   const purchaseProduct = async (pkg) => {
-  console.log('🔵 purchaseProduct called with package:', pkg?.identifier);
-  
-  if (!user) {
-    console.log('❌ No user found');
-    Alert.alert('Error', 'Please log in first');
-    return false;
-  }
-
-  if (!pkg) {
-    console.log('❌ No package provided');
-    Alert.alert('Error', 'No product selected');
-    return false;
-  }
-
-  setLoading(true);
-  try {
-    console.log('Calling RevenueCatService.purchasePackage...');
-    const result = await RevenueCatService.purchasePackage(pkg);
-    console.log('RevenueCat result:', result);
+    console.log('🔵 purchaseProduct called with package:', pkg?.identifier);
     
-    if (result.success) {
-      console.log('✅ Purchase successful, checking status...');
-      const status = await RevenueCatService.checkPremiumStatus(user.uid);
-      console.log('New premium status:', status);
-      setIsPremium(status);
-      
-      if (status) {
-        const info = await RevenueCatService.getCustomerInfo();
-        setSubscriptionEndDate(info?.entitlements.active?.premium?.expirationDate || null);
-      }
-      
-      Alert.alert(
-        '🎉 Welcome to Premium!',
-        'Thank you for subscribing. You now have access to all premium features.',
-        [{ text: 'Continue' }]
-      );
-      return true;
-    } else if (result.userCancelled) {
-      console.log('User cancelled purchase');
-      return false;
-    } else {
-      console.log('❌ Purchase failed:', result.error);
-      Alert.alert('Purchase failed', result.error || 'Please try again');
+    if (!user) {
+      console.log('❌ No user found');
+      Alert.alert('Error', 'Please log in first');
       return false;
     }
-  } catch (error) {
-    console.error('❌ Purchase error in context:', error);
-    Alert.alert('Error', error?.message || 'Purchase failed');
-    return false;
-  } finally {
-    setLoading(false);
-    console.log('Purchase flow completed');
-  }
-};
+
+    if (!pkg) {
+      console.log('❌ No package provided');
+      Alert.alert('Error', 'No product selected');
+      return false;
+    }
+
+    setLoading(true);
+    try {
+      console.log('Calling RevenueCatService.purchasePackage...');
+      const result = await RevenueCatService.purchasePackage(pkg);
+      console.log('RevenueCat result:', result);
+
+      if (result.success) {
+        if (user) {
+          const { setPremiumSyncStatus } = require('../store/userProfileStore');
+          const syncService = require('../services/syncService').default;
+
+          setPremiumSyncStatus(true, user.uid);
+          await syncService.fullSyncToCloud(user.uid, true);
+        }
+        console.log('✅ Purchase successful, checking status...');
+        const status = await RevenueCatService.checkPremiumStatus(user.uid);
+        console.log('New premium status:', status);
+        setIsPremium(status);
+
+        if (status) {
+          const info = await RevenueCatService.getCustomerInfo();
+          setSubscriptionEndDate(info?.entitlements.active?.premium?.expirationDate || null);
+        }
+
+        Alert.alert(
+          '🎉 Welcome to Premium!',
+          'Thank you for subscribing. You now have access to all premium features.',
+          [{ text: 'Continue' }]
+        );
+
+          return true;
+      } else if (result.userCancelled) {
+        console.log('User cancelled purchase');
+        return false;
+      } else {
+        console.log('❌ Purchase failed:', result.error);
+        Alert.alert('Purchase failed', result.error || 'Please try again');
+        return false;
+      }
+      
+    } catch (error) {
+      console.error('❌ Purchase error in context:', error);
+      Alert.alert('Error', error?.message || 'Purchase failed');
+      return false;
+    } finally {
+      setLoading(false);
+      console.log('Purchase flow completed');
+    }
+    
+  };
 
   const restorePurchases = async () => {
     if (!user) {
@@ -195,6 +206,16 @@ export const PremiumProvider = ({ children }) => {
     }
   };
 
+  // Helper to get formatted pricing
+  const getPricing = () => {
+    return {
+      monthly: packages.monthly?.product.priceString || '$4.99',
+      yearly: packages.yearly?.product.priceString || '$29.99',
+      lifetime: packages.lifetime?.product.priceString || '$49.99',
+      yearlySavings: yearlySavings
+    };
+  };
+
   return (
     <PremiumContext.Provider
       value={{
@@ -205,7 +226,9 @@ export const PremiumProvider = ({ children }) => {
         purchaseProduct,
         restorePurchases,
         checkStatus,
-        loadProducts
+        loadProducts,
+        getPricing,
+        yearlySavings
       }}
     >
       {children}
