@@ -230,7 +230,7 @@ export default function ProfileScreen({ navigation }) {
             <TouchableOpacity
               key={index}
               style={[styles.careerItem, { backgroundColor: colors.card }]}
-              onPress={() => navigation.navigate('CareerExplorer', { career })}
+              onPress={() => navigation.navigate('ResultTab', { career })}
             >
               <Text style={{ color: colors.text }}>{career}</Text>
               <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
