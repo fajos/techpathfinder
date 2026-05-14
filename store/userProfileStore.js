@@ -4,11 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import syncService from '../services/syncService';
 
-// We'll inject isPremium from outside since store doesn't have access to context
 let currentIsPremium = false;
 let currentUserId = null;
 
-// Function to set premium status from outside
 export const setPremiumSyncStatus = (isPremium, userId) => {
   currentIsPremium = isPremium;
   currentUserId = userId;
@@ -54,6 +52,15 @@ export const useUserProfileStore = create()(
         };
       }),
       
+      // ✅ ADD THIS FUNCTION
+      ensureCurrentUser: (userId) => set((state) => {
+        if (!state.currentUserId && userId && state.profiles[userId]) {
+          console.log('✅ Ensuring current user:', userId);
+          return { currentUserId: userId };
+        }
+        return state;
+      }),
+      
       updateLastActive: (userId) => set((state) => {
         const profile = state.profiles[userId];
         if (profile) {
@@ -83,7 +90,6 @@ export const useUserProfileStore = create()(
         if (profile && !profile.savedCareers.includes(career)) {
           profile.savedCareers.push(career);
           
-          // Auto-sync for premium users
           if (currentIsPremium && currentUserId === userId) {
             syncService.syncSavedCareers(userId, profile.savedCareers, true).catch(console.error);
           }
@@ -233,7 +239,6 @@ export const useUserProfileStore = create()(
           ...learningPlansUpdate
         };
 
-        // Sync to cloud for premium users
         if (currentIsPremium && currentUserId === userId) {
           syncService.syncProfileToCloud(userId, state.profiles[userId], true).catch(console.error);
         }
@@ -281,7 +286,6 @@ export const useUserProfileStore = create()(
       
       clearUser: () => set({ currentUserId: null }),
       
-      // Manual sync method for premium users
       syncToCloud: async (userId) => {
         if (currentIsPremium && currentUserId === userId) {
           const profile = get().getCurrentProfile();
@@ -295,7 +299,6 @@ export const useUserProfileStore = create()(
         if (currentIsPremium && currentUserId === userId) {
           const success = await syncService.loadFromCloudToLocal(userId, true);
           if (success) {
-            // Refresh local state
             const freshProfile = get().getCurrentProfile();
             return freshProfile;
           }

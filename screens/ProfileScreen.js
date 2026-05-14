@@ -1,5 +1,6 @@
-// screens/ProfileScreen.js - With Gradients
+// screens/ProfileScreen.js - Updated version
 import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -20,7 +21,7 @@ import { trackScreen } from '../services/analytics';
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useAuth();
-  const { getCurrentProfile, updateProfile, profiles, initProfile, ensureCurrentUser } = useUserProfileStore();
+  const { getCurrentProfile, updateProfile, initProfile, ensureCurrentUser } = useUserProfileStore();
   const { colors, isDark } = useThemeStyles();
   
   const [profile, setProfile] = useState(null);
@@ -42,11 +43,12 @@ export default function ProfileScreen({ navigation }) {
     }
   }, [user]);
 
+  // Track screen view
   useEffect(() => {
-  trackScreen('ProfileScreen');
-}, []);
+    trackScreen('ProfileScreen');
+  }, []);
   
-  // Load profile data
+  // Load profile data - make this a standalone function
   const loadProfile = useCallback(() => {
     if (user) {
       setLoading(true);
@@ -77,9 +79,21 @@ export default function ProfileScreen({ navigation }) {
     }
   }, [user, getCurrentProfile]);
   
+  // ✅ Use useFocusEffect to reload when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        loadProfile();
+      }
+    }, [user, loadProfile])
+  );
+  
+  // Also reload when user changes
   useEffect(() => {
-    loadProfile();
-  }, [loadProfile]);
+    if (user) {
+      loadProfile();
+    }
+  }, [user, loadProfile]);
   
   const onRefresh = async () => {
     setRefreshing(true);
@@ -153,7 +167,7 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </LinearGradient>
       
-      {/* Stats Cards with Gradients */}
+      {/* Stats Cards */}
       <View style={styles.statsGrid}>
         <LinearGradient
           colors={isDark ? ['#1f2937', '#111827'] : ['#ffffff', '#f9fafb']}
@@ -203,15 +217,20 @@ export default function ProfileScreen({ navigation }) {
       
       {/* Saved Careers */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Saved Careers
-        </Text>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Saved Careers
+          </Text>
+          <Text style={[styles.sectionCount, { color: colors.primary }]}>
+            {safeProfile.savedCareers?.length || 0}
+          </Text>
+        </View>
         {safeProfile.savedCareers?.length > 0 ? (
           safeProfile.savedCareers.map((career, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.careerItem, { backgroundColor: colors.card }]}
-              onPress={() => navigation.navigate('ResultTab', { career })}
+              onPress={() => navigation.navigate('CareerExplorer', { career })}
             >
               <Text style={{ color: colors.text }}>{career}</Text>
               <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
@@ -357,10 +376,19 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 16,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 12,
+  },
+  sectionCount: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   careerItem: {
     flexDirection: 'row',

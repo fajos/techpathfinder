@@ -1,13 +1,16 @@
 // services/syncService.js
-import firestore from '@react-native-firebase/firestore';
+import { db } from '../config/firebase';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Silence deprecation warnings (optional)
+globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 
 class SyncService {
   constructor() {
     this.syncInProgress = false;
   }
 
-  // Check if user is premium before syncing
   async canSync(userId, isPremium) {
     if (!isPremium) {
       console.log('⏭️ Skipping sync - not a premium user');
@@ -20,19 +23,16 @@ class SyncService {
     return true;
   }
 
-  // Save user profile to cloud (premium only)
   async syncProfileToCloud(userId, profile, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          profile,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-          premium: true,
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        profile,
+        updatedAt: new Date().toISOString(),
+        premium: true,
+      }, { merge: true });
       
       console.log('✅ Profile synced to cloud');
       return true;
@@ -42,18 +42,15 @@ class SyncService {
     }
   }
 
-  // Load profile from cloud (premium only)
   async loadProfileFromCloud(userId, isPremium) {
     if (!await this.canSync(userId, isPremium)) return null;
 
     try {
-      const doc = await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .get();
+      const userRef = doc(db, 'premium_sync', userId);
+      const docSnap = await getDoc(userRef);
       
-      if (doc.exists) {
-        const data = doc.data();
+      if (docSnap.exists()) {
+        const data = docSnap.data();
         console.log('✅ Profile loaded from cloud');
         return data.profile;
       }
@@ -64,18 +61,15 @@ class SyncService {
     }
   }
 
-  // Sync saved careers (premium only)
   async syncSavedCareers(userId, careers, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          savedCareers: careers,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        savedCareers: careers,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       
       return true;
     } catch (error) {
@@ -84,18 +78,15 @@ class SyncService {
     }
   }
 
-  // Sync quiz history (premium only)
   async syncQuizHistory(userId, quizHistory, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          quizHistory,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        quizHistory,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       
       return true;
     } catch (error) {
@@ -104,18 +95,15 @@ class SyncService {
     }
   }
 
-  // Sync learning progress (premium only)
   async syncLearningProgress(userId, progress, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          learningProgress: progress,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        learningProgress: progress,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       
       return true;
     } catch (error) {
@@ -124,18 +112,15 @@ class SyncService {
     }
   }
 
-  // Sync resume data (premium only)
   async syncResumeData(userId, resumes, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          resumes,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        resumes,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
       
       return true;
     } catch (error) {
@@ -144,7 +129,6 @@ class SyncService {
     }
   }
 
-  // Full sync (upload all local data to cloud) - premium only
   async fullSyncToCloud(userId, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
     if (this.syncInProgress) return false;
@@ -161,21 +145,17 @@ class SyncService {
       ]);
 
       const profile = profileStorage ? JSON.parse(profileStorage) : null;
-      const currentUserId = profile?.currentUserId || userId;
-
+      
       // Upload to cloud
-      await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .set({
-          userId: currentUserId,
-          profile: profile?.profiles?.[userId] || null,
-          savedCareers: savedCareers ? JSON.parse(savedCareers) : [],
-          quizHistory: quizHistory ? JSON.parse(quizHistory) : [],
-          resumes: resumeStorage ? JSON.parse(resumeStorage) : [],
-          lastSync: firestore.FieldValue.serverTimestamp(),
-          premium: true,
-        }, { merge: true });
+      const userRef = doc(db, 'premium_sync', userId);
+      await setDoc(userRef, {
+        profile: profile?.profiles?.[userId] || null,
+        savedCareers: savedCareers ? JSON.parse(savedCareers) : [],
+        quizHistory: quizHistory ? JSON.parse(quizHistory) : [],
+        resumes: resumeStorage ? JSON.parse(resumeStorage) : [],
+        lastSync: new Date().toISOString(),
+        premium: true,
+      }, { merge: true });
 
       console.log('✅ Full sync completed for premium user');
       return true;
@@ -187,18 +167,15 @@ class SyncService {
     }
   }
 
-  // Load all data from cloud to local (premium only)
   async loadFromCloudToLocal(userId, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      const doc = await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .get();
+      const userRef = doc(db, 'premium_sync', userId);
+      const docSnap = await getDoc(userRef);
 
-      if (doc.exists) {
-        const data = doc.data();
+      if (docSnap.exists()) {
+        const data = docSnap.data();
         
         // Save to local storage
         if (data.profile) {
@@ -231,18 +208,15 @@ class SyncService {
     }
   }
 
-  // Check if cloud has newer data (premium only)
   async hasNewerData(userId, isPremium) {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
-      const doc = await firestore()
-        .collection('premium_sync')
-        .doc(userId)
-        .get();
+      const userRef = doc(db, 'premium_sync', userId);
+      const docSnap = await getDoc(userRef);
 
-      if (doc.exists) {
-        const cloudTime = doc.data().lastSync?.toDate() || new Date(0);
+      if (docSnap.exists()) {
+        const cloudTime = docSnap.data().lastSync ? new Date(docSnap.data().lastSync) : new Date(0);
         const localTime = await this.getLastLocalSync();
         return cloudTime > localTime;
       }

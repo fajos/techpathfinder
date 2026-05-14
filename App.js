@@ -140,6 +140,7 @@ const RootNavigator = () => {
           <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
           <Stack.Screen name="SkillGap" component={SkillGapScreen} options={{ title: 'Skill Gap' }} />
           <Stack.Screen name="LearningPlan" component={LearningPlanScreen} options={{ title: 'Learning Plan' }} />
+          <Stack.Screen name="ResultTab" component={ResultTabScreen} options={{ title: 'Result Tab' }} />
         </>
       )}
     </Stack.Navigator>
