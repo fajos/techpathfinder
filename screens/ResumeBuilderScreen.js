@@ -42,7 +42,7 @@ export default function ResumeBuilderScreen({ route, navigation }) {
         importFromProfile
     } = useResumeStore();
 
-    const { colors } = useThemeStyles();
+    const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
     const [resume, setResume] = useState(null);
     const [activeSection, setActiveSection] = useState('personal');
     const [editing, setEditing] = useState(false);
@@ -176,19 +176,19 @@ const saveToDownloads = async (sourceFile, fileName) => {
     // Premium gate
     if (!isPremium) {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-                <Ionicons name="lock-closed" size={60} color={colors.primary} />
-                <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: 20 }]}>
+            <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: wp(5) }]}>
+                <Ionicons name="lock-closed" size={normalize(60)} color={colors.primary} />
+                <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: hp(2), fontSize: normalize(24), fontWeight: 'bold' }]}>
                     Resume Builder
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: 20 }]}>
+                <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: hp(2), fontSize: normalize(16) }]}>
                     Upgrade to Premium to generate tailored resumes for your target career.
                 </Text>
                 <TouchableOpacity
-                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1' }]}
+                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1', width: isTablet ? wp(40) : wp(70) }]}
                     onPress={() => navigation.navigate('Premium')}
                 >
-                    <Text style={styles.upgradeButtonText}>View Premium</Text>
+                    <Text style={[styles.upgradeButtonText, { fontSize: normalize(16) }]}>View Premium</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -497,9 +497,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 {/* Header with job title and delete */}
                                 <View style={styles.experienceHeader}>
                                     <View style={styles.titleContainer}>
-                                        <Ionicons name="briefcase-outline" size={20} color={colors.text} />
+                                        <Ionicons name="briefcase-outline" size={normalize(20)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.jobTitleInput, { color: colors.text }]}
+                                            style={[styles.jobTitleInput, { color: colors.text, fontSize: normalize(16) }]}
                                             value={exp.title}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -511,15 +511,15 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                         />
                                     </View>
                                     <TouchableOpacity onPress={() => removeArrayItem('experience', index)}>
-                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                        <Ionicons name="trash-outline" size={normalize(20)} color="#EF4444" />
                                     </TouchableOpacity>
                                 </View>
 
                                 {/* Company */}
                                 <View style={styles.companyContainer}>
-                                    <Ionicons name="business-outline" size={16} color={colors.text} />
+                                    <Ionicons name="business-outline" size={normalize(16)} color={colors.text} />
                                     <TextInput
-                                        style={[styles.companyInput, { color: colors.text }]}
+                                        style={[styles.companyInput, { color: colors.text, fontSize: normalize(14) }]}
                                         value={exp.company}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.experience];
@@ -534,9 +534,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 {/* Date Range */}
                                 <View style={styles.dateRangeContainer}>
                                     <View style={styles.dateField}>
-                                        <Ionicons name="calendar-outline" size={14} color={colors.text} />
+                                        <Ionicons name="calendar-outline" size={normalize(14)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.dateInput, { color: colors.text }]}
+                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13) }]}
                                             value={exp.startDate}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -547,11 +547,11 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                             placeholderTextColor="#9CA3AF"
                                         />
                                     </View>
-                                    <Text style={{ color: colors.text }}>→</Text>
+                                    <Text style={{ color: colors.text, fontSize: normalize(14) }}>→</Text>
                                     <View style={styles.dateField}>
-                                        <Ionicons name="calendar-outline" size={14} color={colors.text} />
+                                        <Ionicons name="calendar-outline" size={normalize(14)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.dateInput, { color: colors.text }]}
+                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13) }]}
                                             value={exp.endDate}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -566,9 +566,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
                                 {/* Description */}
                                 <View style={styles.descriptionContainer}>
-                                    <Ionicons name="document-text-outline" size={16} color={colors.text} />
+                                    <Ionicons name="document-text-outline" size={normalize(16)} color={colors.text} />
                                     <TextInput
-                                        style={[styles.experienceDescription, { color: colors.text }]}
+                                        style={[styles.experienceDescription, { color: colors.text, fontSize: normalize(13) }]}
                                         value={exp.description}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.experience];
@@ -598,8 +598,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 updateField('experience', null, updated);
                             }}
                         >
-                            <Ionicons name="add-circle-outline" size={20} color={colors.text} />
-                            <Text style={{ color: colors.text, fontWeight: '500' }}>Add Experience</Text>
+                            <Ionicons name="add-circle-outline" size={normalize(20)} color={colors.text} />
+                            <Text style={{ color: colors.text, fontWeight: '500', fontSize: normalize(14) }}>Add Experience</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -613,7 +613,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             <View key={index} style={[styles.arrayItem, { borderColor: colors.border }]}>
                                 <View style={styles.arrayItemHeader}>
                                     <TextInput
-                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1 }]}
+                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1, fontSize: normalize(16) }]}
                                         value={project.name}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.projects];
@@ -624,12 +624,12 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                         placeholderTextColor="#9CA3AF"
                                     />
                                     <TouchableOpacity onPress={() => removeArrayItem('projects', index)}>
-                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                                        <Ionicons name="trash-outline" size={normalize(20)} color="#EF4444" />
                                     </TouchableOpacity>
                                 </View>
 
                                 <TextInput
-                                    style={[styles.arrayItemDescription, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                    style={[styles.arrayItemDescription, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, fontSize: normalize(14) }]}
                                     value={project.description}
                                     onChangeText={(text) => {
                                         const updated = [...resume.data.projects];
@@ -643,7 +643,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 />
 
                                 <TextInput
-                                    style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: 8 }]}
+                                    style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1), fontSize: normalize(14) }]}
                                     value={project.technologies}
                                     onChangeText={(text) => {
                                         const updated = [...resume.data.projects];
@@ -667,8 +667,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 updateField('projects', null, updated);
                             }}
                         >
-                            <Ionicons name="add" size={20} color={colors.text} />
-                            <Text style={{ color: colors.text }}>Add Project</Text>
+                            <Ionicons name="add" size={normalize(20)} color={colors.text} />
+                            <Text style={{ color: colors.text, fontSize: normalize(14) }}>Add Project</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -750,16 +750,16 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         <View style={styles.skillTags}>
                             {(resume.data.skills || []).map((skill, index) => (
                                 <View key={index} style={[styles.skillTag, { backgroundColor: colors.primary + '20' }]}>
-                                    <Text style={{ color: colors.primary }}>{skill}</Text>
+                                    <Text style={{ color: colors.primary, fontSize: normalize(14) }}>{skill}</Text>
                                     <TouchableOpacity onPress={() => removeArrayItem('skills', index)}>
-                                        <Ionicons name="close-circle" size={16} color={colors.primary} />
+                                        <Ionicons name="close-circle" size={normalize(16)} color={colors.primary} />
                                     </TouchableOpacity>
                                 </View>
                             ))}
                         </View>
 
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: 10 }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1.5), fontSize: normalize(14) }]}
                             placeholder="Add a skill and press Enter"
                             placeholderTextColor="#9CA3AF"
                             onSubmitEditing={(e) => {
@@ -783,62 +783,73 @@ const saveToDownloads = async (sourceFile, fileName) => {
             {/* Header */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Resume Builder</Text>
-                <TouchableOpacity onPress={generatePDF} disabled={generatingPDF}>
+                <TouchableOpacity onPress={generatePDF} disabled={generatingPDF} style={styles.headerIconButton}>
                     {generatingPDF ? (
                         <ActivityIndicator size="small" color={colors.primary} />
                     ) : (
-                        <Ionicons name="download-outline" size={24} color={colors.primary} />
+                        <Ionicons name="download-outline" size={normalize(24)} color={colors.primary} />
                     )}
                 </TouchableOpacity>
             </View>
 
-            {/* Career Info */}
-            <View style={[styles.careerInfo, { backgroundColor: colors.card }]}>
-                <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
-                <TouchableOpacity
-                    style={[styles.templateButton, { borderColor: colors.text }]}
-                    onPress={() => setShowTemplateModal(true)}
-                >
-                    <Ionicons name="color-palette-outline" size={16} color={colors.text} />
-                    <Text style={{ color: colors.text }}>Change Template</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Section Tabs */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs}>
-                {['personal', 'summary', 'skills', 'experience', 'projects', 'education'].map(section => (
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={[
+                    isTablet && { width: wp(85), alignSelf: 'center' }
+                ]}
+            >
+                {/* Career Info */}
+                <View style={[styles.careerInfo, { backgroundColor: colors.card }]}>
+                    <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
                     <TouchableOpacity
-                        key={section}
-                        style={[
-                            styles.tab,
-                            activeSection === section && styles.activeTab,
-                            { borderColor: activeSection === section ? colors.text : 'transparent' }
-                        ]}
-                        onPress={() => setActiveSection(section)}
+                        style={[styles.templateButton, { borderColor: colors.text }]}
+                        onPress={() => setShowTemplateModal(true)}
                     >
-                        <Text style={[
-                            styles.tabText,
-                            { color: activeSection === section ? colors.text : colors.text }
-                        ]}>
-                            {section.charAt(0).toUpperCase() + section.slice(1)}
-                        </Text>
+                        <Ionicons name="color-palette-outline" size={normalize(16)} color={colors.text} />
+                        <Text style={{ color: colors.text, fontSize: normalize(14) }}>Change Template</Text>
                     </TouchableOpacity>
-                ))}
-            </ScrollView>
+                </View>
 
-            {/* Section Editor */}
-            <ScrollView style={styles.editorContainer}>
-                {renderSection()}
+                {/* Section Tabs */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs} contentContainerStyle={styles.tabsContent}>
+                    {['personal', 'summary', 'skills', 'experience', 'projects', 'education'].map(section => (
+                        <TouchableOpacity
+                            key={section}
+                            style={[
+                                styles.tab,
+                                activeSection === section && styles.activeTab,
+                                { borderColor: activeSection === section ? colors.text : 'transparent' }
+                            ]}
+                            onPress={() => setActiveSection(section)}
+                        >
+                            <Text style={[
+                                styles.tabText,
+                                { color: activeSection === section ? colors.text : colors.text }
+                            ]}>
+                                {section.charAt(0).toUpperCase() + section.slice(1)}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                {/* Section Editor */}
+                <View style={styles.editorContainer}>
+                    {renderSection()}
+                </View>
             </ScrollView>
 
             {/* Template Modal */}
             <Modal visible={showTemplateModal} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={[
+                        styles.modalContent,
+                        { backgroundColor: colors.card },
+                        isTablet && { width: wp(60), alignSelf: 'center', borderTopLeftRadius: 20, borderTopRightRadius: 20, marginBottom: hp(5) }
+                    ]}>
                         <View style={styles.modalHeader}>
                             <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Template</Text>
                             <TouchableOpacity onPress={() => setShowTemplateModal(false)}>
-                                <Ionicons name="close" size={24} color={colors.textSecondary} />
+                                <Ionicons name="close" size={normalize(24)} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
 
@@ -861,7 +872,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                     <Text style={[styles.templateDesc, { color: colors.textSecondary }]}>{template.description}</Text>
                                 </View>
                                 {resume.template === template.id && (
-                                    <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+                                    <Ionicons name="checkmark-circle" size={normalize(24)} color={colors.primary} />
                                 )}
                             </TouchableOpacity>
                         ))}
@@ -880,120 +891,126 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: wp(4),
+        paddingVertical: hp(1.5),
         borderBottomWidth: 1,
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: normalize(18),
         fontWeight: '600',
+    },
+    headerIconButton: {
+        padding: wp(1),
     },
     careerInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        margin: 16,
-        borderRadius: 12,
+        padding: wp(4),
+        margin: wp(4),
+        borderRadius: normalize(12),
     },
     careerName: {
-        fontSize: 18,
+        fontSize: normalize(18),
         fontWeight: '600',
     },
     templateButton: {
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderRadius: 20,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        gap: 4,
+        borderRadius: normalize(20),
+        paddingHorizontal: wp(3),
+        paddingVertical: hp(0.8),
+        gap: wp(1),
     },
     tabs: {
-        maxHeight: 50,
-        paddingHorizontal: 16,
+        maxHeight: hp(7),
+        paddingHorizontal: wp(4),
+    },
+    tabsContent: {
+        paddingRight: wp(8),
     },
     tab: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        marginRight: 8,
+        paddingHorizontal: wp(4),
+        paddingVertical: hp(1),
+        marginRight: wp(2),
         borderBottomWidth: 2,
     },
     activeTab: {
         borderBottomWidth: 2,
     },
     tabText: {
-        fontSize: 14,
+        fontSize: normalize(14),
         fontWeight: '500',
     },
     editorContainer: {
-        flex: 1,
-        padding: 16,
+        padding: wp(4),
     },
     sectionEditor: {
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 20,
+        padding: wp(4),
+        borderRadius: normalize(12),
+        marginBottom: hp(2.5),
     },
     sectionEditorTitle: {
-        fontSize: 18,
+        fontSize: normalize(18),
         fontWeight: '600',
-        marginBottom: 16,
+        marginBottom: hp(2),
     },
     label: {
-        fontSize: 12,
-        marginBottom: 4,
-        marginTop: 12,
+        fontSize: normalize(12),
+        marginBottom: hp(0.5),
+        marginTop: hp(1.5),
     },
     input: {
         borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 14,
+        borderRadius: normalize(8),
+        padding: wp(3),
+        fontSize: normalize(14),
     },
     textArea: {
         borderWidth: 1,
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 14,
-        minHeight: 120,
+        borderRadius: normalize(8),
+        padding: wp(3),
+        fontSize: normalize(14),
+        minHeight: hp(15),
         textAlignVertical: 'top',
     },
     arrayItem: {
-        padding: 12,
+        padding: wp(3),
         borderWidth: 1,
         borderColor: '#e5e7eb',
-        borderRadius: 8,
-        marginBottom: 8,
+        borderRadius: normalize(8),
+        marginBottom: hp(1),
     },
     arrayItemHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 4,
+        marginBottom: hp(0.5),
     },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 12,
+        padding: wp(3),
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: normalize(8),
         borderStyle: 'dashed',
-        gap: 8,
+        gap: wp(2),
+        marginTop: hp(1),
     },
     skillTags: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
+        gap: wp(2),
     },
     skillTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 16,
-        gap: 4,
+        paddingHorizontal: wp(2.5),
+        paddingVertical: hp(0.6),
+        borderRadius: normalize(16),
+        gap: wp(1),
     },
     modalOverlay: {
         flex: 1,
@@ -1001,151 +1018,139 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        minHeight: 300,
+        borderTopLeftRadius: normalize(20),
+        borderTopRightRadius: normalize(20),
+        padding: wp(5),
+        minHeight: hp(40),
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: hp(2.5),
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: normalize(20),
         fontWeight: 'bold',
     },
     templateOption: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
+        padding: wp(4),
         borderWidth: 1,
-        borderRadius: 12,
-        marginBottom: 12,
+        borderRadius: normalize(12),
+        marginBottom: hp(1.5),
     },
     selectedTemplate: {
         borderWidth: 2,
     },
     templateName: {
-        fontSize: 16,
+        fontSize: normalize(16),
         fontWeight: '600',
-        marginBottom: 4,
+        marginBottom: hp(0.5),
     },
     templateDesc: {
-        fontSize: 12,
+        fontSize: normalize(12),
     },
     upgradeButton: {
-        padding: 16,
-        borderRadius: 8,
-        width: '70%',
+        padding: wp(4),
+        borderRadius: normalize(8),
         alignItems: 'center',
     },
     upgradeButtonText: {
         color: 'white',
-        fontSize: 16,
         fontWeight: 'bold',
     },
     arrayItemTitle: {
-        fontSize: 16,
         fontWeight: '600',
-        marginBottom: 4,
+        marginBottom: hp(0.5),
     },
     arrayItemSubtitle: {
-        fontSize: 14,
-        marginBottom: 8,
+        fontSize: normalize(14),
+        marginBottom: hp(1),
     },
     arrayItemDescription: {
         borderWidth: 1,
-        borderRadius: 6,
-        padding: 8,
-        fontSize: 14,
-        minHeight: 60,
+        borderRadius: normalize(6),
+        padding: wp(2),
+        minHeight: hp(8),
         textAlignVertical: 'top',
-        marginTop: 8,
+        marginTop: hp(1),
     },
     dateRow: {
         flexDirection: 'row',
-        gap: 12,
-        marginTop: 8,
+        gap: wp(3),
+        marginTop: hp(1),
     },
     dateInput: {
         flex: 1,
         borderWidth: 1,
-        borderRadius: 6,
-        padding: 8,
-        fontSize: 14,
+        borderRadius: normalize(6),
+        padding: wp(2),
+        fontSize: normalize(14),
     },
     experienceCard: {
         borderWidth: 1,
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
+        borderRadius: normalize(12),
+        padding: wp(4),
+        marginBottom: hp(1.5),
     },
     experienceHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: hp(1),
     },
     titleContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
+        gap: wp(2),
     },
     jobTitleInput: {
         flex: 1,
-        fontSize: 16,
         fontWeight: '600',
         padding: 0,
     },
     companyContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginBottom: 12,
-        paddingLeft: 28,
+        gap: wp(2),
+        marginBottom: hp(1.5),
+        paddingLeft: wp(7),
     },
     companyInput: {
         flex: 1,
-        fontSize: 14,
         padding: 0,
     },
     dateRangeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginBottom: 12,
-        paddingLeft: 28,
+        gap: wp(2),
+        marginBottom: hp(1.5),
+        paddingLeft: wp(7),
     },
     dateField: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: wp(1),
         borderWidth: 1,
         borderColor: '#e5e7eb',
-        borderRadius: 6,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-    },
-    dateInput: {
-        flex: 1,
-        fontSize: 13,
-        padding: 0,
+        borderRadius: normalize(6),
+        paddingHorizontal: wp(2),
+        paddingVertical: hp(0.8),
     },
     descriptionContainer: {
         flexDirection: 'row',
-        gap: 8,
-        paddingLeft: 28,
+        gap: wp(2),
+        paddingLeft: wp(7),
     },
     experienceDescription: {
         flex: 1,
-        fontSize: 13,
-        lineHeight: 18,
-        minHeight: 60,
+        lineHeight: normalize(18),
+        minHeight: hp(8),
         padding: 0,
     },
 });

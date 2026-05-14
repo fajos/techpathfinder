@@ -21,7 +21,7 @@ import { usePremium } from '../context/PremiumContext';
 import { trackScreen } from '../services/analytics';
 
 const CareerExplorerScreen = () => {
-  const { colors, isDark } = useThemeStyles();
+  const { colors, isDark, wp, hp, normalize, isTablet } = useThemeStyles();
   const [query, setQuery] = useState("");
   const [savedTitles, setSavedTitles] = useState([]);
   const navigation = useNavigation();
@@ -54,8 +54,14 @@ const CareerExplorerScreen = () => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>🔍 Explore Tech Careers</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={[
+        { padding: wp(4) },
+        isTablet ? { alignSelf: 'center', width: wp(80) } : null
+      ]}
+    >
+      <Text style={[styles.title, { color: colors.text, fontSize: normalize(24), marginTop: hp(2), marginBottom: hp(2) }]}>🔍 Explore Tech Careers</Text>
 
       <ThreeDButton
         title="Home"
@@ -66,86 +72,126 @@ const CareerExplorerScreen = () => {
       <TextInput
         placeholder="Search careers..."
         placeholderTextColor={colors.textSecondary}
-        style={[styles.searchBox, { color: colors.text, borderColor: colors.border, backgroundColor: colors.card, marginTop: 10 }]}
+        style={[styles.searchBox, {
+          color: colors.text,
+          borderColor: colors.border,
+          backgroundColor: colors.card,
+          marginTop: hp(1.5),
+          padding: normalize(12),
+          fontSize: normalize(16),
+          borderRadius: normalize(12)
+        }]}
         onChangeText={setQuery}
         value={query}
       />
 
       {filteredCareers.map((career) => (
-        <View key={career.title} style={[styles.card, { backgroundColor: colors.card }]}>
+        <View key={career.title} style={[styles.card, {
+          backgroundColor: colors.card,
+          borderRadius: normalize(16),
+          padding: normalize(18),
+          marginBottom: hp(2.5)
+        }]}>
           {/* Watermark */}
           <Image
             source={require("../assets/splash/splash.png")}
-            style={styles.watermark}
+            style={[styles.watermark, { width: normalize(70), height: normalize(70), borderRadius: normalize(35) }]}
           />
 
           {/* Title Badge */}
-          <View style={styles.badgeRow}>
-            <View style={[styles.titleBadge, { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff" }]}>
-              <Text style={styles.emoji}>{careerEmojis[career.title] || "💼"}</Text>
-              <Text style={[styles.badgeText, { color: isDark ? "#c7d2fe" : "#1e3a8a" }]}>
+          <View style={[styles.badgeRow, { marginBottom: hp(1.5) }]}>
+            <View style={[styles.titleBadge, {
+              backgroundColor: isDark ? "#4f46e520" : "#e0e7ff",
+              paddingVertical: hp(0.75),
+              paddingHorizontal: wp(3),
+              borderRadius: normalize(20)
+            }]}>
+              <Text style={[styles.emoji, { fontSize: normalize(18) }]}>{careerEmojis[career.title] || "💼"}</Text>
+              <Text style={[styles.badgeText, { color: isDark ? "#c7d2fe" : "#1e3a8a", fontSize: normalize(16), marginLeft: wp(2) }]}>
                 {career.title}
               </Text>
             </View>
           </View>
 
           {career.intro && (
-            <Text style={[styles.intro, { color: colors.textSecondary }]}>{career.intro}</Text>
+            <Text style={[styles.intro, { color: colors.textSecondary, fontSize: normalize(14), marginBottom: hp(1.5), lineHeight: normalize(20) }]}>{career.intro}</Text>
           )}
 
           {career.roles?.length > 0 && (
             <>
-              <Text style={[styles.label, { color: colors.text }]}>Roles:</Text>
-              <View style={styles.skillContainer}>
+              <Text style={[styles.label, { color: colors.text, fontSize: normalize(15), marginBottom: hp(1) }]}>Roles:</Text>
+              <View style={[styles.skillContainer, { gap: wp(2), marginBottom: hp(1.5) }]}>
                 {career.roles.slice(0, 3).map((r, i) => (
                   <Text key={i} style={[
                     styles.skillTag,
-                    { backgroundColor: isDark ? "#374151" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                    {
+                      backgroundColor: isDark ? "#374151" : "#e0e7ff",
+                      color: isDark ? "#c7d2fe" : "#1e3a8a",
+                      fontSize: normalize(12),
+                      paddingHorizontal: wp(2.5),
+                      paddingVertical: hp(0.5),
+                      borderRadius: normalize(999)
+                    }
                   ]}>{r}</Text>
                 ))}
               </View>
             </>
           )}
 
-          <Text style={[styles.label, { color: colors.text }]}>Top Skills:</Text>
-          <View style={styles.skillContainer}>
+          <Text style={[styles.label, { color: colors.text, fontSize: normalize(15), marginBottom: hp(1) }]}>Top Skills:</Text>
+          <View style={[styles.skillContainer, { gap: wp(2), marginBottom: hp(1.5) }]}>
             {career.skills?.map((s, i) => (
               <Text key={i} style={[
                 styles.skillTag,
-                { backgroundColor: isDark ? "#374151" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                {
+                  backgroundColor: isDark ? "#374151" : "#e0e7ff",
+                  color: isDark ? "#c7d2fe" : "#1e3a8a",
+                  fontSize: normalize(12),
+                  paddingHorizontal: wp(2.5),
+                  paddingVertical: hp(0.5),
+                  borderRadius: normalize(999)
+                }
               ]}>{s}</Text>
             ))}
           </View>
 
-          <Text style={[styles.label, { color: colors.text, marginTop: 16 }]}>Roadmap:</Text>
+          <Text style={[styles.label, { color: colors.text, marginTop: hp(2), fontSize: normalize(15), marginBottom: hp(1) }]}>Roadmap:</Text>
           {career.roadmap?.slice(0, 8).map((step, i) => (
-            <View key={i} style={styles.stepContainer}>
-              <Text style={[styles.step, { color: colors.text }]}>• {step.text}</Text>
+            <View key={i} style={[styles.stepContainer, { marginBottom: hp(0.75) }]}>
+              <Text style={[styles.step, { color: colors.text, fontSize: normalize(14), lineHeight: normalize(20) }]}>• {step.text}</Text>
               <Text style={[
                 styles.stepDifficulty,
-                { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff", color: colors.primary }
+                {
+                  backgroundColor: isDark ? "#4f46e520" : "#e0e7ff",
+                  color: colors.primary,
+                  fontSize: normalize(11),
+                  marginLeft: wp(2),
+                  paddingHorizontal: wp(1.5),
+                  paddingVertical: hp(0.25),
+                  borderRadius: normalize(6)
+                }
               ]}>
                 {step.difficulty}
               </Text>
             </View>
           ))}
           {career.roadmap?.length > 8 && (
-            <Text style={[styles.moreSteps, { color: colors.textSecondary }]}>
+            <Text style={[styles.moreSteps, { color: colors.textSecondary, fontSize: normalize(12), marginTop: hp(0.5) }]}>
               + {career.roadmap.length - 8} more steps
             </Text>
           )}
 
           {career.resources?.length > 0 && (
             <>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.label, { color: colors.text, marginTop: 8 }]}>Resources:</Text>
+              <View style={[styles.sectionHeader, { marginTop: hp(1), marginBottom: hp(0.5) }]}>
+                <Text style={[styles.label, { color: colors.text, fontSize: normalize(15) }]}>Resources:</Text>
                 {!isPremium && (
                   <TouchableOpacity
                     onPress={() => navigation.navigate('Premium')}
-                    style={[styles.premiumBadge, { backgroundColor: colors.primary }]}
+                    style={[styles.premiumBadge, { backgroundColor: colors.primary, paddingHorizontal: wp(2), paddingVertical: hp(0.5), borderRadius: normalize(12), gap: wp(1) }]}
                   >
-                    <Ionicons name="diamond" size={14} color="#FFD700" />
-                    <Text style={styles.premiumText}>PREMIUM</Text>
+                    <Ionicons name="diamond" size={normalize(14)} color="#FFD700" />
+                    <Text style={[styles.premiumText, { fontSize: normalize(10) }]}>PREMIUM</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -154,7 +200,7 @@ const CareerExplorerScreen = () => {
                 career.resources.slice(0, 4).map((link) => (
                   <Text
                     key={link}
-                    style={[styles.link, { color: colors.primary }]}
+                    style={[styles.link, { color: colors.primary, fontSize: normalize(13), marginTop: hp(0.5) }]}
                     onPress={() => Linking.openURL(link)}
                   >
                     🔗 {link}
@@ -162,64 +208,64 @@ const CareerExplorerScreen = () => {
                 ))
               ) : (
                 <>
-                  <Text style={[styles.previewText, { color: colors.textSecondary }]}>
+                  <Text style={[styles.previewText, { color: colors.textSecondary, marginTop: hp(0.5) }]}>
                     {career.resources.slice(0, 1).map((link) => (
-                      <Text key={link} style={[styles.link, { color: colors.primary }]}>
+                      <Text key={link} style={[styles.link, { color: colors.primary, fontSize: normalize(13) }]}>
                         🔗 {link.substring(0, 40)}...\n
                       </Text>
                     ))}
                   </Text>
                   <TouchableOpacity
                     onPress={() => navigation.navigate('Premium')}
-                    style={[styles.unlockButton, { backgroundColor: colors.primary }]}
+                    style={[styles.unlockButton, { backgroundColor: colors.primary, padding: normalize(10), borderRadius: normalize(8), marginTop: hp(1), gap: wp(2) }]}
                   >
-                    <Ionicons name="lock-open" size={20} color="white" />
-                    <Text style={styles.unlockButtonText}>Unlock All Resources</Text>
+                    <Ionicons name="lock-open" size={normalize(20)} color="white" />
+                    <Text style={[styles.unlockButtonText, { fontSize: normalize(14) }]}>Unlock All Resources</Text>
                   </TouchableOpacity>
                 </>
               )}
             </>
           )}
 
-          <View style={styles.buttonGrid}>
+          <View style={[styles.buttonGrid, { marginTop: hp(2), marginBottom: hp(1) }]}>
             <TouchableOpacity
-              style={[styles.premiumButton, { backgroundColor: '#0d9488' }]}
+              style={[styles.premiumButton, { backgroundColor: '#0d9488', paddingVertical: hp(1.5), borderRadius: normalize(10), marginBottom: hp(1), gap: wp(2) }]}
               onPress={() => navigation.navigate('LearningPlan', { career: career.title })}
             >
-              <Ionicons name="calendar-outline" size={18} color="white" />
-              <Text style={styles.buttonText}>Learning Plan</Text>
+              <Ionicons name="calendar-outline" size={normalize(18)} color="white" />
+              <Text style={[styles.buttonText, { fontSize: normalize(14) }]}>Learning Plan</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.premiumButton, { backgroundColor: '#10B981' }]}
+              style={[styles.premiumButton, { backgroundColor: '#10B981', paddingVertical: hp(1.5), borderRadius: normalize(10), marginBottom: hp(1), gap: wp(2) }]}
               onPress={() => navigation.navigate('SkillGap', { career: career.title })}
             >
-              <Ionicons name="analytics" size={18} color="white" />
-              <Text style={styles.buttonText}>Skill Gap</Text>
+              <Ionicons name="analytics" size={normalize(18)} color="white" />
+              <Text style={[styles.buttonText, { fontSize: normalize(14) }]}>Skill Gap</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.premiumButton, { backgroundColor: '#8B5CF6' }]}
+              style={[styles.premiumButton, { backgroundColor: '#8B5CF6', paddingVertical: hp(1.5), borderRadius: normalize(10), marginBottom: hp(1), gap: wp(2) }]}
               onPress={() => navigation.navigate('ProjectIdeas', { career: career.title })}
             >
-              <Ionicons name="bulb-outline" size={18} color="white" />
-              <Text style={styles.buttonText}>Projects</Text>
+              <Ionicons name="bulb-outline" size={normalize(18)} color="white" />
+              <Text style={[styles.buttonText, { fontSize: normalize(14) }]}>Projects</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.premiumButton, { backgroundColor: '#EC489A' }]}
+              style={[styles.premiumButton, { backgroundColor: '#EC489A', paddingVertical: hp(1.5), borderRadius: normalize(10), marginBottom: hp(1), gap: wp(2) }]}
               onPress={() => navigation.navigate('MockInterview', { career: career.title })}
             >
-              <Ionicons name="chatbubbles-outline" size={18} color="white" />
-              <Text style={styles.buttonText}>Interview</Text>
+              <Ionicons name="chatbubbles-outline" size={normalize(18)} color="white" />
+              <Text style={[styles.buttonText, { fontSize: normalize(14) }]}>Interview</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.premiumButton, { backgroundColor: '#F59E0B' }]}
+              style={[styles.premiumButton, { backgroundColor: '#F59E0B', paddingVertical: hp(1.5), borderRadius: normalize(10), marginBottom: hp(1), gap: wp(2) }]}
               onPress={() => navigation.navigate('ResumeBuilder', { career: career.title })}
             >
-              <Ionicons name="document-text" size={18} color="white" />
-              <Text style={styles.buttonText}>Resume</Text>
+              <Ionicons name="document-text" size={normalize(18)} color="white" />
+              <Text style={[styles.buttonText, { fontSize: normalize(14) }]}>Resume</Text>
             </TouchableOpacity>
           </View>
 
@@ -228,10 +274,15 @@ const CareerExplorerScreen = () => {
             disabled={savedTitles.includes(career.title)}
             style={[
               styles.saveBtn,
-              { backgroundColor: savedTitles.includes(career.title) ? (isDark ? "#4b5563" : "#9ca3af") : colors.primary },
+              {
+                backgroundColor: savedTitles.includes(career.title) ? (isDark ? "#4b5563" : "#9ca3af") : colors.primary,
+                paddingVertical: hp(1.75),
+                borderRadius: normalize(10),
+                marginBottom: hp(1.75)
+              },
             ]}
           >
-            <Text style={styles.saveText}>
+            <Text style={[styles.saveText, { fontSize: normalize(14) }]}>
               {savedTitles.includes(career.title) ? "✔ Saved" : "Save to Dashboard"}
             </Text>
           </TouchableOpacity>

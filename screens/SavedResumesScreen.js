@@ -10,7 +10,7 @@ const { Paths, File, Directory } = FileSystem;
 
 export default function SavedResumesScreen({ navigation }) {
   const [resumes, setResumes] = useState([]);
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
   
   useEffect(() => {
     loadSavedResumes();
@@ -52,16 +52,16 @@ export default function SavedResumesScreen({ navigation }) {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={normalize(24)} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Saved Resumes</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: normalize(24) }} />
       </View>
       
       {resumes.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="document-outline" size={64} color={colors.textSecondary} />
+          <Ionicons name="document-outline" size={normalize(64)} color={colors.textSecondary} />
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             No saved resumes yet
           </Text>
@@ -76,7 +76,7 @@ export default function SavedResumesScreen({ navigation }) {
           renderItem={({ item }) => (
             <View style={[styles.resumeItem, { backgroundColor: colors.card }]}>
               <View style={styles.resumeInfo}>
-                <Ionicons name="document-text" size={24} color={colors.primary} />
+                <Ionicons name="document-text" size={normalize(24)} color={colors.primary} />
                 <View style={styles.resumeDetails}>
                   <Text style={[styles.resumeName, { color: colors.text }]} numberOfLines={1}>
                     {item.name}
@@ -89,15 +89,18 @@ export default function SavedResumesScreen({ navigation }) {
               
               <View style={styles.resumeActions}>
                 <TouchableOpacity onPress={() => shareResume(item)} style={styles.actionButton}>
-                  <Ionicons name="share-outline" size={20} color={colors.primary} />
+                  <Ionicons name="share-outline" size={normalize(20)} color={colors.primary} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => deleteResume(item)} style={styles.actionButton}>
-                  <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                  <Ionicons name="trash-outline" size={normalize(20)} color="#EF4444" />
                 </TouchableOpacity>
               </View>
             </View>
           )}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[
+            styles.listContent,
+            isTablet && { width: wp(85), alignSelf: 'center' }
+          ]}
         />
       )}
     </View>
@@ -110,32 +113,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: wp(4),
+    paddingVertical: hp(1.5),
     borderBottomWidth: 1,
   },
-  headerTitle: { fontSize: 18, fontWeight: '600' },
+  headerTitle: { fontSize: normalize(18), fontWeight: '600' },
+  backButton: {
+    padding: wp(1),
+  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: wp(5),
   },
-  emptyText: { fontSize: 18, marginTop: 16 },
-  emptySubtext: { fontSize: 14, marginTop: 8 },
-  listContent: { padding: 16 },
+  emptyText: { fontSize: normalize(18), marginTop: hp(2) },
+  emptySubtext: { fontSize: normalize(14), marginTop: hp(1) },
+  listContent: { padding: wp(4) },
   resumeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    padding: wp(4),
+    borderRadius: normalize(12),
+    marginBottom: hp(1.5),
   },
-  resumeInfo: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: 12 },
+  resumeInfo: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: wp(3) },
   resumeDetails: { flex: 1 },
-  resumeName: { fontSize: 14, fontWeight: '500' },
-  resumeDate: { fontSize: 12, marginTop: 2 },
-  resumeActions: { flexDirection: 'row', gap: 12 },
-  actionButton: { padding: 8 },
+  resumeName: { fontSize: normalize(14), fontWeight: '500' },
+  resumeDate: { fontSize: normalize(12), marginTop: hp(0.3) },
+  resumeActions: { flexDirection: 'row', gap: wp(3) },
+  actionButton: { padding: wp(2) },
 });

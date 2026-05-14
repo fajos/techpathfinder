@@ -20,7 +20,7 @@ import { trackScreen } from '../services/analytics';
 export default function SettingsScreen({ navigation }) {
   const { user, logout } = useAuth();
   const { isPremium } = usePremium();
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
   const { isDark, toggleTheme } = useContext(ThemeContext);
   
   const [notifications, setNotifications] = useState(true);
@@ -74,33 +74,45 @@ export default function SettingsScreen({ navigation }) {
       disabled={!onPress}
     >
       <View style={styles.settingLeft}>
-        <View style={[styles.settingIcon, { backgroundColor: destructive ? '#EF444420' : colors.primary + '20' }]}>
-          <Ionicons name={icon} size={22} color={destructive ? '#EF4444' : colors.primary} />
+        <View style={[styles.settingIcon, {
+          backgroundColor: destructive ? '#EF444420' : colors.primary + '20',
+          width: normalize(42),
+          height: normalize(42),
+          borderRadius: normalize(12),
+          marginRight: wp(4),
+        }]}>
+          <Ionicons name={icon} size={normalize(22)} color={destructive ? '#EF4444' : colors.primary} />
         </View>
         <View style={styles.settingText}>
-          <Text style={[styles.settingTitle, { color: destructive ? '#EF4444' : colors.text }]}>
+          <Text style={[styles.settingTitle, { color: destructive ? '#EF4444' : colors.text, fontSize: normalize(16) }]}>
             {title}
           </Text>
           {subtitle && (
-            <Text style={[styles.settingSubtitle, { color: colors.textSecondary }]}>
+            <Text style={[styles.settingSubtitle, { color: colors.textSecondary, fontSize: normalize(13) }]}>
               {subtitle}
             </Text>
           )}
         </View>
       </View>
-      {rightElement || (onPress && <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />)}
+      {rightElement || (onPress && <Ionicons name="chevron-forward" size={normalize(20)} color={colors.textSecondary} />)}
     </TouchableOpacity>
   );
 
   const SwitchItem = ({ icon, title, subtitle, value, onValueChange }) => (
     <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
       <View style={styles.settingLeft}>
-        <View style={[styles.settingIcon, { backgroundColor: colors.primary + '20' }]}>
-          <Ionicons name={icon} size={22} color={colors.primary} />
+        <View style={[styles.settingIcon, {
+          backgroundColor: colors.primary + '20',
+          width: normalize(42),
+          height: normalize(42),
+          borderRadius: normalize(12),
+          marginRight: wp(4),
+        }]}>
+          <Ionicons name={icon} size={normalize(22)} color={colors.primary} />
         </View>
         <View style={styles.settingText}>
-          <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
-          {subtitle && <Text style={[styles.settingSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
+          <Text style={[styles.settingTitle, { color: colors.text, fontSize: normalize(16) }]}>{title}</Text>
+          {subtitle && <Text style={[styles.settingSubtitle, { color: colors.textSecondary, fontSize: normalize(13) }]}>{subtitle}</Text>}
         </View>
       </View>
       <Switch
@@ -113,28 +125,37 @@ export default function SettingsScreen({ navigation }) {
   );
 
   const StatsItem = ({ icon, title, value, color }) => (
-    <View style={[styles.statsItem, { backgroundColor: colors.card }]}>
-      <View style={[styles.statsIcon, { backgroundColor: color + '20' }]}>
-        <Ionicons name={icon} size={24} color={color} />
+    <View style={[styles.statsItem, { backgroundColor: colors.card, paddingVertical: hp(2), borderRadius: normalize(16) }]}>
+      <View style={[styles.statsIcon, {
+        backgroundColor: color + '20',
+        width: normalize(44),
+        height: normalize(44),
+        borderRadius: normalize(22),
+        marginBottom: hp(1),
+      }]}>
+        <Ionicons name={icon} size={normalize(24)} color={color} />
       </View>
-      <Text style={[styles.statsValue, { color: colors.text }]}>{value}</Text>
-      <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>{title}</Text>
+      <Text style={[styles.statsValue, { color: colors.text, fontSize: normalize(20) }]}>{value}</Text>
+      <Text style={[styles.statsLabel, { color: colors.textSecondary, fontSize: normalize(11) }]}>{title}</Text>
     </View>
   );
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={isTablet ? { alignSelf: 'center', width: wp(80) } : null}
+    >
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
+      <View style={[styles.header, { paddingHorizontal: wp(5), paddingTop: hp(5), paddingBottom: hp(2) }]}>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: normalize(32) }]}>Settings</Text>
+        <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: normalize(14) }]}>
           Customize your experience
         </Text>
       </View>
 
       {/* Preferences Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Preferences</Text>
+      <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>Preferences</Text>
         <SwitchItem
           icon="moon-outline"
           title="Dark Mode"
@@ -152,8 +173,8 @@ export default function SettingsScreen({ navigation }) {
       </View>
 
       {/* Premium Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Premium</Text>
+      <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>Premium</Text>
         <SettingItem
           icon="diamond-outline"
           title={isPremium ? "Premium Active" : "Upgrade to Premium"}
@@ -161,8 +182,8 @@ export default function SettingsScreen({ navigation }) {
           onPress={() => navigation.navigate('Premium')}
           rightElement={
             isPremium ? (
-              <View style={styles.premiumBadge}>
-                <Text style={styles.premiumBadgeText}>ACTIVE</Text>
+              <View style={[styles.premiumBadge, { paddingHorizontal: wp(2.5), paddingVertical: hp(0.5), borderRadius: normalize(12) }]}>
+                <Text style={[styles.premiumBadgeText, { fontSize: normalize(10) }]}>ACTIVE</Text>
               </View>
             ) : null
           }
@@ -171,8 +192,8 @@ export default function SettingsScreen({ navigation }) {
 
       {/* Account Section */}
       {user && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+        <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>Account</Text>
           <SettingItem
             icon="person-outline"
             title="Edit Profile"
@@ -190,8 +211,8 @@ export default function SettingsScreen({ navigation }) {
       )}
 
       {/* Data Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Data</Text>
+      <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>Data</Text>
         <SettingItem
           icon="trash-outline"
           title="Clear All Data"
@@ -202,8 +223,8 @@ export default function SettingsScreen({ navigation }) {
       </View>
 
       {/* About Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
+      <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
+        <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>About</Text>
         <SettingItem
           icon="information-circle-outline"
           title="About TechPathFinder"
@@ -225,7 +246,7 @@ export default function SettingsScreen({ navigation }) {
       </View>
 
       {/* Copyright */}
-      <Text style={[styles.copyright, { color: colors.textSecondary }]}>
+      <Text style={[styles.copyright, { color: colors.textSecondary, fontSize: normalize(12), marginVertical: hp(3), marginBottom: hp(5) }]}>
         © 2026 TechPathFinder. All rights reserved.
       </Text>
     </ScrollView>

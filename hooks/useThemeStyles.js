@@ -1,6 +1,7 @@
 // hooks/useThemeStyles.js
 import { useContext } from 'react';
 import { ThemeContext } from '../utils/ThemeContext';
+import { wp, hp, normalize, isTablet, SCREEN_WIDTH, SCREEN_HEIGHT } from '../utils/responsive';
 
 export const useThemeStyles = () => {
   const { isDark } = useContext(ThemeContext);
@@ -47,5 +48,11 @@ export const useThemeStyles = () => {
   return {
     colors: safeColors,
     isDark,
+    wp,
+    hp,
+    normalize,
+    isTablet: isTablet(),
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
   };
 };

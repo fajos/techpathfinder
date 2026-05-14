@@ -24,7 +24,7 @@ export default function SkillGapScreen({ route, navigation }) {
     const { user } = useAuth();
     const { isPremium } = usePremium();
     const { getCurrentProfile, addSkill, removeSkill } = useUserProfileStore();
-    const { colors } = useThemeStyles();
+    const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
 
     const [analysis, setAnalysis] = useState(null);
     const [newSkill, setNewSkill] = useState('');
@@ -110,19 +110,19 @@ export default function SkillGapScreen({ route, navigation }) {
     // Premium gate
     if (!isPremium) {
         return (
-            <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-                <Ionicons name="lock-closed" size={60} color={colors.primary} />
-                <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: 20 }]}>
+            <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: wp(5) }]}>
+                <Ionicons name="lock-closed" size={normalize(60)} color={colors.primary} />
+                <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: hp(2), fontSize: normalize(24), fontWeight: 'bold' }]}>
                     Skill Gap Analysis
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: 20 }]}>
+                <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: hp(2), fontSize: normalize(16) }]}>
                     Upgrade to Premium to see how your skills match up with career requirements and identify what to learn next.
                 </Text>
                 <TouchableOpacity
-                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1' }]}
+                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1', width: isTablet ? wp(40) : wp(70), padding: hp(2), borderRadius: normalize(8) }]}
                     onPress={() => navigation.navigate('Premium')}
                 >
-                    <Text style={styles.upgradeButtonText}>View Premium</Text>
+                    <Text style={[styles.upgradeButtonText, { fontSize: normalize(16), fontWeight: 'bold' }]}>View Premium</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -139,76 +139,56 @@ export default function SkillGapScreen({ route, navigation }) {
     if (!analysis) {
         return (
             <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-                <Text style={{ color: colors.text }}>Career data not found</Text>
+                <Text style={{ color: colors.text, fontSize: normalize(16) }}>Career data not found</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <ScrollView
+            style={[styles.container, { backgroundColor: colors.background }]}
+            contentContainerStyle={isTablet ? { alignSelf: 'center', width: wp(90) } : null}
+        >
             {/* Header */}
-            <View style={styles.header}>
-                <Text style={[styles.careerTitle, { color: colors.text }]}>
+            <View style={[styles.header, { padding: wp(5), paddingBottom: hp(1) }]}>
+                <Text style={[styles.careerTitle, { color: colors.text, fontSize: normalize(28) }]}>
                     {analysis.careerTitle}
                 </Text>
-                <Text style={[styles.subtitle, { color: colors.text }]}>
+                <Text style={[styles.subtitle, { color: colors.text, fontSize: normalize(14), marginTop: hp(0.5) }]}>
                     Skill Gap Analysis
                 </Text>
             </View>
 
             {/* Match Percentage Card */}
-            <View style={[styles.percentageCard, { backgroundColor: colors.card }]}>
-                <Text style={[styles.percentageLabel, { color: colors.text }]}>
+            <View style={[styles.percentageCard, { backgroundColor: colors.card, margin: wp(5), padding: normalize(20), borderRadius: normalize(12) }]}>
+                <Text style={[styles.percentageLabel, { color: colors.text, fontSize: normalize(14) }]}>
                     Match Percentage
                 </Text>
-                <Text style={[styles.percentageValue, { color: colors.text }]}>
+                <Text style={[styles.percentageValue, { color: colors.text, fontSize: normalize(48), marginVertical: hp(1) }]}>
                     {analysis.percentage}%
                 </Text>
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${analysis.percentage}%`, backgroundColor: colors.primary }]} />
+                <View style={[styles.progressBar, { height: normalize(8), borderRadius: normalize(4), marginVertical: hp(1) }]}>
+                    <View style={[styles.progressFill, { width: `${analysis.percentage}%`, backgroundColor: colors.primary, height: normalize(8), borderRadius: normalize(4) }]} />
                 </View>
-                <Text style={[styles.matchText, { color: colors.text }]}>
+                <Text style={[styles.matchText, { color: colors.text, fontSize: normalize(14) }]}>
                     {analysis.matched.length} of {analysis.total} skills matched
                 </Text>
             </View>
 
-       {/* Custom Skill Input (Optional) 
-<View style={[styles.addSkillCard, { backgroundColor: colors.card, marginTop: 0 }]}>
-  <Text style={[styles.sectionTitle, { color: colors.text }]}>
-    + Add Custom Skill
-  </Text>
-  <View style={styles.addSkillRow}>
-    <TextInput
-      style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-      placeholder="e.g., TypeScript, GraphQL"
-      placeholderTextColor={colors.textSecondary}
-      value={newSkill}
-      onChangeText={setNewSkill}
-      onSubmitEditing={handleAddSkill}
-    />
-    <TouchableOpacity
-      style={[styles.addButton, { backgroundColor: colors.primary }]}
-      onPress={handleAddSkill}
-    >
-      <Ionicons name="add" size={24} color="white" />
-    </TouchableOpacity>
-  </View>
-</View>*/}
-
             {/* Matched Skills */}
             {analysis.matched.length > 0 && (
-                <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <View style={[styles.sectionCard, { backgroundColor: colors.card, margin: wp(5), marginTop: 0, padding: normalize(20), borderRadius: normalize(12) }]}>
+                    <View style={[styles.sectionHeader, { marginBottom: hp(1.5), gap: wp(2) }]}>
+                        <Ionicons name="checkmark-circle" size={normalize(24)} color="#10B981" />
+                        <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>
                             Skills You Have ({analysis.matched.length})
                         </Text>
                     </View>
 
                     {analysis.matched.map((skill) => ( 
-                        <View key={skill} style={styles.skillRow}>
-                            <Ionicons name="checkmark" size={18} color="#10B981" />
-                            <Text style={[styles.skillText, { color: colors.text }]}>{skill}</Text>
+                        <View key={skill} style={[styles.skillRow, { marginBottom: hp(1), gap: wp(2) }]}>
+                            <Ionicons name="checkmark" size={normalize(18)} color="#10B981" />
+                            <Text style={[styles.skillText, { color: colors.text, fontSize: normalize(14) }]}>{skill}</Text>
 
                             <TouchableOpacity
                                 style={styles.removeSkillButton}
@@ -234,7 +214,7 @@ export default function SkillGapScreen({ route, navigation }) {
                                     );
                                 }}
                             >
-                                <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                                <Ionicons name="trash-outline" size={normalize(18)} color="#EF4444" />
                             </TouchableOpacity>
                         </View>
                     ))}
@@ -243,10 +223,10 @@ export default function SkillGapScreen({ route, navigation }) {
 
             {/* Missing Skills */}
 {analysis.missing.length > 0 && (
-  <View style={[styles.sectionCard, { backgroundColor: colors.card }]}>
-    <View style={styles.sectionHeader}>
-      <Ionicons name="alert-circle" size={24} color="#EF4444" />
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+  <View style={[styles.sectionCard, { backgroundColor: colors.card, margin: wp(5), marginTop: 0, padding: normalize(20), borderRadius: normalize(12) }]}>
+    <View style={[styles.sectionHeader, { marginBottom: hp(1.5), gap: wp(2) }]}>
+      <Ionicons name="alert-circle" size={normalize(24)} color="#EF4444" />
+      <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>
         Skills to Learn ({analysis.missing.length})
       </Text>
     </View>
@@ -257,17 +237,17 @@ export default function SkillGapScreen({ route, navigation }) {
       );
       
       return (
-        <View key={skill} style={styles.skillRow}>
+        <View key={skill} style={[styles.skillRow, { marginBottom: hp(1), gap: wp(2) }]}>
           <Ionicons 
             name={isAdded ? "checkmark-circle" : "close"} 
-            size={18} 
+            size={normalize(18)}
             color={isAdded ? "#10B981" : "#EF4444"} 
           />
-          <Text style={[styles.skillText, { color: colors.text }]}>{skill}</Text>
+          <Text style={[styles.skillText, { color: colors.text, fontSize: normalize(14) }]}>{skill}</Text>
           
           {!isAdded ? (
             <TouchableOpacity
-              style={[styles.addSkillButton, { borderColor: colors.text }]}
+              style={[styles.addSkillButton, { borderColor: colors.text, paddingHorizontal: wp(2), paddingVertical: hp(0.25), borderRadius: normalize(12) }]}
               onPress={async () => {
                 const updatedSkills = [...userSkills, skill];
                 setUserSkills(updatedSkills);
@@ -275,11 +255,11 @@ export default function SkillGapScreen({ route, navigation }) {
                 analyzeSkillGap(updatedSkills);
               }}
             >
-              <Text style={{ color: colors.text, fontSize: 12 }}>Add</Text>
+              <Text style={{ color: colors.text, fontSize: normalize(12) }}>Add</Text>
             </TouchableOpacity>
           ) : (
-            <View style={[styles.addedSkillBadge, { backgroundColor: '#10B98120' }]}>
-              <Text style={{ color: '#10B981', fontSize: 12 }}>Added ✓</Text>
+            <View style={[styles.addedSkillBadge, { backgroundColor: '#10B98120', paddingHorizontal: wp(2), paddingVertical: hp(0.25), borderRadius: normalize(12) }]}>
+              <Text style={{ color: '#10B981', fontSize: normalize(12) }}>Added ✓</Text>
             </View>
           )}
         </View>
@@ -290,15 +270,15 @@ export default function SkillGapScreen({ route, navigation }) {
 
             {/* Smart Suggestions */}
             {analysis.missing.length > 0 && (
-                <View style={[styles.suggestionsCard, { backgroundColor: colors.card, marginTop: 10 }]}>
-                    <Text style={[styles.suggestionsTitle, { color: colors.text }]}>
+                <View style={[styles.suggestionsCard, { backgroundColor: colors.card, margin: wp(5), marginTop: 0, padding: normalize(16), borderRadius: normalize(12) }]}>
+                    <Text style={[styles.suggestionsTitle, { color: colors.text, fontSize: normalize(14), marginBottom: hp(1.5) }]}>
                         💡 Quick Add
                     </Text>
-                    <View style={styles.suggestionTags}>
+                    <View style={[styles.suggestionTags, { gap: wp(2) }]}>
                         {analysis.missing.slice(0, 5).map((skill, index) => (
                             <TouchableOpacity
                                 key={index}
-                                style={[styles.suggestionTag, { backgroundColor: colors.primary + '20' }]}
+                                style={[styles.suggestionTag, { backgroundColor: colors.primary + '20', paddingHorizontal: wp(3), paddingVertical: hp(0.75), borderRadius: normalize(16) }]}
                                 onPress={() => {
                                     const currentSkills = userSkills || [];
                                     const updated = [...currentSkills, skill];
@@ -307,7 +287,7 @@ export default function SkillGapScreen({ route, navigation }) {
                                     analyzeSkillGap(updated);
                                 }}
                             >
-                                <Text style={{ color: colors.text }}>+ {skill}</Text>
+                                <Text style={{ color: colors.text, fontSize: normalize(12) }}>+ {skill}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -316,30 +296,32 @@ export default function SkillGapScreen({ route, navigation }) {
 
             {/* Recommendations */}
             {analysis.missing.length > 0 && (
-                <View style={[styles.recommendationsCard, { backgroundColor: colors.card }]}>
-                    <Text style={[styles.recommendationsTitle, { color: colors.text }]}>
+                <View style={[styles.recommendationsCard, { backgroundColor: colors.card, margin: wp(5), marginTop: 0, padding: normalize(20), borderRadius: normalize(12) }]}>
+                    <Text style={[styles.recommendationsTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1) }]}>
                         🎯 Next Steps
                     </Text>
-                    <Text style={[styles.recommendationText, { color: colors.text }]}>
+                    <Text style={[styles.recommendationText, { color: colors.text, fontSize: normalize(14), marginBottom: hp(1.5) }]}>
                         Focus on learning these {analysis.missing.length} skills to become a competitive {analysis.careerTitle}:
                     </Text>
                     {analysis.missing.slice(0, 10).map((skill, index) => (
-                        <View key={index} style={styles.recommendationItem}>
-                            <Ionicons name="arrow-forward" size={16} color={colors.text} />
-                            <Text style={[styles.recommendationItemText, { color: colors.text }]}>
+                        <View key={index} style={[styles.recommendationItem, { marginBottom: hp(0.75), gap: wp(2) }]}>
+                            <Ionicons name="arrow-forward" size={normalize(16)} color={colors.text} />
+                            <Text style={[styles.recommendationItemText, { color: colors.text, fontSize: normalize(14) }]}>
                                 {skill}
                             </Text>
                         </View>
                     ))}
                     <TouchableOpacity
-                        style={[styles.learningPlanButton, { backgroundColor: colors.primary }]}
+                        style={[styles.learningPlanButton, { backgroundColor: colors.primary, marginTop: hp(2), padding: hp(1.5), borderRadius: normalize(8), alignItems: 'center' }]}
                         onPress={() => navigation.navigate('LearningPlan', { career })}
                     >
-                        <Text style={styles.learningPlanButtonText}>Create Learning Plan</Text>
+                        <Text style={[styles.learningPlanButtonText, { color: 'white', fontSize: normalize(14), fontWeight: '600' }]}>Create Learning Plan</Text>
                     </TouchableOpacity>
                 </View>
             )}
         </ScrollView>
+    );
+}
     );
 }
 

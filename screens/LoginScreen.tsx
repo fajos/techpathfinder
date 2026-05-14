@@ -22,18 +22,18 @@ export default function LoginScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { signIn, signUp, isLoading: authLoading, initialized } = useAuth();
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
 
   useEffect(() => {
-  trackScreen('LoginScreen');
-}, []);
+    trackScreen('LoginScreen');
+  }, []);
 
   // Show loading while auth is initializing
   if (!initialized || authLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center' }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', padding: wp(5) }]}>
         <ActivityIndicator size="large" color="#4f46e5" />
-        <Text style={{ color: colors.text, marginTop: 16 }}>Initializing...</Text>
+        <Text style={{ color: colors.text, marginTop: hp(2), fontSize: normalize(16) }}>Initializing...</Text>
       </View>
     );
   }
@@ -56,21 +56,27 @@ export default function LoginScreen() {
 
   const isButtonDisabled = isSubmitting || !email || !password;
 
+  const containerPadding = wp(6);
+  const formWidth = isTablet ? wp(60) : wp(88);
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Ionicons name="person-circle" size={64} color="#4f46e5" />
-        <Text style={[styles.title, { color: colors.text }]}>
+    <View style={[styles.container, { backgroundColor: colors.background, padding: containerPadding, alignItems: 'center' }]}>
+      <View style={[styles.header, { marginTop: hp(8), marginBottom: hp(5) }]}>
+        <Ionicons name="person-circle" size={normalize(80)} color="#4f46e5" />
+        <Text style={[styles.title, { color: colors.text, fontSize: normalize(28) }]}>
           {isLogin ? 'Welcome' : 'Create Account'}
         </Text>
       </View>
 
-      <View style={styles.form}>
+      <View style={[styles.form, { width: formWidth }]}>
         <TextInput
           style={[styles.input, { 
             backgroundColor: colors.card,
             color: colors.text,
-            borderColor: colors.border || '#ccc'
+            borderColor: colors.border || '#ccc',
+            height: normalize(50),
+            fontSize: normalize(16),
+            paddingHorizontal: wp(4)
           }]}
           placeholder="Email"
           placeholderTextColor="#999"
@@ -86,7 +92,11 @@ export default function LoginScreen() {
             style={[styles.passwordInput, { 
               backgroundColor: colors.card,
               color: colors.text,
-              borderColor: colors.border || '#ccc'
+              borderColor: colors.border || '#ccc',
+              height: normalize(50),
+              fontSize: normalize(16),
+              paddingHorizontal: wp(4),
+              paddingRight: wp(12)
             }]}
             placeholder="Password"
             placeholderTextColor="#999"
@@ -96,13 +106,13 @@ export default function LoginScreen() {
             editable={!isSubmitting}
           />
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={[styles.eyeIcon, { top: normalize(13), right: wp(3) }]}
             onPress={() => setShowPassword(!showPassword)}
             disabled={isSubmitting}
           >
             <Ionicons 
               name={showPassword ? 'eye-off' : 'eye'} 
-              size={24} 
+              size={normalize(24)}
               color="#999" 
             />
           </TouchableOpacity>
@@ -111,6 +121,7 @@ export default function LoginScreen() {
         <TouchableOpacity
           style={[
             styles.button, 
+            { height: normalize(50) },
             isButtonDisabled && styles.buttonDisabled
           ]}
           onPress={handleSubmit}
@@ -119,18 +130,18 @@ export default function LoginScreen() {
           {isSubmitting ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { fontSize: normalize(18) }]}>
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.switchButton}
+          style={[styles.switchButton, { marginTop: hp(3) }]}
           onPress={() => setIsLogin(!isLogin)}
           disabled={isSubmitting}
         >
-          <Text style={{ color: colors.text || '#666' }}>
+          <Text style={{ color: colors.text || '#666', fontSize: normalize(14) }}>
             {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
           </Text>
         </TouchableOpacity>
@@ -142,49 +153,34 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   header: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 40,
   },
   title: {
-    fontSize: 28,
     fontWeight: 'bold',
     marginTop: 16,
   },
   form: {
-    flex: 1,
   },
   input: {
-    height: 50,
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 16,
     marginBottom: 16,
-    fontSize: 16,
   },
   passwordContainer: {
     position: 'relative',
     marginBottom: 16,
   },
   passwordInput: {
-    height: 50,
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    paddingRight: 50,
   },
   eyeIcon: {
     position: 'absolute',
-    right: 12,
-    top: 12,
   },
   button: {
     backgroundColor: '#4f46e5',
-    height: 50,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -195,11 +191,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
     fontWeight: '600',
   },
   switchButton: {
-    marginTop: 20,
     alignItems: 'center',
   },
 });

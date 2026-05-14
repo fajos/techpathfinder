@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Animated, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeStyles } from '../hooks/useThemeStyles';
 
 const SplashScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const moveAnim = useRef(new Animated.Value(30)).current;
   const navigation = useNavigation();
+  const { hp, normalize } = useThemeStyles();
 
   useEffect(() => {
     // Start the rocket animation
@@ -30,6 +32,8 @@ const SplashScreen = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const logoSize = normalize(200);
+
   return (
     <View style={styles.container}>
       <Animated.Image
@@ -37,6 +41,10 @@ const SplashScreen = () => {
         style={[
           styles.image,
           {
+            width: logoSize,
+            height: logoSize,
+            borderRadius: logoSize / 2,
+            marginTop: hp(10),
             opacity: fadeAnim,
             transform: [{ translateY: moveAnim }],
           },
@@ -47,8 +55,6 @@ const SplashScreen = () => {
   );
 };
 
-const { height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -57,10 +63,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    marginTop: height * 0.1,
   },
 });
 

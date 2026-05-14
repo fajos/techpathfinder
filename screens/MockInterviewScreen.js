@@ -31,7 +31,7 @@ export default function MockInterviewScreen({ route, navigation }) {
   const { career } = route.params;
   const { user } = useAuth();
   const { isPremium } = usePremium();
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
 
   const [questions, setQuestions] = useState({ behavioral: [], technical: [] });
   const [selectedCategory, setSelectedCategory] = useState('behavioral');
@@ -334,19 +334,19 @@ useEffect(() => {
   // Premium gate
   if (!isPremium) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-        <Ionicons name="lock-closed" size={60} color={colors.primary} />
-        <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: 20 }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: wp(5) }]}>
+        <Ionicons name="lock-closed" size={normalize(60)} color={colors.primary} />
+        <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: hp(2.5), fontSize: normalize(20), fontWeight: 'bold' }]}>
           Mock Interviews
         </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: 20 }]}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: hp(2.5), fontSize: normalize(14) }]}>
           Practice real interview questions with sample answers, record your responses, and track your progress.
         </Text>
         <TouchableOpacity
-          style={[styles.upgradeButton, { backgroundColor: '#4d31f1' }]}
+          style={[styles.upgradeButton, { backgroundColor: '#4d31f1', padding: normalize(16), width: normalize(280) }]}
           onPress={() => navigation.navigate('Premium')}
         >
-          <Text style={styles.upgradeButtonText}>View Premium</Text>
+          <Text style={[styles.upgradeButtonText, { fontSize: normalize(16) }]}>View Premium</Text>
         </TouchableOpacity>
       </View>
     );
@@ -374,121 +374,128 @@ useEffect(() => {
       { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
     ]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingHorizontal: wp(4), paddingVertical: hp(1.5), marginTop: hp(2.5) }]}>
         
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Mock Interview</Text>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: normalize(18) }]}>Mock Interview</Text>
         <TouchableOpacity onPress={() => setShowPracticeModal(true)}>
-          <Ionicons name="mic-outline" size={24} color={colors.primary} />
+          <Ionicons name="mic-outline" size={normalize(24)} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
-      {/* Career Info */}
-      <View style={[styles.careerCard, { backgroundColor: colors.card }]}>
-        <Ionicons name="chatbubbles-outline" size={24} color={colors.text} />
-        <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
-      </View>
-
-      {/* Category Tabs */}
-      <View style={styles.tabs}>
-        {getQuestionCategories().map(cat => (
-          <TouchableOpacity
-            key={cat}
-            style={[
-              styles.tab,
-              selectedCategory === cat && styles.activeTab,
-              { borderBottomColor: selectedCategory === cat ? colors.text : 'transparent' }
-            ]}
-            onPress={() => {
-              setSelectedCategory(cat);
-              const newList = cat === 'behavioral' ? questions.behavioral : questions.technical;
-              if (newList.length > 0) {
-                setCurrentQuestion(newList[0]);
-              }
-              setShowAnswer(false);
-            }}
-          >
-            <Text style={[
-              styles.tabText,
-              { color: selectedCategory === cat ? colors.text : colors.text }
-            ]}>
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Question Counter */}
-      <Text style={[styles.counter, { color: colors.text }]}>
-        Question {currentIndex + 1} of {currentList.length}
-      </Text>
-
-      {/* Question Card */}
-      <View style={[styles.questionCard, { backgroundColor: colors.card }]}>
-        <View style={styles.questionHeader}>
-          <Text style={[styles.categoryBadge, { color: colors.text, borderColor: colors.text }]}>
-            {currentQuestion?.category}
-          </Text>
-          <TouchableOpacity onPress={() => toggleFavorite(currentQuestion?.id)}>
-            <Ionicons
-              name={isFavorite ? 'star' : 'star-outline'}
-              size={22}
-              color={isFavorite ? '#FFD700' : colors.text}
-            />
-          </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={[
+          { paddingBottom: hp(5) },
+          isTablet ? { alignSelf: 'center', width: wp(85) } : null
+        ]}
+      >
+        {/* Career Info */}
+        <View style={[styles.careerCard, { backgroundColor: colors.card, margin: wp(4), padding: normalize(16) }]}>
+          <Ionicons name="chatbubbles-outline" size={normalize(24)} color={colors.text} />
+          <Text style={[styles.careerName, { color: colors.text, fontSize: normalize(18) }]}>{career}</Text>
         </View>
 
-        <Text style={[styles.questionText, { color: colors.text }]}>
-          {currentQuestion?.question}
+        {/* Category Tabs */}
+        <View style={[styles.tabs, { paddingHorizontal: wp(4), marginBottom: hp(1) }]}>
+          {getQuestionCategories().map(cat => (
+            <TouchableOpacity
+              key={cat}
+              style={[
+                styles.tab,
+                selectedCategory === cat && styles.activeTab,
+                { borderBottomColor: selectedCategory === cat ? colors.text : 'transparent', paddingVertical: hp(1) }
+              ]}
+              onPress={() => {
+                setSelectedCategory(cat);
+                const newList = cat === 'behavioral' ? questions.behavioral : questions.technical;
+                if (newList.length > 0) {
+                  setCurrentQuestion(newList[0]);
+                }
+                setShowAnswer(false);
+              }}
+            >
+              <Text style={[
+                styles.tabText,
+                { color: selectedCategory === cat ? colors.text : colors.text, fontSize: normalize(14) }
+              ]}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Question Counter */}
+        <Text style={[styles.counter, { color: colors.text, paddingHorizontal: wp(4), marginBottom: hp(1), fontSize: normalize(12) }]}>
+          Question {currentIndex + 1} of {currentList.length}
         </Text>
 
-        <TouchableOpacity
-          style={styles.showAnswerButton}
-          onPress={() => setShowAnswer(!showAnswer)}
-        >
-          <Text style={{ color: colors.text }}>
-            {showAnswer ? 'Hide Answer' : 'Show Sample Answer'}
-          </Text>
-          <Ionicons
-            name={showAnswer ? 'chevron-up' : 'chevron-down'}
-            size={16}
-            color={colors.text}
-          />
-        </TouchableOpacity>
-
-        {showAnswer && (
-          <View style={styles.answerContainer}>
-            <Text style={[styles.answerTitle, { color: colors.text }]}>Sample Answer:</Text>
-            <Text style={[styles.answerText, { color: colors.text }]}>
-              {currentQuestion?.sampleAnswer}
+        {/* Question Card */}
+        <View style={[styles.questionCard, { backgroundColor: colors.card, margin: wp(4), padding: normalize(20) }]}>
+          <View style={styles.questionHeader}>
+            <Text style={[styles.categoryBadge, { color: colors.text, borderColor: colors.text, fontSize: normalize(12), paddingHorizontal: normalize(8), paddingVertical: normalize(2) }]}>
+              {currentQuestion?.category}
             </Text>
-            <Text style={[styles.tipsTitle, { color: colors.text }]}>💡 Tips:</Text>
-            <Text style={[styles.tipsText, { color: colors.text }]}>
-              {currentQuestion?.tips}
-            </Text>
+            <TouchableOpacity onPress={() => toggleFavorite(currentQuestion?.id)}>
+              <Ionicons
+                name={isFavorite ? 'star' : 'star-outline'}
+                size={normalize(22)}
+                color={isFavorite ? '#FFD700' : colors.text}
+              />
+            </TouchableOpacity>
           </View>
-        )}
-      </View>
 
-      {/* Navigation Buttons */}
-      <View style={styles.navigation}>
-        <TouchableOpacity
-          style={[styles.navButton, currentIndex === 0 && styles.disabledButton]}
-          onPress={previousQuestion}
-          disabled={currentIndex === 0}
-        >
-          <Ionicons name="chevron-back" size={20} color={currentIndex === 0 ? colors.text : colors.text} />
-          <Text style={{ color: currentIndex === 0 ? colors.text : colors.text }}>Previous</Text>
-        </TouchableOpacity>
+          <Text style={[styles.questionText, { color: colors.text, fontSize: normalize(18), lineHeight: normalize(26) }]}>
+            {currentQuestion?.question}
+          </Text>
 
-        <TouchableOpacity
-          style={[styles.navButton, currentIndex === currentList.length - 1 && styles.disabledButton]}
-          onPress={nextQuestion}
-          disabled={currentIndex === currentList.length - 1}
-        >
-          <Text style={{ color: currentIndex === currentList.length - 1 ? colors.textSecondary : colors.text }}>Next</Text>
-          <Ionicons name="chevron-forward" size={20} color={currentIndex === currentList.length - 1 ? colors.text : colors.text} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.showAnswerButton}
+            onPress={() => setShowAnswer(!showAnswer)}
+          >
+            <Text style={{ color: colors.text, fontSize: normalize(14) }}>
+              {showAnswer ? 'Hide Answer' : 'Show Sample Answer'}
+            </Text>
+            <Ionicons
+              name={showAnswer ? 'chevron-up' : 'chevron-down'}
+              size={normalize(16)}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+
+          {showAnswer && (
+            <View style={[styles.answerContainer, { marginTop: hp(2), paddingTop: hp(2) }]}>
+              <Text style={[styles.answerTitle, { color: colors.text, fontSize: normalize(14), fontWeight: '600' }]}>Sample Answer:</Text>
+              <Text style={[styles.answerText, { color: colors.text, fontSize: normalize(14), lineHeight: normalize(20) }]}>
+                {currentQuestion?.sampleAnswer}
+              </Text>
+              <Text style={[styles.tipsTitle, { color: colors.text, fontSize: normalize(14), fontWeight: '600' }]}>💡 Tips:</Text>
+              <Text style={[styles.tipsText, { color: colors.text, fontSize: normalize(13), lineHeight: normalize(18) }]}>
+                {currentQuestion?.tips}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Navigation Buttons */}
+        <View style={[styles.navigation, { paddingHorizontal: wp(4) }]}>
+          <TouchableOpacity
+            style={[styles.navButton, currentIndex === 0 && styles.disabledButton, { padding: normalize(12) }]}
+            onPress={previousQuestion}
+            disabled={currentIndex === 0}
+          >
+            <Ionicons name="chevron-back" size={normalize(20)} color={currentIndex === 0 ? colors.text : colors.text} />
+            <Text style={{ color: currentIndex === 0 ? colors.text : colors.text, fontSize: normalize(14) }}>Previous</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.navButton, currentIndex === currentList.length - 1 && styles.disabledButton, { padding: normalize(12) }]}
+            onPress={nextQuestion}
+            disabled={currentIndex === currentList.length - 1}
+          >
+            <Text style={{ color: currentIndex === currentList.length - 1 ? colors.textSecondary : colors.text, fontSize: normalize(14) }}>Next</Text>
+            <Ionicons name="chevron-forward" size={normalize(20)} color={currentIndex === currentList.length - 1 ? colors.text : colors.text} />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       {/* Practice Modal */}
       <Modal
@@ -498,22 +505,22 @@ useEffect(() => {
         onRequestClose={() => setShowPracticeModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card, padding: normalize(20), width: isTablet ? wp(85) : '100%', alignSelf: 'center' }]}>
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>Practice Answer</Text>
+              <Text style={[styles.modalTitle, { color: colors.text, fontSize: normalize(20) }]}>Practice Answer</Text>
               <TouchableOpacity onPress={() => setShowPracticeModal(false)}>
-                <Ionicons name="close" size={24} color={colors.textSecondary} />
+                <Ionicons name="close" size={normalize(24)} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalBody}>
-              <Text style={[styles.modalQuestion, { color: colors.text }]}>
+              <Text style={[styles.modalQuestion, { color: colors.text, fontSize: normalize(16), lineHeight: normalize(22) }]}>
                 {currentQuestion?.question}
               </Text>
 
-              <Text style={[styles.modalLabel, { color: colors.text }]}>Your Answer:</Text>
+              <Text style={[styles.modalLabel, { color: colors.text, fontSize: normalize(14), marginTop: hp(2) }]}>Your Answer:</Text>
               <TextInput
-                style={[styles.answerInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                style={[styles.answerInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, padding: normalize(12), fontSize: normalize(14) }]}
                 value={userAnswer}
                 onChangeText={setUserAnswer}
                 placeholder="Type your answer here..."
@@ -523,25 +530,25 @@ useEffect(() => {
                 textAlignVertical="top"
               />
 
-              <Text style={[styles.modalLabel, { color: colors.text }]}>Record Your Answer:</Text>
-              <View style={styles.recordingControls}>
+              <Text style={[styles.modalLabel, { color: colors.text, fontSize: normalize(14), marginTop: hp(2) }]}>Record Your Answer:</Text>
+              <View style={[styles.recordingControls, { marginTop: hp(1) }]}>
                 {!isRecording && !recordedUri && (
                   <TouchableOpacity
-                    style={[styles.recordButton, { backgroundColor: '#ee0e0e' }]}
+                    style={[styles.recordButton, { backgroundColor: '#ee0e0e', padding: normalize(12) }]}
                     onPress={startRecording}
                   >
-                    <Ionicons name="mic" size={20} color="white" />
-                    <Text style={styles.recordButtonText}>Start Recording</Text>
+                    <Ionicons name="mic" size={normalize(20)} color="white" />
+                    <Text style={[styles.recordButtonText, { fontSize: normalize(14) }]}>Start Recording</Text>
                   </TouchableOpacity>
                 )}
 
                 {isRecording && (
                   <TouchableOpacity
-                    style={[styles.recordButton, { backgroundColor: '#EF4444' }]}
+                    style={[styles.recordButton, { backgroundColor: '#EF4444', padding: normalize(12) }]}
                     onPress={stopRecording}
                   >
-                    <Ionicons name="stop" size={20} color="white" />
-                    <Text style={styles.recordButtonText}>Stop Recording</Text>
+                    <Ionicons name="stop" size={normalize(20)} color="white" />
+                    <Text style={[styles.recordButtonText, { fontSize: normalize(14) }]}>Stop Recording</Text>
                   </TouchableOpacity>
                 )}
 
@@ -549,44 +556,44 @@ useEffect(() => {
                   <View style={styles.playbackControls}>
                     {!isPlaying ? (
                       <TouchableOpacity
-                        style={[styles.playButton, { backgroundColor: '#4f59e6' }]}
+                        style={[styles.playButton, { backgroundColor: '#4f59e6', padding: normalize(12) }]}
                         onPress={playRecording}
                       >
-                        <Ionicons name="play" size={20} color="white" />
-                        <Text style={styles.recordButtonText}>Play Recording</Text>
+                        <Ionicons name="play" size={normalize(20)} color="white" />
+                        <Text style={[styles.recordButtonText, { fontSize: normalize(14) }]}>Play Recording</Text>
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity
-                        style={[styles.playButton, { backgroundColor: '#EF4444' }]}
+                        style={[styles.playButton, { backgroundColor: '#EF4444', padding: normalize(12) }]}
                         onPress={stopPlayback}
                       >
-                        <Ionicons name="stop" size={20} color="white" />
-                        <Text style={styles.recordButtonText}>Stop</Text>
+                        <Ionicons name="stop" size={normalize(20)} color="white" />
+                        <Text style={[styles.recordButtonText, { fontSize: normalize(14) }]}>Stop</Text>
                       </TouchableOpacity>
                     )}
 
                     <TouchableOpacity
-                      style={[styles.recordButton, { backgroundColor: '#6B7280' }]}
+                      style={[styles.recordButton, { backgroundColor: '#6B7280', padding: normalize(12) }]}
                       onPress={() => setRecordedUri(null)}
                     >
-                      <Ionicons name="trash" size={20} color="white" />
-                      <Text style={styles.recordButtonText}>Discard</Text>
+                      <Ionicons name="trash" size={normalize(20)} color="white" />
+                      <Text style={[styles.recordButtonText, { fontSize: normalize(14) }]}>Discard</Text>
                     </TouchableOpacity>
                   </View>
                 )}
               </View>
             </ScrollView>
 
-            <View style={styles.modalActions}>
+            <View style={[styles.modalActions, { marginTop: hp(2) }]}>
               <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: '#078122' }]}
+                style={[styles.saveButton, { backgroundColor: '#078122', padding: normalize(14) }]}
                 onPress={() => {
                   // Save practice answer
                   Alert.alert('Saved!', 'Your practice answer has been saved.');
                   setShowPracticeModal(false);
                 }}
               >
-                <Text style={styles.saveButtonText}>Save Practice</Text>
+                <Text style={[styles.saveButtonText, { fontSize: normalize(16) }]}>Save Practice</Text>
               </TouchableOpacity>
             </View>
           </View>

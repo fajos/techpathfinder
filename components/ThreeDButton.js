@@ -8,9 +8,11 @@ import {
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useThemeStyles } from "../hooks/useThemeStyles";
 
 const ThreeDButton = ({ title, onPress, gradient = false, style = {} }) => {
   const anim = useRef(new Animated.Value(0)).current;
+  const { normalize, wp } = useThemeStyles();
 
   const pressIn = () => {
     Animated.spring(anim, {
@@ -32,10 +34,18 @@ const ThreeDButton = ({ title, onPress, gradient = false, style = {} }) => {
     transform: [{ translateY: anim }],
   };
 
-  const buttonStyle = [styles.button, style];
+  const buttonStyle = [
+    styles.button,
+    {
+      paddingVertical: normalize(12),
+      paddingHorizontal: normalize(24),
+      borderRadius: normalize(12)
+    },
+    style
+  ];
   const buttonContent = (
     <Animated.View style={[buttonStyle, transformStyle]}>
-      <Text style={styles.text}>{title}</Text>
+      <Text style={[styles.text, { fontSize: normalize(16) }]}>{title}</Text>
     </Animated.View>
   );
 
@@ -50,7 +60,7 @@ const ThreeDButton = ({ title, onPress, gradient = false, style = {} }) => {
           colors={["#6366f1", "#4f46e5"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={styles.gradient}
+          style={[styles.gradient, { borderRadius: normalize(12) }]}
         >
           {buttonContent}
         </LinearGradient>
@@ -63,15 +73,11 @@ const ThreeDButton = ({ title, onPress, gradient = false, style = {} }) => {
 
 const styles = StyleSheet.create({
   gradient: {
-    borderRadius: 12,
     marginVertical: 4,
     padding: 1,
   },
   button: {
     backgroundColor: "#4f46e5",
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",

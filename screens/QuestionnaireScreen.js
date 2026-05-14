@@ -16,12 +16,12 @@ import { trackScreen } from "../services/analytics";
 
 const QuestionnaireScreen = ({ navigation }) => {
   const [answers, setAnswers] = useState({});
-  const { colors, isDark } = useThemeStyles();
+  const { colors, isDark, wp, hp, normalize, isTablet } = useThemeStyles();
   const isConnected = useNetworkStatus();
 
   useEffect(() => {
-  trackScreen('QuestionnaireScreen');
-}, []);
+    trackScreen('QuestionnaireScreen');
+  }, []);
 
   // Your original questions - hardcoded in English (since removing i18n)
   const questions = [
@@ -148,22 +148,30 @@ const QuestionnaireScreen = ({ navigation }) => {
 
   const isComplete = Object.keys(answers).length === questions.length;
 
+  const containerPadding = wp(4);
+  const questionBoxPadding = normalize(18);
+  const headingSize = normalize(28);
+  const subheadingSize = normalize(14);
+  const questionTextSize = normalize(17);
+  const optionTextSize = normalize(14);
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={[
           styles.container,
-          { backgroundColor: colors.background },
+          { backgroundColor: colors.background, padding: containerPadding },
+          isTablet && { width: wp(85), alignSelf: 'center' }
         ]}
         showsVerticalScrollIndicator={false}
       >
         <NetworkBanner isConnected={isConnected} />
 
-        <Text style={[styles.heading, { color: colors.text }]}>
+        <Text style={[styles.heading, { color: colors.text, fontSize: headingSize }]}>
           🚀 Discover Your Tech Career Path
         </Text>
 
-        <Text style={[styles.subheading, { color: colors.textSecondary }]}>
+        <Text style={[styles.subheading, { color: colors.textSecondary, fontSize: subheadingSize }]}>
           Answer these 10 questions to find your ideal career match
         </Text>
 
@@ -178,13 +186,14 @@ const QuestionnaireScreen = ({ navigation }) => {
                 {
                   backgroundColor: colors.card,
                   borderColor: colors.border,
+                  padding: questionBoxPadding,
                 },
               ]}
             >
               <Text
                 style={[
                   styles.questionText,
-                  { color: colors.text },
+                  { color: colors.text, fontSize: questionTextSize },
                 ]}
               >
                 {`${questionId}. ${q.q}`}
@@ -207,13 +216,15 @@ const QuestionnaireScreen = ({ navigation }) => {
                               ? "#374151"
                               : "#f3f4f6",
                           borderColor: selected ? colors.primary : colors.border,
+                          paddingVertical: normalize(10),
+                          paddingHorizontal: normalize(18),
                         },
                       ]}
                     >
                       <Text
                         style={{
                           color: selected ? "#fff" : colors.text,
-                          fontSize: 14,
+                          fontSize: optionTextSize,
                           fontWeight: selected ? "700" : "500",
                         }}
                       >
@@ -227,16 +238,26 @@ const QuestionnaireScreen = ({ navigation }) => {
           );
         })}
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: hp(12) }} />
       </ScrollView>
 
       {isComplete && (
-        <View style={[styles.submitContainer, { backgroundColor: colors.background }]}>
-          <ThreeDButton
-            title="🎯 Show My Career Path"
-            onPress={handleSubmit}
-            gradient
-          />
+        <View style={[
+          styles.submitContainer,
+          {
+            backgroundColor: colors.background,
+            paddingVertical: hp(2),
+            paddingHorizontal: wp(5),
+            alignItems: 'center'
+          }
+        ]}>
+          <View style={{ width: isTablet ? wp(50) : '100%' }}>
+            <ThreeDButton
+              title="🎯 Show My Career Path"
+              onPress={handleSubmit}
+              gradient
+            />
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -250,18 +271,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    padding: 16,
     paddingBottom: 40,
   },
   heading: {
-    fontSize: 28,
     fontWeight: "bold",
     marginTop: 20,
     marginBottom: 8,
     textAlign: "center",
   },
   subheading: {
-    fontSize: 14,
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
@@ -269,7 +287,6 @@ const styles = StyleSheet.create({
   questionBox: {
     borderRadius: 16,
     borderWidth: 1,
-    padding: 18,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -278,7 +295,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   questionText: {
-    fontSize: 17,
     fontWeight: "600",
     marginBottom: 14,
     lineHeight: 24,
@@ -290,15 +306,11 @@ const styles = StyleSheet.create({
   },
   option: {
     borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
     borderRadius: 25,
     marginBottom: 8,
     marginRight: 8,
   },
   submitContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
     borderTopWidth: 0,
   },
 });

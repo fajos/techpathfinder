@@ -53,7 +53,7 @@ export default function ProjectIdeasScreen({ route, navigation }) {
   const { career } = route.params;
   const { user } = useAuth();
   const { isPremium } = usePremium();
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
   
   const [projects, setProjects] = useState({ beginner: [], intermediate: [], advanced: [] });
   const [selectedDifficulty, setSelectedDifficulty] = useState('beginner');
@@ -130,29 +130,29 @@ useEffect(() => {
   // Premium gate
   if (!isPremium) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: wp(5) }]}>
         <LinearGradient
           colors={['#4f46e5', '#7c3aed']}
-          style={styles.lockIconContainer}
+          style={[styles.lockIconContainer, { width: normalize(80), height: normalize(80), borderRadius: normalize(40) }]}
         >
-          <Ionicons name="lock-closed" size={40} color="white" />
+          <Ionicons name="lock-closed" size={normalize(40)} color="white" />
         </LinearGradient>
-        <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: 20 }]}>
+        <Text style={[styles.title, { color: colors.text, textAlign: 'center', marginTop: hp(2.5), fontSize: normalize(22), fontWeight: 'bold' }]}>
           Project Ideas
         </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: 20 }]}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary, textAlign: 'center', marginVertical: hp(2.5), fontSize: normalize(14) }]}>
           Get curated portfolio projects to build your skills and stand out to employers.
         </Text>
         <TouchableOpacity
-          style={styles.upgradeButton}
+          style={[styles.upgradeButton, { maxWidth: normalize(280) }]}
           onPress={() => navigation.navigate('Premium')}
         >
           <LinearGradient
             colors={['#4f46e5', '#7c3aed']}
-            style={styles.upgradeGradient}
+            style={[styles.upgradeGradient, { padding: normalize(14) }]}
           >
-            <Ionicons name="diamond" size={20} color="white" />
-            <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
+            <Ionicons name="diamond" size={normalize(20)} color="white" />
+            <Text style={[styles.upgradeButtonText, { fontSize: normalize(16) }]}>Upgrade to Premium</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -173,69 +173,79 @@ useEffect(() => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Project Ideas</Text>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingVertical: hp(1.5), marginTop: hp(2.5) }]}>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: normalize(18) }]}>Project Ideas</Text>
         <View style={{ width: 40 }} />
       </View>
       
       {/* Hero Section */}
-      <LinearGradient
-        colors={['#4f46e5', '#7c3aed']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.heroSection}
-      >
-        <Ionicons name="bulb-outline" size={40} color="white" />
-        <Text style={styles.heroTitle}>Build Your Portfolio</Text>
-        <Text style={styles.heroSubtitle}>
-          Complete projects to showcase your {career} skills
-        </Text>
-      </LinearGradient>
+      <View style={[isTablet ? { alignSelf: 'center', width: wp(85) } : null]}>
+        <LinearGradient
+          colors={['#4f46e5', '#7c3aed']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.heroSection, { margin: wp(4), padding: normalize(24) }]}
+        >
+          <Ionicons name="bulb-outline" size={normalize(40)} color="white" />
+          <Text style={[styles.heroTitle, { fontSize: normalize(22) }]}>Build Your Portfolio</Text>
+          <Text style={[styles.heroSubtitle, { fontSize: normalize(14) }]}>
+            Complete projects to showcase your {career} skills
+          </Text>
+        </LinearGradient>
+      </View>
       
       {/* Difficulty Tabs */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={styles.tabs}
-        contentContainerStyle={styles.tabsContent}
-      >
-        {getDifficultyLevels().map(level => {
-          const config = difficultyConfig[level];
-          const isActive = selectedDifficulty === level;
-          return (
-            <TouchableOpacity
-              key={level}
-              style={[
-                styles.tab,
-                isActive && { backgroundColor: config.gradient[0] + '15' }
-              ]}
-              onPress={() => setSelectedDifficulty(level)}
-            >
-              <Text style={[
-                styles.tabEmoji,
-                isActive && { color: config.gradient[0] }
-              ]}>{config.icon}</Text>
-              <Text style={[
-                styles.tabText,
-                { color: isActive ? config.gradient[0] : colors.textSecondary }
-              ]}>
-                {config.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View style={[isTablet ? { alignSelf: 'center', width: wp(85) } : null]}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabs}
+          contentContainerStyle={[styles.tabsContent, { paddingHorizontal: wp(4) }]}
+        >
+          {getDifficultyLevels().map(level => {
+            const config = difficultyConfig[level];
+            const isActive = selectedDifficulty === level;
+            return (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.tab,
+                  { paddingHorizontal: normalize(16), paddingVertical: normalize(10) },
+                  isActive && { backgroundColor: config.gradient[0] + '15' }
+                ]}
+                onPress={() => setSelectedDifficulty(level)}
+              >
+                <Text style={[
+                  styles.tabEmoji,
+                  { fontSize: normalize(16) },
+                  isActive && { color: config.gradient[0] }
+                ]}>{config.icon}</Text>
+                <Text style={[
+                  styles.tabText,
+                  { fontSize: normalize(14), color: isActive ? config.gradient[0] : colors.textSecondary }
+                ]}>
+                  {config.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
       
       {/* Projects List */}
       <ScrollView 
         style={styles.projectsList} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.projectsListContent}
+        contentContainerStyle={[
+          styles.projectsListContent,
+          { padding: wp(4), paddingBottom: hp(5) },
+          isTablet ? { alignSelf: 'center', width: wp(85) } : null
+        ]}
       >
         {currentProjects.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Ionicons name="bulb-outline" size={64} color={colors.textSecondary} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+            <Ionicons name="bulb-outline" size={normalize(64)} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary, fontSize: normalize(16) }]}>
               No projects available for this level yet.
             </Text>
           </View>
@@ -257,19 +267,19 @@ useEffect(() => {
                   colors={isCompleted ? ['#10B981', '#059669'] : ['#183663', '#04225e']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
-                  style={styles.projectCard}
+                  style={[styles.projectCard, { padding: normalize(18) }]}
                 >
                   {/* Completion ribbon */}
                   {isCompleted && (
                     <View style={styles.completedRibbon}>
-                      <Ionicons name="checkmark" size={16} color="white" />
+                      <Ionicons name="checkmark" size={normalize(16)} color="white" />
                       <Text style={styles.completedRibbonText}>Completed</Text>
                     </View>
                   )}
                   
                   <View style={styles.projectHeader}>
-                    <View style={styles.projectNumber}>
-                      <Text style={styles.projectNumberText}>{String(index + 1).padStart(2, '0')}</Text>
+                    <View style={[styles.projectNumber, { width: normalize(40), height: normalize(40) }]}>
+                      <Text style={[styles.projectNumberText, { fontSize: normalize(14) }]}>{String(index + 1).padStart(2, '0')}</Text>
                     </View>
                     <TouchableOpacity 
                       onPress={() => toggleComplete(project.id)}
@@ -277,50 +287,50 @@ useEffect(() => {
                     >
                       <Ionicons
                         name={isCompleted ? 'checkmark-circle' : 'checkmark-circle-outline'}
-                        size={28}
+                        size={normalize(28)}
                         color={isCompleted ? '#10B981' : '#9CA3AF'}
                       />
                     </TouchableOpacity>
                   </View>
                   
-                  <Text style={[styles.projectTitle, { color: isCompleted ? '#D1D5DB' : 'white' }]}>
+                  <Text style={[styles.projectTitle, { color: isCompleted ? '#D1D5DB' : 'white', fontSize: normalize(18) }]}>
                     {project.title}
                   </Text>
                   
-                  <Text style={[styles.projectDescription, { color: '#9CA3AF' }]}>
+                  <Text style={[styles.projectDescription, { color: '#9CA3AF', fontSize: normalize(13), lineHeight: normalize(18) }]}>
                     {project.description}
                   </Text>
                   
                   <View style={styles.projectMeta}>
-                    <View style={[styles.metaItem, { backgroundColor: config.gradient[0] + '20' }]}>
-                      <Ionicons name="time-outline" size={14} color={config.gradient[0]} />
-                      <Text style={{ color: config.gradient[0], fontSize: 12 }}>
+                    <View style={[styles.metaItem, { backgroundColor: config.gradient[0] + '20', paddingHorizontal: normalize(10), paddingVertical: normalize(4) }]}>
+                      <Ionicons name="time-outline" size={normalize(14)} color={config.gradient[0]} />
+                      <Text style={{ color: config.gradient[0], fontSize: normalize(12) }}>
                         {project.estimatedHours} hrs
                       </Text>
                     </View>
                     <View style={styles.techStack}>
                       {project.technologies.slice(0, 3).map((tech, idx) => (
-                        <View key={idx} style={[styles.techTag, { backgroundColor: '#374151' }]}>
-                          <Text style={styles.techTagText}>{tech}</Text>
+                        <View key={idx} style={[styles.techTag, { backgroundColor: '#374151', paddingHorizontal: normalize(8), paddingVertical: normalize(3) }]}>
+                          <Text style={[styles.techTagText, { fontSize: normalize(10) }]}>{tech}</Text>
                         </View>
                       ))}
                       {project.technologies.length > 3 && (
-                        <Text style={{ color: '#6B7280', fontSize: 11 }}>+{project.technologies.length - 3}</Text>
+                        <Text style={{ color: '#6B7280', fontSize: normalize(11) }}>+{project.technologies.length - 3}</Text>
                       )}
                     </View>
                   </View>
 
                   {/* Click for details indicator - Enhanced */}
                   <Animated.View style={{ transform: [{ scale: bounceAnim }] }}>
-                  <View style={styles.clickIndicator}>
+                  <View style={[styles.clickIndicator, { marginTop: normalize(12), paddingTop: normalize(10) }]}>
                     <LinearGradient
                       colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.05)']}
                       style={styles.clickIndicatorGradient}
                     >
                       <View style={styles.clickIndicatorContent}>
-                        <Ionicons name="information-circle-outline" size={16} color="#9CA3AF" />
-                        <Text style={[styles.clickIndicatorText, {color: colors.text}]}>Tap for step-by-step guide</Text>
-                        <Ionicons name="chevron-forward" size={14} color="#9CA3AF" />
+                        <Ionicons name="information-circle-outline" size={normalize(16)} color="#9CA3AF" />
+                        <Text style={[styles.clickIndicatorText, {color: colors.text, fontSize: normalize(11)}]}>Tap for step-by-step guide</Text>
+                        <Ionicons name="chevron-forward" size={normalize(14)} color="#9CA3AF" />
                       </View>
                     </LinearGradient>
                   </View>
@@ -340,70 +350,70 @@ useEffect(() => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card, width: isTablet ? wp(85) : '100%', alignSelf: 'center' }]}>
             <LinearGradient
               colors={difficultyConfig[selectedDifficulty]?.gradient || ['#4f46e5', '#7c3aed']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={styles.modalHeaderGradient}
+              style={[styles.modalHeaderGradient, { paddingHorizontal: wp(5), paddingVertical: hp(2.5) }]}
             >
-              <Text style={styles.modalHeaderTitle}>{selectedProject?.title}</Text>
+              <Text style={[styles.modalHeaderTitle, { fontSize: normalize(20) }]}>{selectedProject?.title}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
-                <Ionicons name="close" size={24} color="white" />
+                <Ionicons name="close" size={normalize(24)} color="white" />
               </TouchableOpacity>
             </LinearGradient>
             
-            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
-              <View style={styles.modalMetaContainer}>
-                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="time-outline" size={18} color={colors.text} />
-                  <Text style={{ color: colors.text, marginLeft: 6 }}>
+            <ScrollView style={[styles.modalBody, { padding: wp(5) }]} showsVerticalScrollIndicator={false}>
+              <View style={[styles.modalMetaContainer, { marginBottom: hp(2.5) }]}>
+                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15', paddingHorizontal: normalize(12), paddingVertical: normalize(8) }]}>
+                  <Ionicons name="time-outline" size={normalize(18)} color={colors.text} />
+                  <Text style={{ color: colors.text, marginLeft: normalize(6), fontSize: normalize(14) }}>
                     {selectedProject?.estimatedHours} hours
                   </Text>
                 </View>
-                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="code-outline" size={18} color={colors.text} />
-                  <Text style={{ color: colors.text, marginLeft: 6 }}>
+                <View style={[styles.modalMetaItem, { backgroundColor: colors.primary + '15', paddingHorizontal: normalize(12), paddingVertical: normalize(8) }]}>
+                  <Ionicons name="code-outline" size={normalize(18)} color={colors.text} />
+                  <Text style={{ color: colors.text, marginLeft: normalize(6), fontSize: normalize(14) }}>
                     {selectedProject?.technologies.length} technologies
                   </Text>
                 </View>
               </View>
               
-              <Text style={[styles.modalDescription, { color: colors.text }]}>
+              <Text style={[styles.modalDescription, { color: colors.text, fontSize: normalize(14), lineHeight: normalize(20), marginBottom: hp(2.5) }]}>
                 {selectedProject?.description}
               </Text>
               
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>
                 📋 Steps to Complete
               </Text>
               {selectedProject?.steps.map((step, index) => (
-                <View key={index} style={styles.stepRow}>
+                <View key={index} style={[styles.stepRow, { marginBottom: hp(1.5) }]}>
                   <LinearGradient
                     colors={['#4f46e5', '#7c3aed']}
-                    style={styles.stepNumberCircle}
+                    style={[styles.stepNumberCircle, { width: normalize(28), height: normalize(28), borderRadius: normalize(14) }]}
                   >
-                    <Text style={styles.stepNumberText}>{index + 1}</Text>
+                    <Text style={[styles.stepNumberText, { fontSize: normalize(12) }]}>{index + 1}</Text>
                   </LinearGradient>
-                  <Text style={[styles.stepText, { color: colors.text }]}>{step}</Text>
+                  <Text style={[styles.stepText, { color: colors.text, fontSize: normalize(14), lineHeight: normalize(20) }]}>{step}</Text>
                 </View>
               ))}
               
               {selectedProject?.resources && selectedProject.resources.length > 0 && (
                 <>
-                  <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 16 }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.text, marginTop: hp(2), fontSize: normalize(16) }]}>
                     📚 Helpful Resources
                   </Text>
                   {selectedProject.resources.map((resource, index) => (
                     <TouchableOpacity
                       key={index}
-                      style={[styles.resourceLink, { backgroundColor: colors.primary + '10' }]}
+                      style={[styles.resourceLink, { backgroundColor: colors.primary + '10', padding: normalize(12) }]}
                       onPress={() => Linking.openURL(resource)}
                     >
-                      <Ionicons name="link-outline" size={18} color={colors.text} />
-                      <Text style={{ color: colors.text, marginLeft: 10, flex: 1 }} numberOfLines={1}>
+                      <Ionicons name="link-outline" size={normalize(18)} color={colors.text} />
+                      <Text style={{ color: colors.text, marginLeft: normalize(10), flex: 1, fontSize: normalize(14) }} numberOfLines={1}>
                         {resource.replace('https://', '').substring(0, 50)}
                       </Text>
-                      <Ionicons name="open-outline" size={16} color={colors.text} />
+                      <Ionicons name="open-outline" size={normalize(16)} color={colors.text} />
                     </TouchableOpacity>
                   ))}
                 </>
@@ -411,7 +421,7 @@ useEffect(() => {
             </ScrollView>
             
             <TouchableOpacity
-              style={styles.startButton}
+              style={[styles.startButton, { margin: wp(5), marginTop: 0 }]}
               onPress={() => {
                 setModalVisible(false);
                 Alert.alert('🎯 Get Started!', `Time to build "${selectedProject?.title}". Good luck with your project!`);
@@ -419,10 +429,10 @@ useEffect(() => {
             >
               <LinearGradient
                 colors={['#4f46e5', '#7c3aed']}
-                style={styles.startButtonGradient}
+                style={[styles.startButtonGradient, { padding: normalize(16) }]}
               >
-                <Ionicons name="rocket-outline" size={20} color="white" />
-                <Text style={styles.startButtonText}>Start Building</Text>
+                <Ionicons name="rocket-outline" size={normalize(20)} color="white" />
+                <Text style={[styles.startButtonText, { fontSize: normalize(16) }]}>Start Building</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

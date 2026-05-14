@@ -16,11 +16,16 @@ import { trackScreen } from '../services/analytics';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const { colors, isDark } = useThemeStyles();
+  const { colors, isDark, wp, hp, normalize, isTablet } = useThemeStyles();
   const [loading, setLoading] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
+
+  // Responsive values
+  const logoSize = isTablet ? normalize(150) : normalize(110);
+  const titleSize = isTablet ? normalize(36) : normalize(28);
+  const subtitleSize = isTablet ? normalize(20) : normalize(16);
 
   const handleNavigation = (screen, params = {}) => {
     setLoading(true);
@@ -31,8 +36,8 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-  trackScreen('HomeScreen');
-}, []);
+    trackScreen('HomeScreen');
+  }, []);
 
   useEffect(() => {
     Animated.parallel([
@@ -55,7 +60,7 @@ const HomeScreen = () => {
     : ['#e0f2fe', '#f0f9ff']; // Light mode: light blue to very light blue
 
   return (
-    <LinearGradient colors={gradientColors} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={[styles.gradient, { paddingVertical: hp(5), paddingHorizontal: wp(5) }]}>
       <Animated.View
         style={[
           styles.container,
@@ -64,38 +69,38 @@ const HomeScreen = () => {
       >
         <Image
           source={require("../assets/splash/splash.png")}
-          style={styles.logo}
+          style={[styles.logo, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}
         />
 
-        <Text style={[styles.title, { color: isDark ? '#e2e8f0' : '#1e3a8a' }]}>
+        <Text style={[styles.title, { color: isDark ? '#e2e8f0' : '#1e3a8a', fontSize: titleSize }]}>
           Tech Career Pathfinder
         </Text>
         
-        <Text style={[styles.subtitle, { color: isDark ? '#94a3b8' : '#374151' }]}>
+        <Text style={[styles.subtitle, { color: isDark ? '#94a3b8' : '#374151', fontSize: subtitleSize }]}>
           Find your perfect tech career and build your future
         </Text>
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.primary }]}
+          style={[styles.button, { backgroundColor: colors.primary, width: isTablet ? wp(50) : wp(80) }]}
           onPress={() => navigation.navigate("Questionnaire")}
         >
-          <Text style={styles.buttonText}>🚀 Start Career Quiz</Text>
+          <Text style={[styles.buttonText, { fontSize: normalize(16) }]}>🚀 Start Career Quiz</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: '#9333ea' }]}
+          style={[styles.button, { backgroundColor: '#9333ea', width: isTablet ? wp(50) : wp(80) }]}
           onPress={() => handleNavigation('CareerExplorer')}
         >
-          <Text style={styles.buttonText}>🔎 Explore Careers</Text>
+          <Text style={[styles.buttonText, { fontSize: normalize(16) }]}>🔎 Explore Careers</Text>
         </TouchableOpacity>
       </Animated.View>
       <LoadingOverlay visible={loading} message="Loading careers..." />
         
       <View style={styles.bottomInfo}>
-        <Text style={[styles.versionText, { color: isDark ? '#94a3b8' : '#374151' }]}>
+        <Text style={[styles.versionText, { color: isDark ? '#94a3b8' : '#374151', fontSize: normalize(12) }]}>
           Version 1.0.0
         </Text>
-        <Text style={[styles.poweredText, { color: isDark ? '#94a3b8' : '#374151' }]}>
+        <Text style={[styles.poweredText, { color: isDark ? '#94a3b8' : '#374151', fontSize: normalize(12) }]}>
           Built by FajosTech
         </Text>
       </View>
@@ -109,8 +114,6 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     justifyContent: "space-between",
-    paddingVertical: 40,
-    paddingHorizontal: 20,
   },
   container: {
     alignItems: "center",
@@ -118,20 +121,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
-    width: 110,
-    height: 110,
     resizeMode: "contain",
-    borderRadius: 55,
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 16,
     textAlign: "center",
     marginBottom: 32,
     paddingHorizontal: 20,
@@ -141,23 +139,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 12,
     marginTop: 16,
-    minWidth: "80%",
     alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
   },
   bottomInfo: {
     alignItems: "center",
     paddingBottom: 10,
   },
   versionText: {
-    fontSize: 12,
     marginBottom: 2,
   },
   poweredText: {
-    fontSize: 12,
   },
 });

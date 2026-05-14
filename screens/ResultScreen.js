@@ -39,7 +39,7 @@ const ResultScreen = () => {
   const { answers } = route.params || {};
   const { isDark } = useContext(ThemeContext);
   const isConnected = useNetworkStatus();
-  const { colors } = useThemeStyles();
+  const { colors, wp, hp, normalize, isTablet } = useThemeStyles();
   const [_, forceUpdate] = useState({}); // For forcing re-render on theme change
 
   const careerTitles = mapAnswersToCareers(answers);
@@ -180,39 +180,43 @@ const ResultScreen = () => {
       )}
 
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
+        contentContainerStyle={[
+          { padding: wp(4), paddingBottom: hp(8) },
+          isTablet ? { alignSelf: 'center', width: wp(85) } : null
+        ]}
         style={{ flex: 1, backgroundColor: colors.background }}
       >
         <NetworkBanner isConnected={isConnected} />
         {!isConnected && <OfflineBanner />}
 
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={[styles.title, { color: colors.text, fontSize: normalize(24) }]}>
           🎯 Your Top Career Matches
         </Text>
 
         {showConfetti && (
-          <Text style={{ fontSize: 26, textAlign: "center", marginBottom: 12, color: colors.text }}>
+          <Text style={{ fontSize: normalize(26), textAlign: "center", marginBottom: hp(1.5), color: colors.text }}>
             🎉 Congratulations!
           </Text>
         )}
 
         {fullResults.map((career, idx) => {
           const isSaved = savedTitles.includes(career.title);
+          const logoSize = normalize(70);
           return (
             <TouchableOpacity
               key={career.title}
               onPress={() => openModal(career)}
               activeOpacity={0.9}
             >
-              <View style={[styles.card, { backgroundColor: colors.card }]}>
+              <View style={[styles.card, { backgroundColor: colors.card, padding: normalize(16) }]}>
                 <Image
                   source={require("../assets/splash/splash.png")}
                   style={{
                     position: "absolute",
-                    width: 70,
-                    height: 70,
+                    width: logoSize,
+                    height: logoSize,
                     opacity: 0.3,
-                    borderRadius: 35,
+                    borderRadius: logoSize / 2,
                     top: 0,
                     right: 10,
                     zIndex: -1,
@@ -220,15 +224,15 @@ const ResultScreen = () => {
                 />
 
                 <Animated.View style={{ opacity: fadeAnim }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", marginBottom: normalize(12) }}>
                     <View style={[
                       styles.titleBadge,
-                      { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff" }
+                      { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff", paddingVertical: normalize(6), paddingHorizontal: normalize(12) }
                     ]}>
-                      <Text style={styles.emoji}>{careerEmojis[career.title] || "💼"}</Text>
+                      <Text style={[styles.emoji, { fontSize: normalize(18) }]}>{careerEmojis[career.title] || "💼"}</Text>
                       <Text style={[
                         styles.badgeText,
-                        { color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                        { color: isDark ? "#c7d2fe" : "#1e3a8a", fontSize: normalize(16) }
                       ]}>
                         {career.title}
                       </Text>
@@ -238,7 +242,7 @@ const ResultScreen = () => {
 
                 {/* Career Intro */}
                 {career.intro && (
-                  <Text style={[styles.intro, { color: colors.textSecondary }]}>
+                  <Text style={[styles.intro, { color: colors.textSecondary, fontSize: normalize(14), lineHeight: normalize(20) }]}>
                     {career.intro}
                   </Text>
                 )}
@@ -246,38 +250,56 @@ const ResultScreen = () => {
                 {/* Roles */}
                 {career.roles?.length > 0 && (
                   <>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Roles:</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>Roles:</Text>
                     <View style={styles.skillContainer}>
                       {career.roles.slice(0, 3).map((role, i) => (
                         <Text key={i} style={[
                           styles.skillTag,
-                          { backgroundColor: isDark ? "#4f46e520" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                          {
+                            backgroundColor: isDark ? "#4f46e520" : "#e0e7ff",
+                            color: isDark ? "#c7d2fe" : "#1e3a8a",
+                            fontSize: normalize(12),
+                            paddingHorizontal: normalize(10),
+                            paddingVertical: normalize(4)
+                          }
                         ]}>{role}</Text>
                       ))}
                     </View>
                   </>
                 )}
 
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Top Skills:</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>Top Skills:</Text>
                 <View style={styles.skillContainer}>
                   {career.skills?.slice(0, 8).map((skill, i) => (
                     <Text key={i} style={[
                       styles.skillTag,
-                      { backgroundColor: isDark ? "#374151" : "#e0e7ff", color: isDark ? "#c7d2fe" : "#1e3a8a" }
+                      {
+                        backgroundColor: isDark ? "#374151" : "#e0e7ff",
+                        color: isDark ? "#c7d2fe" : "#1e3a8a",
+                        fontSize: normalize(12),
+                        paddingHorizontal: normalize(10),
+                        paddingVertical: normalize(4)
+                      }
                     ]}>{skill}</Text>
                   ))}
                 </View>
 
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Roadmap Preview:</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16) }]}>Roadmap Preview:</Text>
                 {career.roadmap?.slice(0, 5).map((step, i) => (
                   <View key={i} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                    <Text style={[styles.smallText, { color: colors.text }]}>
+                    <Text style={[styles.smallText, { color: colors.text, fontSize: normalize(14), lineHeight: normalize(18) }]}>
                       • {typeof step === 'object' ? step.text : step}
                     </Text>
                     {typeof step === 'object' && step.difficulty && (
                       <Text style={[
                         styles.difficultyBadge,
-                        { backgroundColor: colors.primary + '20', color: colors.primary }
+                        {
+                          backgroundColor: colors.primary + '20',
+                          color: colors.primary,
+                          fontSize: normalize(10),
+                          paddingHorizontal: normalize(6),
+                          paddingVertical: normalize(2)
+                        }
                       ]}>
                         {step.difficulty}
                       </Text>
@@ -406,14 +428,12 @@ export default ResultScreen;
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 24,
     fontWeight: "bold",
     marginTop: 25,
     marginBottom: 16,
     textAlign: "center",
   },
   card: {
-    padding: 16,
     borderRadius: 16,
     marginBottom: 16,
     overflow: "hidden",
@@ -424,24 +444,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   titleBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
     borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
   },
   emoji: {
-    fontSize: 18,
   },
   badgeText: {
-    fontSize: 16,
     fontWeight: "bold",
     marginLeft: 8,
   },
   intro: {
     marginBottom: 8,
     fontStyle: "italic",
-    lineHeight: 20,
   },
   sectionTitle: {
     fontWeight: "600",
@@ -455,27 +470,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   skillTag: {
-    fontSize: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
     borderRadius: 999,
   },
   smallText: {
-    fontSize: 14,
     marginTop: 4,
-    lineHeight: 18,
   },
   difficultyBadge: {
-    fontSize: 10,
     fontWeight: "500",
     marginLeft: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
     borderRadius: 10,
     overflow: "hidden",
   },
   link: {
-    fontSize: 13,
     marginTop: 4,
     textDecorationLine: "underline",
   },
@@ -517,7 +523,6 @@ const styles = StyleSheet.create({
   },
   premiumText: {
     color: '#FFD700',
-    fontSize: 10,
     fontWeight: 'bold',
   },
   previewText: {
@@ -552,7 +557,6 @@ const styles = StyleSheet.create({
   },
   premiumButtonText: {
     color: 'white',
-    fontSize: 14,
     fontWeight: '600',
   },
   resumeButton: {
@@ -566,7 +570,6 @@ const styles = StyleSheet.create({
   },
   resumeButtonText: {
     color: 'white',
-    fontSize: 14,
     fontWeight: '600',
   },
 });
