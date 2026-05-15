@@ -13,11 +13,11 @@ class SyncService {
 
   async canSync(userId, isPremium) {
     if (!isPremium) {
-      console.log('⏭️ Skipping sync - not a premium user');
+
       return false;
     }
     if (!userId) {
-      console.log('⏭️ Skipping sync - no user ID');
+
       return false;
     }
     return true;
@@ -34,7 +34,7 @@ class SyncService {
         premium: true,
       }, { merge: true });
       
-      console.log('✅ Profile synced to cloud');
+
       return true;
     } catch (error) {
       console.error('Sync error:', error);
@@ -51,7 +51,7 @@ class SyncService {
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log('✅ Profile loaded from cloud');
+
         return data.profile;
       }
       return null;
@@ -157,7 +157,7 @@ class SyncService {
         premium: true,
       }, { merge: true });
 
-      console.log('✅ Full sync completed for premium user');
+
       return true;
     } catch (error) {
       console.error('Full sync error:', error);
@@ -198,7 +198,7 @@ class SyncService {
           await AsyncStorage.setItem('resume-storage', JSON.stringify(data.resumes));
         }
         
-        console.log('✅ Cloud data loaded to local for premium user');
+
         return true;
       }
       return false;

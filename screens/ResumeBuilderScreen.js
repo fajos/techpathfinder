@@ -50,7 +50,7 @@ export default function ResumeBuilderScreen({ route, navigation }) {
     const [generatingPDF, setGeneratingPDF] = useState(false);
     const { Paths, File, Directory } = FileSystem;
 
-    console.log('FileSystem API:', Object.keys(FileSystem));
+
 
 
 useEffect(() => {
@@ -149,7 +149,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
     }, [user, career]);
 
     useEffect(() => {
-  console.log('Document directory:', FileSystem.documentDirectory);
+
 }, []);
 
     const loadOrCreateResume = () => {
@@ -185,10 +185,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
                     Upgrade to Premium to generate tailored resumes for your target career.
                 </Text>
                 <TouchableOpacity
-                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1', width: isTablet ? wp(40) : wp(70) }]}
+                    style={[styles.upgradeButton, { backgroundColor: '#4d31f1', width: isTablet ? wp(40) : wp(70), padding: wp(4), borderRadius: normalize(8), alignItems: 'center' }]}
                     onPress={() => navigation.navigate('Premium')}
                 >
-                    <Text style={[styles.upgradeButtonText, { fontSize: normalize(16) }]}>View Premium</Text>
+                    <Text style={[styles.upgradeButtonText, { fontSize: normalize(16), color: 'white', fontWeight: 'bold' }]}>View Premium</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -370,7 +370,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
     const destFile = new File(Paths.document, fileName);
     await sourceFile.copy(destFile);
     
-    console.log('PDF saved to:', destFile.uri);
+
     
     // Show success with clear next steps
     Alert.alert(
@@ -404,21 +404,21 @@ const saveToDownloads = async (sourceFile, fileName) => {
         switch (activeSection) {
             case 'personal':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Personal Information</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Personal Information</Text>
 
-                        <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>Full Name</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.name}
                             onChangeText={(text) => updateField('personal', 'name', text)}
                             placeholder="John Doe"
                             placeholderTextColor="#9CA3AF"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Email</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>Email</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.email}
                             onChangeText={(text) => updateField('personal', 'email', text)}
                             placeholder="john@example.com"
@@ -427,9 +427,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             autoCapitalize="none"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Phone</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>Phone</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.phone}
                             onChangeText={(text) => updateField('personal', 'phone', text)}
                             placeholder="(555) 123-4567"
@@ -437,18 +437,18 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             keyboardType="phone-pad"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Location</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>Location</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.location}
                             onChangeText={(text) => updateField('personal', 'location', text)}
                             placeholder="San Francisco, CA"
                             placeholderTextColor="#9CA3AF"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>LinkedIn</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>LinkedIn</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.linkedin}
                             onChangeText={(text) => updateField('personal', 'linkedin', text)}
                             placeholder="linkedin.com/in/username"
@@ -456,9 +456,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                             autoCapitalize="none"
                         />
 
-                        <Text style={[styles.label, { color: colors.text }]}>Portfolio/GitHub</Text>
+                        <Text style={[styles.label, { color: colors.text, fontSize: normalize(12), marginBottom: hp(0.5), marginTop: hp(1.5) }]}>Portfolio/GitHub</Text>
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14) }]}
                             value={resume.data.personal.portfolio}
                             onChangeText={(text) => updateField('personal', 'portfolio', text)}
                             placeholder="github.com/username"
@@ -470,10 +470,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
             case 'summary':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Professional Summary</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Professional Summary</Text>
                         <TextInput
-                            style={[styles.textArea, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            style={[styles.textArea, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(8), padding: wp(3), fontSize: normalize(14), minHeight: hp(15), textAlignVertical: 'top' }]}
                             value={resume.data.summary}
                             onChangeText={(text) => updateField('summary', null, text)}
                             placeholder="Write a brief summary of your professional background and goals..."
@@ -486,20 +486,24 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
             case 'experience':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Work Experience</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Work Experience</Text>
 
                         {(resume.data.experience || []).map((exp, index) => (
                             <View key={index} style={[styles.experienceCard, {
                                 backgroundColor: colors.background,
-                                borderColor: colors.border
+                                borderColor: colors.border,
+                                borderWidth: 1,
+                                borderRadius: normalize(12),
+                                padding: wp(4),
+                                marginBottom: hp(1.5)
                             }]}>
                                 {/* Header with job title and delete */}
-                                <View style={styles.experienceHeader}>
-                                    <View style={styles.titleContainer}>
+                                <View style={[styles.experienceHeader, { marginBottom: hp(1) }]}>
+                                    <View style={[styles.titleContainer, { gap: wp(2) }]}>
                                         <Ionicons name="briefcase-outline" size={normalize(20)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.jobTitleInput, { color: colors.text, fontSize: normalize(16) }]}
+                                            style={[styles.jobTitleInput, { color: colors.text, fontSize: normalize(16), fontWeight: '600', padding: 0 }]}
                                             value={exp.title}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -516,10 +520,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 </View>
 
                                 {/* Company */}
-                                <View style={styles.companyContainer}>
+                                <View style={[styles.companyContainer, { gap: wp(2), marginBottom: hp(1.5), paddingLeft: wp(7) }]}>
                                     <Ionicons name="business-outline" size={normalize(16)} color={colors.text} />
                                     <TextInput
-                                        style={[styles.companyInput, { color: colors.text, fontSize: normalize(14) }]}
+                                        style={[styles.companyInput, { color: colors.text, fontSize: normalize(14), padding: 0 }]}
                                         value={exp.company}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.experience];
@@ -532,11 +536,11 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 </View>
 
                                 {/* Date Range */}
-                                <View style={styles.dateRangeContainer}>
-                                    <View style={styles.dateField}>
+                                <View style={[styles.dateRangeContainer, { gap: wp(2), marginBottom: hp(1.5), paddingLeft: wp(7) }]}>
+                                    <View style={[styles.dateField, { gap: wp(1), borderWidth: 1, borderColor: '#e5e7eb', borderRadius: normalize(6), paddingHorizontal: wp(2), paddingVertical: hp(0.8) }]}>
                                         <Ionicons name="calendar-outline" size={normalize(14)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13) }]}
+                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13), flex: 1, padding: 0 }]}
                                             value={exp.startDate}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -548,10 +552,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                         />
                                     </View>
                                     <Text style={{ color: colors.text, fontSize: normalize(14) }}>→</Text>
-                                    <View style={styles.dateField}>
+                                    <View style={[styles.dateField, { gap: wp(1), borderWidth: 1, borderColor: '#e5e7eb', borderRadius: normalize(6), paddingHorizontal: wp(2), paddingVertical: hp(0.8) }]}>
                                         <Ionicons name="calendar-outline" size={normalize(14)} color={colors.text} />
                                         <TextInput
-                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13) }]}
+                                            style={[styles.dateInput, { color: colors.text, fontSize: normalize(13), flex: 1, padding: 0 }]}
                                             value={exp.endDate}
                                             onChangeText={(text) => {
                                                 const updated = [...resume.data.experience];
@@ -565,10 +569,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 </View>
 
                                 {/* Description */}
-                                <View style={styles.descriptionContainer}>
+                                <View style={[styles.descriptionContainer, { gap: wp(2), paddingLeft: wp(7) }]}>
                                     <Ionicons name="document-text-outline" size={normalize(16)} color={colors.text} />
                                     <TextInput
-                                        style={[styles.experienceDescription, { color: colors.text, fontSize: normalize(13) }]}
+                                        style={[styles.experienceDescription, { color: colors.text, fontSize: normalize(13), flex: 1, lineHeight: normalize(18), minHeight: hp(8), padding: 0 }]}
                                         value={exp.description}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.experience];
@@ -586,7 +590,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.text }]}
+                            style={[styles.addButton, { borderColor: colors.text, borderWidth: 1, borderRadius: normalize(8), borderStyle: 'dashed', padding: wp(3), gap: wp(2), marginTop: hp(1) }]}
                             onPress={() => {
                                 const updated = [...(resume.data.experience || []), {
                                     title: '',
@@ -606,14 +610,14 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
             case 'projects':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Projects</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Projects</Text>
 
                         {(resume.data.projects || []).map((project, index) => (
-                            <View key={index} style={[styles.arrayItem, { borderColor: colors.border }]}>
-                                <View style={styles.arrayItemHeader}>
+                            <View key={index} style={[styles.arrayItem, { borderColor: colors.border, padding: wp(3), borderWidth: 1, borderRadius: normalize(8), marginBottom: hp(1) }]}>
+                                <View style={[styles.arrayItemHeader, { marginBottom: hp(0.5) }]}>
                                     <TextInput
-                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1, fontSize: normalize(16) }]}
+                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1, fontSize: normalize(16), fontWeight: '600', marginBottom: hp(0.5) }]}
                                         value={project.name}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.projects];
@@ -629,7 +633,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 </View>
 
                                 <TextInput
-                                    style={[styles.arrayItemDescription, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, fontSize: normalize(14) }]}
+                                    style={[styles.arrayItemDescription, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, fontSize: normalize(14), borderWidth: 1, borderRadius: normalize(6), padding: wp(2), minHeight: hp(8), textAlignVertical: 'top', marginTop: hp(1) }]}
                                     value={project.description}
                                     onChangeText={(text) => {
                                         const updated = [...resume.data.projects];
@@ -643,7 +647,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 />
 
                                 <TextInput
-                                    style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1), fontSize: normalize(14) }]}
+                                    style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1), fontSize: normalize(14), borderWidth: 1, borderRadius: normalize(8), padding: wp(3) }]}
                                     value={project.technologies}
                                     onChangeText={(text) => {
                                         const updated = [...resume.data.projects];
@@ -657,7 +661,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.text }]}
+                            style={[styles.addButton, { borderColor: colors.text, borderWidth: 1, borderRadius: normalize(8), borderStyle: 'dashed', padding: wp(3), gap: wp(2), marginTop: hp(1) }]}
                             onPress={() => {
                                 const updated = [...(resume.data.projects || []), {
                                     name: '',
@@ -675,14 +679,14 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
             case 'education':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Education</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Education</Text>
 
                         {(resume.data.education || []).map((edu, index) => (
-                            <View key={index} style={[styles.arrayItem, { borderColor: colors.border }]}>
-                                <View style={styles.arrayItemHeader}>
+                            <View key={index} style={[styles.arrayItem, { borderColor: colors.border, padding: wp(3), borderWidth: 1, borderRadius: normalize(8), marginBottom: hp(1) }]}>
+                                <View style={[styles.arrayItemHeader, { marginBottom: hp(0.5) }]}>
                                     <TextInput
-                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1 }]}
+                                        style={[styles.arrayItemTitle, { color: colors.text, flex: 1, fontWeight: '600', marginBottom: hp(0.5) }]}
                                         value={edu.degree}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.education];
@@ -698,7 +702,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 </View>
 
                                 <TextInput
-                                    style={[styles.arrayItemSubtitle, { color: colors.textSecondary }]}
+                                    style={[styles.arrayItemSubtitle, { color: colors.textSecondary, fontSize: normalize(14), marginBottom: hp(1) }]}
                                     value={edu.institution}
                                     onChangeText={(text) => {
                                         const updated = [...resume.data.education];
@@ -709,9 +713,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                     placeholderTextColor="#9CA3AF"
                                 />
 
-                                <View style={styles.dateRow}>
+                                <View style={[styles.dateRow, { gap: wp(3), marginTop: hp(1) }]}>
                                     <TextInput
-                                        style={[styles.dateInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                                        style={[styles.dateInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, borderWidth: 1, borderRadius: normalize(6), padding: wp(2), fontSize: normalize(14), flex: 1 }]}
                                         value={edu.year}
                                         onChangeText={(text) => {
                                             const updated = [...resume.data.education];
@@ -726,7 +730,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         ))}
 
                         <TouchableOpacity
-                            style={[styles.addButton, { borderColor: colors.text }]}
+                            style={[styles.addButton, { borderColor: colors.text, borderWidth: 1, borderRadius: normalize(8), borderStyle: 'dashed', padding: wp(3), gap: wp(2), marginTop: hp(1) }]}
                             onPress={() => {
                                 const updated = [...(resume.data.education || []), {
                                     degree: 'Bachelor of Science',
@@ -744,12 +748,12 @@ const saveToDownloads = async (sourceFile, fileName) => {
 
             case 'skills':
                 return (
-                    <View style={[styles.sectionEditor, { backgroundColor: colors.card }]}>
-                        <Text style={[styles.sectionEditorTitle, { color: colors.text }]}>Skills</Text>
+                    <View style={[styles.sectionEditor, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(2.5) }]}>
+                        <Text style={[styles.sectionEditorTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600', marginBottom: hp(2) }]}>Skills</Text>
 
-                        <View style={styles.skillTags}>
+                        <View style={[styles.skillTags, { gap: wp(2) }]}>
                             {(resume.data.skills || []).map((skill, index) => (
-                                <View key={index} style={[styles.skillTag, { backgroundColor: colors.primary + '20' }]}>
+                                <View key={index} style={[styles.skillTag, { backgroundColor: colors.primary + '20', paddingHorizontal: wp(2.5), paddingVertical: hp(0.6), borderRadius: normalize(16), gap: wp(1) }]}>
                                     <Text style={{ color: colors.primary, fontSize: normalize(14) }}>{skill}</Text>
                                     <TouchableOpacity onPress={() => removeArrayItem('skills', index)}>
                                         <Ionicons name="close-circle" size={normalize(16)} color={colors.primary} />
@@ -759,7 +763,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                         </View>
 
                         <TextInput
-                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1.5), fontSize: normalize(14) }]}
+                            style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border, marginTop: hp(1.5), fontSize: normalize(14), borderWidth: 1, borderRadius: normalize(8), padding: wp(3) }]}
                             placeholder="Add a skill and press Enter"
                             placeholderTextColor="#9CA3AF"
                             onSubmitEditing={(e) => {
@@ -781,9 +785,9 @@ const saveToDownloads = async (sourceFile, fileName) => {
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header */}
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>Resume Builder</Text>
-                <TouchableOpacity onPress={generatePDF} disabled={generatingPDF} style={styles.headerIconButton}>
+            <View style={[styles.header, { borderBottomColor: colors.border, paddingHorizontal: wp(4), paddingVertical: hp(1.5), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1 }]}>
+                <Text style={[styles.headerTitle, { color: colors.text, fontSize: normalize(18), fontWeight: '600' }]}>Resume Builder</Text>
+                <TouchableOpacity onPress={generatePDF} disabled={generatingPDF} style={[styles.headerIconButton, { padding: wp(1) }]}>
                     {generatingPDF ? (
                         <ActivityIndicator size="small" color={colors.primary} />
                     ) : (
@@ -799,10 +803,10 @@ const saveToDownloads = async (sourceFile, fileName) => {
                 ]}
             >
                 {/* Career Info */}
-                <View style={[styles.careerInfo, { backgroundColor: colors.card }]}>
-                    <Text style={[styles.careerName, { color: colors.text }]}>{career}</Text>
+                <View style={[styles.careerInfo, { backgroundColor: colors.card, padding: wp(4), margin: wp(4), borderRadius: normalize(12), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                    <Text style={[styles.careerName, { color: colors.text, fontSize: normalize(18), fontWeight: '600' }]}>{career}</Text>
                     <TouchableOpacity
-                        style={[styles.templateButton, { borderColor: colors.text }]}
+                        style={[styles.templateButton, { borderColor: colors.text, borderWidth: 1, borderRadius: normalize(20), paddingHorizontal: wp(3), paddingVertical: hp(0.8), gap: wp(1), flexDirection: 'row', alignItems: 'center' }]}
                         onPress={() => setShowTemplateModal(true)}
                     >
                         <Ionicons name="color-palette-outline" size={normalize(16)} color={colors.text} />
@@ -811,20 +815,20 @@ const saveToDownloads = async (sourceFile, fileName) => {
                 </View>
 
                 {/* Section Tabs */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs} contentContainerStyle={styles.tabsContent}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.tabs, { maxHeight: hp(7), paddingHorizontal: wp(4) }]} contentContainerStyle={[styles.tabsContent, { paddingRight: wp(8) }]}>
                     {['personal', 'summary', 'skills', 'experience', 'projects', 'education'].map(section => (
                         <TouchableOpacity
                             key={section}
                             style={[
                                 styles.tab,
                                 activeSection === section && styles.activeTab,
-                                { borderColor: activeSection === section ? colors.text : 'transparent' }
+                                { borderColor: activeSection === section ? colors.text : 'transparent', paddingHorizontal: wp(4), paddingVertical: hp(1), marginRight: wp(2), borderBottomWidth: 2 }
                             ]}
                             onPress={() => setActiveSection(section)}
                         >
                             <Text style={[
                                 styles.tabText,
-                                { color: activeSection === section ? colors.text : colors.text }
+                                { color: activeSection === section ? colors.text : colors.text, fontSize: normalize(14), fontWeight: '500' }
                             ]}>
                                 {section.charAt(0).toUpperCase() + section.slice(1)}
                             </Text>
@@ -833,7 +837,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                 </ScrollView>
 
                 {/* Section Editor */}
-                <View style={styles.editorContainer}>
+                <View style={[styles.editorContainer, { padding: wp(4) }]}>
                     {renderSection()}
                 </View>
             </ScrollView>
@@ -843,11 +847,11 @@ const saveToDownloads = async (sourceFile, fileName) => {
                 <View style={styles.modalOverlay}>
                     <View style={[
                         styles.modalContent,
-                        { backgroundColor: colors.card },
+                        { backgroundColor: colors.card, borderTopLeftRadius: normalize(20), borderTopRightRadius: normalize(20), padding: wp(5), minHeight: hp(40) },
                         isTablet && { width: wp(60), alignSelf: 'center', borderTopLeftRadius: 20, borderTopRightRadius: 20, marginBottom: hp(5) }
                     ]}>
-                        <View style={styles.modalHeader}>
-                            <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Template</Text>
+                        <View style={[styles.modalHeader, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: hp(2.5) }]}>
+                            <Text style={[styles.modalTitle, { color: colors.text, fontSize: normalize(20), fontWeight: 'bold' }]}>Choose Template</Text>
                             <TouchableOpacity onPress={() => setShowTemplateModal(false)}>
                                 <Ionicons name="close" size={normalize(24)} color={colors.textSecondary} />
                             </TouchableOpacity>
@@ -859,7 +863,7 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 style={[
                                     styles.templateOption,
                                     resume.template === template.id && styles.selectedTemplate,
-                                    { borderColor: resume.template === template.id ? colors.primary : colors.border }
+                                    { borderColor: resume.template === template.id ? colors.primary : colors.border, padding: wp(4), borderWidth: 1, borderRadius: normalize(12), marginBottom: hp(1.5), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
                                 ]}
                                 onPress={() => {
                                     setResume({ ...resume, template: template.id });
@@ -868,8 +872,8 @@ const saveToDownloads = async (sourceFile, fileName) => {
                                 }}
                             >
                                 <View>
-                                    <Text style={[styles.templateName, { color: colors.text }]}>{template.name}</Text>
-                                    <Text style={[styles.templateDesc, { color: colors.textSecondary }]}>{template.description}</Text>
+                                    <Text style={[styles.templateName, { color: colors.text, fontSize: normalize(16), fontWeight: '600', marginBottom: hp(0.5) }]}>{template.name}</Text>
+                                    <Text style={[styles.templateDesc, { color: colors.textSecondary, fontSize: normalize(12) }]}>{template.description}</Text>
                                 </View>
                                 {resume.template === template.id && (
                                     <Ionicons name="checkmark-circle" size={normalize(24)} color={colors.primary} />
@@ -888,269 +892,86 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: wp(4),
-        paddingVertical: hp(1.5),
         borderBottomWidth: 1,
     },
-    headerTitle: {
-        fontSize: normalize(18),
-        fontWeight: '600',
-    },
-    headerIconButton: {
-        padding: wp(1),
-    },
-    careerInfo: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: wp(4),
-        margin: wp(4),
-        borderRadius: normalize(12),
-    },
-    careerName: {
-        fontSize: normalize(18),
-        fontWeight: '600',
-    },
-    templateButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderRadius: normalize(20),
-        paddingHorizontal: wp(3),
-        paddingVertical: hp(0.8),
-        gap: wp(1),
-    },
-    tabs: {
-        maxHeight: hp(7),
-        paddingHorizontal: wp(4),
-    },
-    tabsContent: {
-        paddingRight: wp(8),
-    },
-    tab: {
-        paddingHorizontal: wp(4),
-        paddingVertical: hp(1),
-        marginRight: wp(2),
-        borderBottomWidth: 2,
-    },
-    activeTab: {
-        borderBottomWidth: 2,
-    },
-    tabText: {
-        fontSize: normalize(14),
-        fontWeight: '500',
-    },
-    editorContainer: {
-        padding: wp(4),
-    },
-    sectionEditor: {
-        padding: wp(4),
-        borderRadius: normalize(12),
-        marginBottom: hp(2.5),
-    },
-    sectionEditorTitle: {
-        fontSize: normalize(18),
-        fontWeight: '600',
-        marginBottom: hp(2),
-    },
-    label: {
-        fontSize: normalize(12),
-        marginBottom: hp(0.5),
-        marginTop: hp(1.5),
-    },
-    input: {
-        borderWidth: 1,
-        borderRadius: normalize(8),
-        padding: wp(3),
-        fontSize: normalize(14),
-    },
-    textArea: {
-        borderWidth: 1,
-        borderRadius: normalize(8),
-        padding: wp(3),
-        fontSize: normalize(14),
-        minHeight: hp(15),
-        textAlignVertical: 'top',
-    },
-    arrayItem: {
-        padding: wp(3),
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-        borderRadius: normalize(8),
-        marginBottom: hp(1),
-    },
-    arrayItemHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: hp(0.5),
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: wp(3),
-        borderWidth: 1,
-        borderRadius: normalize(8),
-        borderStyle: 'dashed',
-        gap: wp(2),
-        marginTop: hp(1),
-    },
+    headerTitle: {},
+    headerIconButton: {},
+    careerInfo: {},
+    careerName: {},
+    templateButton: {},
+    tabs: {},
+    tabsContent: {},
+    tab: {},
+    activeTab: {},
+    tabText: {},
+    editorContainer: {},
+    sectionEditor: {},
+    sectionEditorTitle: {},
+    label: {},
+    input: {},
+    textArea: {},
+    arrayItem: {},
+    arrayItemHeader: {},
+    addButton: {},
     skillTags: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: wp(2),
     },
     skillTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: wp(2.5),
-        paddingVertical: hp(0.6),
-        borderRadius: normalize(16),
-        gap: wp(1),
     },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'flex-end',
     },
-    modalContent: {
-        borderTopLeftRadius: normalize(20),
-        borderTopRightRadius: normalize(20),
-        padding: wp(5),
-        minHeight: hp(40),
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: hp(2.5),
-    },
-    modalTitle: {
-        fontSize: normalize(20),
-        fontWeight: 'bold',
-    },
-    templateOption: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: wp(4),
-        borderWidth: 1,
-        borderRadius: normalize(12),
-        marginBottom: hp(1.5),
-    },
+    modalContent: {},
+    modalHeader: {},
+    modalTitle: {},
+    templateOption: {},
     selectedTemplate: {
         borderWidth: 2,
     },
-    templateName: {
-        fontSize: normalize(16),
-        fontWeight: '600',
-        marginBottom: hp(0.5),
-    },
-    templateDesc: {
-        fontSize: normalize(12),
-    },
-    upgradeButton: {
-        padding: wp(4),
-        borderRadius: normalize(8),
-        alignItems: 'center',
-    },
-    upgradeButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    arrayItemTitle: {
-        fontWeight: '600',
-        marginBottom: hp(0.5),
-    },
-    arrayItemSubtitle: {
-        fontSize: normalize(14),
-        marginBottom: hp(1),
-    },
-    arrayItemDescription: {
-        borderWidth: 1,
-        borderRadius: normalize(6),
-        padding: wp(2),
-        minHeight: hp(8),
-        textAlignVertical: 'top',
-        marginTop: hp(1),
-    },
+    templateName: {},
+    templateDesc: {},
+    upgradeButton: {},
+    upgradeButtonText: {},
+    arrayItemTitle: {},
+    arrayItemSubtitle: {},
+    arrayItemDescription: {},
     dateRow: {
         flexDirection: 'row',
-        gap: wp(3),
-        marginTop: hp(1),
     },
-    dateInput: {
-        flex: 1,
-        borderWidth: 1,
-        borderRadius: normalize(6),
-        padding: wp(2),
-        fontSize: normalize(14),
-    },
-    experienceCard: {
-        borderWidth: 1,
-        borderRadius: normalize(12),
-        padding: wp(4),
-        marginBottom: hp(1.5),
-    },
+    dateInput: {},
+    experienceCard: {},
     experienceHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: hp(1),
     },
     titleContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: wp(2),
     },
-    jobTitleInput: {
-        flex: 1,
-        fontWeight: '600',
-        padding: 0,
-    },
+    jobTitleInput: {},
     companyContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: wp(2),
-        marginBottom: hp(1.5),
-        paddingLeft: wp(7),
     },
-    companyInput: {
-        flex: 1,
-        padding: 0,
-    },
+    companyInput: {},
     dateRangeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: wp(2),
-        marginBottom: hp(1.5),
-        paddingLeft: wp(7),
     },
     dateField: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: wp(1),
-        borderWidth: 1,
-        borderColor: '#e5e7eb',
-        borderRadius: normalize(6),
-        paddingHorizontal: wp(2),
-        paddingVertical: hp(0.8),
     },
     descriptionContainer: {
         flexDirection: 'row',
-        gap: wp(2),
-        paddingLeft: wp(7),
     },
-    experienceDescription: {
-        flex: 1,
-        lineHeight: normalize(18),
-        minHeight: hp(8),
-        padding: 0,
-    },
+    experienceDescription: {},
 });

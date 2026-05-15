@@ -55,7 +55,7 @@ export const useUserProfileStore = create()(
       // ✅ ADD THIS FUNCTION
       ensureCurrentUser: (userId) => set((state) => {
         if (!state.currentUserId && userId && state.profiles[userId]) {
-          console.log('✅ Ensuring current user:', userId);
+
           return { currentUserId: userId };
         }
         return state;

@@ -1,13 +1,13 @@
 // store/authStore.ts
 import { create } from 'zustand';
-import { auth } from '../config/firebase';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  User,
-  onAuthStateChanged
-} from 'firebase/auth';
+import { 
+  auth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from '../config/firebase';
+import type { User } from 'firebase/auth';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -30,11 +30,11 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       initialized: false,
 
-      setUser: (user) => set({ user }),
+      setUser: (user: User | null) => set({ user }),
 
       initialize: () => {
         // Listen to auth state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
           set({ 
             user, 
             isLoading: false,
@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
         return unsubscribe;
       },
 
-      signIn: async (email, password) => {
+      signIn: async (email: string, password: string) => {
         try {
           set({ isLoading: true });
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      signUp: async (email, password) => {
+      signUp: async (email: string, password: string) => {
         try {
           set({ isLoading: true });
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ user: state.user }), // Only persist user
+      partialize: (state: AuthState) => ({ user: state.user }),
     }
   )
 );

@@ -322,9 +322,6 @@ export default function SkillGapScreen({ route, navigation }) {
         </ScrollView>
     );
 }
-    );
-}
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 const NetworkBanner = ({ isConnected }) => {
   useEffect(() => {
-    console.log("📡 Network status in banner:", isConnected);
+
   }, [isConnected]);
 
   if (isConnected) return null;

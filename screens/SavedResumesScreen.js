@@ -51,21 +51,21 @@ export default function SavedResumesScreen({ navigation }) {
   
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingHorizontal: wp(4), paddingVertical: hp(1.5) }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { padding: wp(1) }]}>
           <Ionicons name="arrow-back" size={normalize(24)} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Saved Resumes</Text>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: normalize(18) }]}>Saved Resumes</Text>
         <View style={{ width: normalize(24) }} />
       </View>
       
       {resumes.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <View style={[styles.emptyContainer, { padding: wp(5) }]}>
           <Ionicons name="document-outline" size={normalize(64)} color={colors.textSecondary} />
-          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+          <Text style={[styles.emptyText, { color: colors.textSecondary, fontSize: normalize(18), marginTop: hp(2) }]}>
             No saved resumes yet
           </Text>
-          <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
+          <Text style={[styles.emptySubtext, { color: colors.textSecondary, fontSize: normalize(14), marginTop: hp(1) }]}>
             Generate a resume to see it here
           </Text>
         </View>
@@ -74,24 +74,24 @@ export default function SavedResumesScreen({ navigation }) {
           data={resumes}
           keyExtractor={(item) => item.uri}
           renderItem={({ item }) => (
-            <View style={[styles.resumeItem, { backgroundColor: colors.card }]}>
-              <View style={styles.resumeInfo}>
+            <View style={[styles.resumeItem, { backgroundColor: colors.card, padding: wp(4), borderRadius: normalize(12), marginBottom: hp(1.5) }]}>
+              <View style={[styles.resumeInfo, { gap: wp(3) }]}>
                 <Ionicons name="document-text" size={normalize(24)} color={colors.primary} />
                 <View style={styles.resumeDetails}>
-                  <Text style={[styles.resumeName, { color: colors.text }]} numberOfLines={1}>
+                  <Text style={[styles.resumeName, { color: colors.text, fontSize: normalize(14) }]} numberOfLines={1}>
                     {item.name}
                   </Text>
-                  <Text style={[styles.resumeDate, { color: colors.textSecondary }]}>
+                  <Text style={[styles.resumeDate, { color: colors.textSecondary, fontSize: normalize(12), marginTop: hp(0.3) }]}>
                     {new Date(item.modificationTime).toLocaleDateString()}
                   </Text>
                 </View>
               </View>
               
-              <View style={styles.resumeActions}>
-                <TouchableOpacity onPress={() => shareResume(item)} style={styles.actionButton}>
+              <View style={[styles.resumeActions, { gap: wp(3) }]}>
+                <TouchableOpacity onPress={() => shareResume(item)} style={[styles.actionButton, { padding: wp(2) }]}>
                   <Ionicons name="share-outline" size={normalize(20)} color={colors.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteResume(item)} style={styles.actionButton}>
+                <TouchableOpacity onPress={() => deleteResume(item)} style={[styles.actionButton, { padding: wp(2) }]}>
                   <Ionicons name="trash-outline" size={normalize(20)} color="#EF4444" />
                 </TouchableOpacity>
               </View>
@@ -99,6 +99,7 @@ export default function SavedResumesScreen({ navigation }) {
           )}
           contentContainerStyle={[
             styles.listContent,
+            { padding: wp(4) },
             isTablet && { width: wp(85), alignSelf: 'center' }
           ]}
         />
@@ -113,35 +114,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(1.5),
     borderBottomWidth: 1,
   },
-  headerTitle: { fontSize: normalize(18), fontWeight: '600' },
-  backButton: {
-    padding: wp(1),
-  },
+  headerTitle: { fontWeight: '600' },
+  backButton: {},
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: wp(5),
   },
-  emptyText: { fontSize: normalize(18), marginTop: hp(2) },
-  emptySubtext: { fontSize: normalize(14), marginTop: hp(1) },
-  listContent: { padding: wp(4) },
+  emptyText: {},
+  emptySubtext: {},
+  listContent: {},
   resumeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: wp(4),
-    borderRadius: normalize(12),
-    marginBottom: hp(1.5),
   },
-  resumeInfo: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: wp(3) },
+  resumeInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   resumeDetails: { flex: 1 },
-  resumeName: { fontSize: normalize(14), fontWeight: '500' },
-  resumeDate: { fontSize: normalize(12), marginTop: hp(0.3) },
-  resumeActions: { flexDirection: 'row', gap: wp(3) },
-  actionButton: { padding: wp(2) },
+  resumeName: { fontWeight: '500' },
+  resumeDate: {},
+  resumeActions: { flexDirection: 'row' },
+  actionButton: {},
 });

@@ -24,14 +24,14 @@ export const identifyUser = (userId, traits = {}) => {
 export const trackEvent = (eventName, properties = {}) => {
   if (posthog) {
     posthog.capture(eventName, properties);
-    console.log(`📊 Event tracked: ${eventName}`, properties);
+    // console.log(`📊 Event tracked: ${eventName}`, properties);
   }
 };
 
 export const trackScreen = (screenName) => {
   if (posthog) {
     posthog.screen(screenName);
-    console.log(`📱 Screen viewed: ${screenName}`);
+    // console.log(`📱 Screen viewed: ${screenName}`);
   }
 };
 

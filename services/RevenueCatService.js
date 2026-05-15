@@ -32,7 +32,7 @@ class RevenueCatService {
     if (isConfigured) return;
 
     try {
-      console.log('Configuring RevenueCat for user:', userId);
+
       
       // Use production or test keys based on mode
       const apiKey = this.isProduction 
@@ -43,12 +43,12 @@ class RevenueCatService {
 
       if (userId) {
         const { customerInfo } = await Purchases.logIn(userId);
-        console.log('User logged in:', userId);
+
         this.entitlements = customerInfo.entitlements.active;
       }
 
       isConfigured = true;
-      console.log('✅ RevenueCat configured');
+
     } catch (error) {
       console.error('RevenueCat config error:', error);
     }
@@ -56,7 +56,7 @@ class RevenueCatService {
 
   async getPackages() {
     try {
-      console.log('Fetching offerings...');
+
       const offerings = await Purchases.getOfferings();
       
       if (!offerings.current) {
@@ -109,7 +109,7 @@ class RevenueCatService {
 
   async purchasePackage(purchasedPackage) {
     try {
-      console.log('💳 Starting purchase for:', purchasedPackage.identifier);
+
       
       if (!purchasedPackage || !purchasedPackage.product) {
         throw new Error('Invalid package');
@@ -122,13 +122,13 @@ class RevenueCatService {
       });
       
       const purchaseResult = await Purchases.purchasePackage(purchasedPackage);
-      console.log('Purchase result received');
+
       
       const { customerInfo } = purchaseResult;
       this.entitlements = customerInfo.entitlements.active;
       const isPremium = this.entitlements?.premium?.isActive === true;
       
-      console.log('✅ Purchase successful. Premium status:', isPremium);
+
       
       return { 
         success: true, 
@@ -139,7 +139,7 @@ class RevenueCatService {
       console.error('❌ Purchase error:', error);
       
       if (error.code === '1' || error.userCancelled) {
-        console.log('User cancelled purchase');
+
         return { success: false, userCancelled: true };
       }
       
@@ -153,7 +153,7 @@ class RevenueCatService {
 
   async restorePurchases() {
     try {
-      console.log('Restoring purchases...');
+
       const customerInfo = await Purchases.restorePurchases();
       
       this.entitlements = customerInfo.entitlements.active;

@@ -90,7 +90,7 @@ const PremiumScreen = ({ navigation }) => {
   };
 
   const handleRestore = async () => {
-    console.log('🔄 Restore button pressed');
+
     await restorePurchases();
   };
 

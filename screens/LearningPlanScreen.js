@@ -367,8 +367,6 @@ useEffect(() => {
     </ScrollView>
   );
 }
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
