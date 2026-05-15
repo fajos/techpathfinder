@@ -16,6 +16,7 @@ import { usePremium } from '../context/PremiumContext';
 import { useThemeStyles } from '../hooks/useThemeStyles';
 import { ThemeContext } from '../utils/ThemeContext';
 import { trackScreen } from '../services/analytics';
+import { getAuth } from 'firebase/auth';
 
 export default function SettingsScreen({ navigation }) {
   const { user, logout } = useAuth();
@@ -47,6 +48,35 @@ export default function SettingsScreen({ navigation }) {
       ]
     );
   };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+        'Delete Account',
+        'Are you sure you want to permanently delete your account and all associated data? This action cannot be undone.',
+        [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        const auth = getAuth();
+                        const user = auth.currentUser;
+                        if (user) {
+                            // Call your backend or Firebase function to delete user data here
+                            await user.delete();
+                            Alert.alert('Account Deleted', 'Your account has been permanently deleted.');
+                            navigation.replace('Login');
+                        }
+                    } catch (error) {
+                        console.error('Deletion error:', error);
+                        Alert.alert('Error', 'Failed to delete account. Please try again or contact support.');
+                    }
+                }
+            }
+        ]
+    );
+};
 
   const clearAllData = () => {
     Alert.alert(
@@ -222,6 +252,23 @@ export default function SettingsScreen({ navigation }) {
         />
       </View>
 
+      {/* Delete Account Button */}
+<View style={styles.deleteSection}>
+ 
+  <TouchableOpacity
+    style={styles.deleteButton}
+    onPress={handleDeleteAccount}
+  >
+    <Ionicons name="trash-outline" size={20} color="#fff" />
+    <Text style={styles.deleteButtonText}>Delete Account</Text>
+  </TouchableOpacity>
+   <Text style={[styles.deleteWarning, { color: colors.textSecondary }]}>
+    ⚠️ Deleting your account will permanently remove all your data, including saved careers, quiz history, and progress.
+  </Text>
+</View>
+
+      
+
       {/* About Section */}
       <View style={[styles.section, { paddingHorizontal: wp(5), marginBottom: hp(3) }]}>
         <Text style={[styles.sectionTitle, { color: colors.text, fontSize: normalize(16), marginBottom: hp(1.5) }]}>About</Text>
@@ -360,4 +407,31 @@ const styles = StyleSheet.create({
     marginVertical: 24,
     marginBottom: 40,
   },
+  // Add to your StyleSheet
+deleteSection: {
+  marginTop: 16,
+  marginBottom: 8,
+  paddingHorizontal: 16,
+},
+deleteWarning: {
+  fontSize: 12,
+  textAlign: 'center',
+  marginBottom: 12,
+  lineHeight: 16,
+},
+deleteButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#EF4444',
+  paddingVertical: 14,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  gap: 8,
+},
+deleteButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600',
+},
 });
