@@ -144,7 +144,7 @@ useEffect(() => {
 
 
         <View style={[styles.statCard, { backgroundColor: colors.card, padding: normalize(12), borderRadius: normalize(12), width: wp(28) }]}>
-          <Text style={[styles.statValue, { color: colors.text, fontSize: normalize(22) }]}>
+          <Text style={[styles.statValue, { color: colors.text, fontSize: normalize(20) }]}>
             {plan.pace}
           </Text>
           <Text style={[styles.statLabel, { color: colors.text, fontSize: normalize(12), marginTop: hp(0.5) }]}>Pace</Text>
