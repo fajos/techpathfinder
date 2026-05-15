@@ -1,6 +1,6 @@
 // services/syncService.js
 import { db } from '../config/firebase';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Silence deprecation warnings (optional)
@@ -13,11 +13,15 @@ class SyncService {
 
   async canSync(userId, isPremium) {
     if (!isPremium) {
-
+      console.log('⏭️ Skipping sync - not a premium user');
       return false;
     }
     if (!userId) {
-
+      console.log('⏭️ Skipping sync - no user ID');
+      return false;
+    }
+    if (!db) {
+      console.log('❌ Firestore not initialized');
       return false;
     }
     return true;
@@ -27,6 +31,9 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      // Make sure db is defined
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       await setDoc(userRef, {
         profile,
@@ -34,7 +41,7 @@ class SyncService {
         premium: true,
       }, { merge: true });
       
-
+      console.log('✅ Profile synced to cloud');
       return true;
     } catch (error) {
       console.error('Sync error:', error);
@@ -46,12 +53,14 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return null;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       const docSnap = await getDoc(userRef);
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-
+        console.log('✅ Profile loaded from cloud');
         return data.profile;
       }
       return null;
@@ -65,6 +74,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       await setDoc(userRef, {
         savedCareers: careers,
@@ -82,6 +93,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       await setDoc(userRef, {
         quizHistory,
@@ -99,6 +112,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       await setDoc(userRef, {
         learningProgress: progress,
@@ -116,6 +131,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       await setDoc(userRef, {
         resumes,
@@ -136,6 +153,8 @@ class SyncService {
     this.syncInProgress = true;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       // Get all local data
       const [profileStorage, savedCareers, quizHistory, resumeStorage] = await Promise.all([
         AsyncStorage.getItem('user-profiles-storage'),
@@ -157,7 +176,7 @@ class SyncService {
         premium: true,
       }, { merge: true });
 
-
+      console.log('✅ Full sync completed for premium user');
       return true;
     } catch (error) {
       console.error('Full sync error:', error);
@@ -171,6 +190,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       const docSnap = await getDoc(userRef);
 
@@ -198,7 +219,7 @@ class SyncService {
           await AsyncStorage.setItem('resume-storage', JSON.stringify(data.resumes));
         }
         
-
+        console.log('✅ Cloud data loaded to local for premium user');
         return true;
       }
       return false;
@@ -212,6 +233,8 @@ class SyncService {
     if (!await this.canSync(userId, isPremium)) return false;
 
     try {
+      if (!db) throw new Error('Firestore not initialized');
+      
       const userRef = doc(db, 'premium_sync', userId);
       const docSnap = await getDoc(userRef);
 

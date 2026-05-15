@@ -1,40 +1,26 @@
-// store/authStore.ts
+// store/authStore.js
 import { create } from 'zustand';
-import { 
-  auth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
-} from '../config/firebase';
-import type { User } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface AuthState {
-  user: User | null;
-  isLoading: boolean;
-  initialized: boolean;
-  
-  setUser: (user: User | null) => void;
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  initialize: () => () => void;
-}
-
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create()(
   persist(
     (set, get) => ({
       user: null,
       isLoading: true,
       initialized: false,
 
-      setUser: (user: User | null) => set({ user }),
+      setUser: (user) => set({ user }),
 
       initialize: () => {
-        // Listen to auth state changes
-        const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
           set({ 
             user, 
             isLoading: false,
@@ -42,12 +28,10 @@ export const useAuthStore = create<AuthState>()(
           });
           console.log('Auth state changed:', user?.uid || 'No user');
         });
-
-        // Return unsubscribe function for cleanup
         return unsubscribe;
       },
 
-      signIn: async (email: string, password: string) => {
+      signIn: async (email, password) => {
         try {
           set({ isLoading: true });
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -56,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false 
           });
           return { success: true };
-        } catch (error: any) {
+        } catch (error) {
           set({ isLoading: false });
           return { 
             success: false, 
@@ -65,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      signUp: async (email: string, password: string) => {
+      signUp: async (email, password) => {
         try {
           set({ isLoading: true });
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -74,7 +58,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false 
           });
           return { success: true };
-        } catch (error: any) {
+        } catch (error) {
           set({ isLoading: false });
           return { 
             success: false, 
@@ -95,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state: AuthState) => ({ user: state.user }),
+      partialize: (state) => ({ user: state.user }),
     }
   )
 );
